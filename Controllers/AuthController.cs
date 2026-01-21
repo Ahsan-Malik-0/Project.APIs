@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Project.APIs.Database;
 using Project.APIs.Model;
@@ -18,6 +19,7 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class AuthController(IAuthService authService) : ControllerBase
     {
+        //Registration
         [HttpPost("Register")]
         public async Task<ActionResult<Member>> AddMember([FromBody] MemberDto memberDto)
         {
@@ -55,6 +57,13 @@ namespace Project.APIs.Controllers
         public IActionResult AdminOnlyEndPoint()
         {
             return Ok("You are admin");
+        }
+
+        [Authorize(Roles = "president")]
+        [HttpGet("President-Only")]
+        public IActionResult PresidentOnlyEndPoint()
+        {
+            return Ok("You are President");
         }
     }
 }
