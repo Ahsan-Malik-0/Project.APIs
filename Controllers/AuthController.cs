@@ -59,11 +59,11 @@ namespace Project.APIs.Controllers
             return Ok("You are admin");
         }
 
-        [Authorize(Roles = "president")]
-        [HttpGet("President-Only")]
+        [Authorize(Roles = "CP")]
+        [HttpGet("CP-Only")]
         public IActionResult PresidentOnlyEndPoint()
         {
-            return Ok("You are President");
+            return Ok("You are CP");
         }
     }
 }
