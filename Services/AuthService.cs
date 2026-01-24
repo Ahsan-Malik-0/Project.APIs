@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Project.APIs.Database;
+using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,14 +21,13 @@ namespace Project.APIs.Services
             if (member == null)
             {
                 // Always return same error for security
-                return null;
+                throw new NotFoundException("Member Not Found");
             }
 
             if (string.IsNullOrEmpty(request.HashPassword))
             {
-                return null;
+                throw new BusinessRuleException("Password must required");
             }
-
 
             var result = _passwordHasher.VerifyHashedPassword(
                 null!,
@@ -37,7 +37,7 @@ namespace Project.APIs.Services
 
             if (result == PasswordVerificationResult.Failed)
             {
-                return null;
+                throw new BusinessRuleException("Incorrent Password");
             }
 
             string token = CreateToken(member);
