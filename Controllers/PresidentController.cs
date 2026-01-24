@@ -21,14 +21,14 @@ namespace Project.APIs.Controllers
 
         //Add an event
         [HttpPost("addEvent")]
-        public async Task<IActionResult> AddEvent([FromBody] AddEventByPresidentDto newEvent)
+        public async Task<IActionResult> AddEvent([FromBody] AddEventDto newEvent)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _eventService.AddEventByPresident(newEvent);
+            await _eventService.AddEvent(newEvent, "pending");
             return Created();
         }
 

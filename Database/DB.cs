@@ -9,5 +9,6 @@ namespace Project.APIs.Database
         public DbSet<Member> Members { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventRequirement> EventRequirements { get; set; }
+        public DbSet<EventRequisition> EventRequisitions { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Project.APIs.Model.DTOs
         public Guid SocietyId { get; set; }
     }
 
-    public class AddEventByPresidentDto
+    public class AddEventDto
     {
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
@@ -45,5 +45,19 @@ namespace Project.APIs.Model.DTOs
 
         [Required(ErrorMessage = "Requirements are required")]
         public required ICollection<EventRequirementDto> Requirements { get; set; }
+    }
+
+    public class CreateEventByChairperson
+    {
+
+    }
+
+    public class Accept_RejectEvent
+    {
+        [Required(ErrorMessage = "Id is required")]
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "Status is required")]
+        public required string Status { get; set; }
     }
 }

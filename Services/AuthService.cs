@@ -68,6 +68,7 @@ namespace Project.APIs.Services
                 return null;
             }
 
+
             Member member = new Member
             {
                 Name = memberDto.Name,
@@ -88,25 +89,22 @@ namespace Project.APIs.Services
 
         private string CreateToken(Member member)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, member.Username),
-                new Claim(ClaimTypes.NameIdentifier, member.Id.ToString()),
-                new Claim(ClaimTypes.Role, member.Role),
-
-            };
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSetting:Token")!));
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSetting:Token")!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, member.Id.ToString()),
+                new Claim(ClaimTypes.Name, member.Username),
+                new Claim(ClaimTypes.Role, member.Role),
+            };
+
             var tokenDescriptor = new JwtSecurityToken(
-                issuer: configuration.GetValue<string>("AppSetting:Issuer"),
-                audience: configuration.GetValue<string>("AppSetting:Audience"),
+                signingCredentials: creds,
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(1),
-                signingCredentials: creds
+                issuer: configuration.GetValue<string>("AppSetting:Issuer"),
+                audience: configuration.GetValue<string>("AppSetting:Audience")
             );
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);

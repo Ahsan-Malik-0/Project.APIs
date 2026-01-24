@@ -49,12 +49,6 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Username is required")]
         public required string Username { get; set; }
 
-        //[JsonIgnore]
-        [Required(ErrorMessage = "OldPassword is required")]
-        public required string OldHashPassword { get; set; }
-
-        [Required(ErrorMessage = "NewPassword is required")]
-        public required string NewHashPassword { get; set; }
         public required string Picture { get; set; }
     }
 }

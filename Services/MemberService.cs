@@ -21,7 +21,7 @@ namespace Project.APIs.Services
             return member;
         }
 
-        //Edit Profile
+        //Edit Profile by President
         public async Task EditProfile(UpdateMemberProfileDto updatedMember)
         {
             var oldMember = await _dB.Members.FindAsync(updatedMember.Id);
@@ -29,28 +29,32 @@ namespace Project.APIs.Services
             if (oldMember == null)
                 throw new NotFoundException("Member not found");
 
-            if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
-                throw new BusinessRuleException("Old password must be provided.");
+            //if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
+            //    throw new BusinessRuleException("Old password must be provided.");
 
-            var passVerify = _passwordHasher.VerifyHashedPassword(
-                oldMember,
-                oldMember.HashPassword!,
-                updatedMember.OldHashPassword
-            );
+            //var passVerify = _passwordHasher.VerifyHashedPassword(
+            //    oldMember,
+            //    oldMember.HashPassword!,
+            //    updatedMember.OldHashPassword
+            //);
 
-            if (passVerify == PasswordVerificationResult.Failed)
-            {
-                throw new BusinessRuleException("Password did not matched.");
-            }
+            //if (passVerify == PasswordVerificationResult.Failed)
+            //{
+            //    throw new BusinessRuleException("Password did not matched.");
+            //}
 
 
             oldMember.Name = updatedMember.Name;
             oldMember.Username = updatedMember.Username;
-            oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
+            //oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
             oldMember.Picture = updatedMember.Picture;
             
             _dB.Members.Update(oldMember);
             await _dB.SaveChangesAsync();
         }
+
+
+
+
     }
 }

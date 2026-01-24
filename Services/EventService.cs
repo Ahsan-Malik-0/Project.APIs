@@ -3,6 +3,7 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
+using System.Net.WebSockets;
 
 namespace Project.APIs.Services
 {
@@ -23,8 +24,8 @@ namespace Project.APIs.Services
             return pendingEvents;
         }
 
-        //Add a new event
-        public async Task AddEventByPresident(AddEventByPresidentDto newEvent)
+        //Add a new event from President
+        public async Task AddEvent(AddEventDto newEvent, string status)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
@@ -34,7 +35,7 @@ namespace Project.APIs.Services
                 {
                     Name = newEvent.Name,
                     Date = newEvent.Date,
-                    Status = "pending",
+                    Status = status,
                     Message = null,
                     SocietyId = newEvent.SocietyId
                 };
@@ -189,5 +190,18 @@ namespace Project.APIs.Services
             return pendingEvents;
         }
 
+        // Accept of Reject Event
+        public async Task Accept_Reject(Accept_RejectEvent accept_RejectEvent)
+        {
+            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == accept_RejectEvent.Id);
+
+            if (_event == null)
+                throw new NotFoundException("Event not found");
+
+            _event.Status = accept_RejectEvent.Status;
+
+            _dB.Update(_event);
+            await _dB.SaveChangesAsync();
+        }
     }
 }
