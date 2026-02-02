@@ -44,7 +44,7 @@ public class ExceptionMiddleware
         var response = new
         {
             statusCode = context.Response.StatusCode,
-            message = message
+            errors = message
         };
 
         return context.Response.WriteAsync(JsonSerializer.Serialize(response));

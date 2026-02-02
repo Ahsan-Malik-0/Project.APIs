@@ -45,6 +45,17 @@ builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<SocietyService>();
 builder.Services.AddScoped<MemberService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorWasm",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7179")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
@@ -53,8 +64,14 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
 }
+
+
+app.UseCors("AllowBlazorWasm");
 
 app.UseHttpsRedirection();
 

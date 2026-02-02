@@ -96,7 +96,7 @@ namespace Project.APIs.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, member.Id.ToString()),
                 new Claim(ClaimTypes.Name, member.Username),
-                new Claim(ClaimTypes.Role, member.Role),
+                new Claim(ClaimTypes.Role, member.Role)
             };
 
             var tokenDescriptor = new JwtSecurityToken(

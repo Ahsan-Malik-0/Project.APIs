@@ -11,12 +11,15 @@ namespace Project.APIs.Services
     {
 
         //Get all pending events
-        public async Task<List<Event>> GetPendingEvents()
+        public async Task<List<Event>> GetPendingEvents(Guid memberId)
         {
+            // Fix: Get the SocietyId for the given memberId
             var pendingEvents = await _dB.Events
-                                 .Include(e => e.Requirements)
-                                 .Where(e => e.Status == "pending")
-                                 .ToListAsync();
+                                .Include(e => e.Requirements)
+                                .Where(e => e.Status == "pending")
+                                .Where(e => _dB.Members
+                                    .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
+                                .ToListAsync();
 
             if (!pendingEvents.Any())
                 throw new NotFoundException("Pending events not found");
@@ -81,7 +84,7 @@ namespace Project.APIs.Services
         }
 
 
-        // Update Event by id
+        // Update Event with Requirements
         public async Task UpdateEventWithRequirements(UpdateEventDto dto)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
