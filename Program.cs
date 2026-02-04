@@ -47,12 +47,13 @@ builder.Services.AddScoped<MemberService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorWasm",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("https://localhost:7179")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
         });
 });
 
@@ -71,7 +72,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCors("AllowBlazorWasm");
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
