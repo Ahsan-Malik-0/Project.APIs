@@ -79,5 +79,29 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
+        // Get society id using member's id
+        [HttpGet("getSocietyId")]
+        public async Task<IActionResult> GetSocietyId(Guid memberId)
+        {
+            if (memberId == Guid.Empty)
+                return BadRequest();
+
+            var societyId = await memberService.GetSocietyIdAsync(memberId);
+
+            return Ok(societyId);
+        }
+
+        // Get specific event (use for edit event)
+        [HttpGet("getEventById")]
+        public async Task<IActionResult> GetEventById(Guid eventId)
+        {
+            if(eventId == Guid.Empty)
+                return BadRequest();
+
+            var @event = await _eventService.GetEventById(eventId);
+
+            return Ok(@event);
+        }
+
     }
 }

@@ -206,5 +206,19 @@ namespace Project.APIs.Services
             _dB.Update(_event);
             await _dB.SaveChangesAsync();
         }
+
+        // Get specific event by id
+
+        public async Task<Event> GetEventById(Guid eventId)
+        {
+            var _event = await _dB.Events
+                .Include(e => e.Requirements)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
+
+            if(_event == null)
+                throw new NotFoundException("Event not found");
+
+            return _event;
+        }
     }
 }

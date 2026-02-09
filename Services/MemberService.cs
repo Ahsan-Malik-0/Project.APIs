@@ -53,7 +53,13 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
-
+        public async Task<Guid?> GetSocietyIdAsync(Guid memberId)
+        {
+            return await _dB.Members
+                .Where(m => m.Id == memberId)
+                .Select(m => m.SocietyId)
+                .FirstOrDefaultAsync();
+        }
 
 
     }
