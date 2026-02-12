@@ -180,17 +180,20 @@ namespace Project.APIs.Services
             }
         }
 
-        // Get all events
-        public async Task<List<Event>> GetAllEvents()
+        // Get all accepted events
+        public async Task<List<Event>> GetAllAcceptedEvents(Guid memberId)
         {
-            var pendingEvents = await _dB.Events
+            var acceptedEvents = await _dB.Events
                                  .Include(e => e.Requirements)
+                                 .Where(e => e.Status == "accepted")
+                                 .Where(e => _dB.Members
+                                    .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
                                  .ToListAsync();
 
-            if (!pendingEvents.Any())
-                throw new NotFoundException("Pending events not found");
+            if (!acceptedEvents.Any())
+                throw new NotFoundException("Events not found");
 
-            return pendingEvents;
+            return acceptedEvents;
         }
 
         // Accept of Reject Event

@@ -34,7 +34,7 @@ namespace Project.APIs.Controllers.CRUD
             {
                 Name = eventDto.Name,
                 Date = eventDto.Date,
-                Status = eventDto.Status,
+                Status = eventDto.Status!,
                 Message = eventDto.Message,
                 SocietyId = eventDto.SocietyId
             };
@@ -69,7 +69,7 @@ namespace Project.APIs.Controllers.CRUD
 
             _event.Name = eventDto.Name;
             _event.Date = eventDto.Date;
-            _event.Status = eventDto.Status;
+            _event.Status = eventDto.Status!;
             _event.Message = eventDto.Message;
 
             _dB.Events.Update(_event);

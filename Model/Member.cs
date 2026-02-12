@@ -23,5 +23,12 @@ namespace Project.APIs.Model
         public Society? Society { get; set; }
     }
 
-    
+    public class MemberProfileDto
+    {
+        public required string Name { get; set; }
+        public required string Username { get; set; }
+        //public required string HashPassword { get; set; }
+        public required string Picture { get; set; }
+        public Guid SocietyId { get; set; }
+    }
 }

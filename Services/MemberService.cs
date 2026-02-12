@@ -8,17 +8,25 @@ using Project.APIs.Model.DTOs;
 
 namespace Project.APIs.Services
 {
-    public class MemberService(DB _dB, IPasswordHasher<Member> _passwordHasher)
+    public class MemberService(DB _dB, IPasswordHasher<Member> _passwordHasher, IWebHostEnvironment _env)
     {
         // View Profile
-        public async Task<Member> ViewProfile(Guid id)
+        public async Task<MemberProfileDto> ViewProfile(Guid id)
         {
             var member = await _dB.Members.FindAsync(id);
 
             if (member == null)
                 throw new NotFoundException("Member not found");
 
-            return member;
+            MemberProfileDto memberProfileDto = new MemberProfileDto()
+            {
+                Name = member.Name,
+                Username = member.Username,
+                Picture = member.Picture,
+                SocietyId = member.SocietyId
+            };
+
+            return memberProfileDto;
         }
 
         //Edit Profile by President
@@ -29,24 +37,57 @@ namespace Project.APIs.Services
             if (oldMember == null)
                 throw new NotFoundException("Member not found");
 
-            //if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
-            //    throw new BusinessRuleException("Old password must be provided.");
+            if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
+                throw new BusinessRuleException("Old password must be provided.");
 
-            //var passVerify = _passwordHasher.VerifyHashedPassword(
-            //    oldMember,
-            //    oldMember.HashPassword!,
-            //    updatedMember.OldHashPassword
-            //);
+            // Verify password by comparing 
+            var passVerify = _passwordHasher.VerifyHashedPassword(
+                oldMember,
+                oldMember.HashPassword!,
+                updatedMember.OldHashPassword
+            );
 
-            //if (passVerify == PasswordVerificationResult.Failed)
-            //{
-            //    throw new BusinessRuleException("Password did not matched.");
-            //}
+            if (passVerify == PasswordVerificationResult.Failed)
+            {
+                throw new BusinessRuleException("Password did not matched.");
+            }
+
+
+            // image handling
+
+            if (!string.IsNullOrEmpty(updatedMember.Picture))
+            {
+                // Delete old image (if exists)
+                if (!string.IsNullOrEmpty(oldMember.Picture))
+                {
+                    var oldImagePath = Path.Combine(_env.WebRootPath,oldMember.Picture.TrimStart('/'));
+
+                    if (File.Exists(oldImagePath))
+                        File.Delete(oldImagePath);
+                }
+
+                // Convert Base64 → byte[]
+                var imageBytes = Convert.FromBase64String(updatedMember.Picture);
+
+                // Create folder if not exists
+                var folderPath = Path.Combine(_env.WebRootPath, "profiles");
+                Directory.CreateDirectory(folderPath);
+
+                // Generate unique file name
+                var fileName = $"{Guid.NewGuid()}.png";
+                var fullPath = Path.Combine(folderPath, fileName);
+
+                // Save file
+                await File.WriteAllBytesAsync(fullPath, imageBytes);
+
+                // Save relative path in DB
+                oldMember.Picture = $"/profiles/{fileName}";
+            }
 
 
             oldMember.Name = updatedMember.Name;
             oldMember.Username = updatedMember.Username;
-            //oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
+            oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
             oldMember.Picture = updatedMember.Picture;
             
             _dB.Members.Update(oldMember);
