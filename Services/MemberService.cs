@@ -73,9 +73,6 @@ namespace Project.APIs.Services
                         File.Delete(oldImagePath);
                 }
 
-                // Convert Base64 → byte[]
-                var imageBytes = Convert.FromBase64String(updatedMember.Picture);
-
                 // Create folder if not exists
                 var folderPath = Path.Combine(_env.WebRootPath, "profiles");
                 Directory.CreateDirectory(folderPath);
@@ -83,6 +80,9 @@ namespace Project.APIs.Services
                 // Generate unique file name
                 var fileName = $"{Guid.NewGuid()}.png";
                 var fullPath = Path.Combine(folderPath, fileName);
+
+                // Convert Base64 → byte[]
+                byte[] imageBytes = Convert.FromBase64String(updatedMember.Picture);
 
                 // Save file
                 await File.WriteAllBytesAsync(fullPath, imageBytes);
