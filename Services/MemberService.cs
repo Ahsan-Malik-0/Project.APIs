@@ -5,6 +5,7 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
+using System.Globalization;
 
 namespace Project.APIs.Services
 {
@@ -18,11 +19,17 @@ namespace Project.APIs.Services
             if (member == null)
                 throw new NotFoundException("Member not found");
 
+            // Image handling (only send base64)
+            string trimImage = member.Picture.TrimStart('/');
+            string delimiters = "/";
+            string[] splitImage = trimImage.Split(delimiters);
+            string base64Image = splitImage[1];
+
             MemberProfileDto memberProfileDto = new MemberProfileDto()
             {
                 Name = member.Name,
                 Username = member.Username,
-                Picture = member.Picture,
+                Picture = base64Image,
                 SocietyId = member.SocietyId
             };
 
@@ -88,7 +95,6 @@ namespace Project.APIs.Services
             oldMember.Name = updatedMember.Name;
             oldMember.Username = updatedMember.Username;
             oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
-            oldMember.Picture = updatedMember.Picture;
             
             _dB.Members.Update(oldMember);
             await _dB.SaveChangesAsync();
