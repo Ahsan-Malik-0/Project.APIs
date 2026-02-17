@@ -50,24 +50,24 @@ namespace Project.APIs.Services
             var society = await _dB.Societies.FirstOrDefaultAsync(s => s.Id == memberDto.SocietyId);
             if (society == null)
             {
-                return null;
+                throw new NotFoundException("Society Not Found");
             }
 
             // Check for duplicate username
             var usernameExists = await _dB.Members
-                .AnyAsync(m => m.SocietyId == memberDto.SocietyId &&
-                              m.Username == memberDto.Username);
+                //.AnyAsync(m => m.SocietyId == memberDto.SocietyId &&
+                //              m.Username == memberDto.Username);
+                .AnyAsync(m => m.Username == memberDto.Username);
 
             if (usernameExists)
             {
-                return null;
+                throw new BusinessRuleException("Username already exist");
             }
 
             if (string.IsNullOrEmpty(memberDto.HashPassword))
             {
-                return null;
+                throw new BusinessRuleException("Password must not be null");
             }
-
 
             Member member = new Member
             {

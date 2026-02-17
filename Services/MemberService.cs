@@ -19,17 +19,31 @@ namespace Project.APIs.Services
             if (member == null)
                 throw new NotFoundException("Member not found");
 
-            // Image handling (only send base64)
-            string trimImage = member.Picture.TrimStart('/');
-            string delimiters = "/";
-            string[] splitImage = trimImage.Split(delimiters);
-            string base64Image = splitImage[1];
+            string? base64Image = null;
+
+            if (!string.IsNullOrEmpty(member.Picture))
+            {
+                // Remove starting '/'
+                var relativePath = member.Picture.TrimStart('/');
+
+                // Get full physical path
+                var fullPath = Path.Combine(_env.WebRootPath, relativePath);
+
+                if (File.Exists(fullPath))
+                {
+                    // Read image as byte[]
+                    byte[] imageBytes = await File.ReadAllBytesAsync(fullPath);
+
+                    // Convert to Base64
+                    base64Image = Convert.ToBase64String(imageBytes);
+                }
+            }
 
             MemberProfileDto memberProfileDto = new MemberProfileDto()
             {
                 Name = member.Name,
                 Username = member.Username,
-                Picture = base64Image,
+                Picture = base64Image!,
                 SocietyId = member.SocietyId
             };
 

@@ -16,7 +16,7 @@ namespace Project.APIs.Model
         //[JsonIgnore]
         public string? HashPassword { get; set; }
         public required string Role { get; set; }
-        public required string Picture { get; set; }
+        public string? Picture { get; set; }
         public Guid SocietyId { get; set; }
 
         [ForeignKey("SocietyId")]
