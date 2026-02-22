@@ -8,11 +8,22 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChairPersonController(EventService _eventService) : ControllerBase
+    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService) : ControllerBase
     {
         [HttpGet("pendingRequisitions")]
 
         //Create Requisition
+        [HttpPost("createRequisition")]
+        public async Task<IActionResult> CreateRequisition([FromBody] CreateEventRequisitionDto requisitionDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            await eventRequisitionService.CreateRequisition(requisitionDto);
+            return Ok();
+        }
 
         //Pending Requisitions
 

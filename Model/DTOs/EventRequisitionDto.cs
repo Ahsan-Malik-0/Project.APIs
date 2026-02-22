@@ -7,10 +7,11 @@
         public Guid SocietyId { get; set; }
     }
 
-    public class CreateEventRequisituinDto
+    public class CreateEventRequisitionDto
     {
         public required string Subject { get; set; }
         public required string Body { get; set; }
+        public decimal RequestedAmount { get; set; }
         public Guid SocietyId { get; set; }
     }
 }
