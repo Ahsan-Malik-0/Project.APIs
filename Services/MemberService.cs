@@ -123,5 +123,24 @@ namespace Project.APIs.Services
         }
 
 
+        public async Task<ChairpersonDetailForRequisitionDto> GetChairpersonDetailsForRequisitionForm(Guid memberId)
+        {
+            var member = await _dB.Members
+                .Include(m => m.Society)
+                .FirstOrDefaultAsync(m => m.Id == memberId);
+
+            if (member == null)
+                throw new NotFoundException("Member not found");
+
+            ChairpersonDetailForRequisitionDto memberDetail = new ChairpersonDetailForRequisitionDto()
+            {
+                Name = member.Name,
+                Role = member.Role,
+                SocietyName = member.Society!.Name,
+            };
+
+            return memberDetail;
+        }
+
     }
 }

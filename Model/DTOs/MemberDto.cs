@@ -65,4 +65,11 @@ namespace Project.APIs.Model.DTOs
 
         public string? Picture { get; set; }
     }
+
+    public class ChairpersonDetailForRequisitionDto
+    {
+        public required string Name { get; set; }
+        public required string Role { get; set; }
+        public required string SocietyName { get; set; }
+    }
 }
