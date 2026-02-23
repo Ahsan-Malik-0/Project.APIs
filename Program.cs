@@ -44,6 +44,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<SocietyService>();
 builder.Services.AddScoped<MemberService>();
+builder.Services.AddScoped<EventRequisitionService>();
 
 builder.Services.AddCors(options =>
 {

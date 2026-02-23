@@ -20,8 +20,7 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Role is required")]
         public required string Role { get; set; }
 
-        [Required(ErrorMessage = "Picture is required")]
-        public required string Picture { get; set; }
+        public string? Picture { get; set; }
 
         [Required(ErrorMessage = "Society Id is required")]
         public Guid SocietyId { get; set; }
@@ -37,6 +36,15 @@ namespace Project.APIs.Model.DTOs
         public required string HashPassword { get; set; }
     }
 
+    public class MemberProfileDto
+    {
+        public required string Name { get; set; }
+        public required string Username { get; set; }
+        //public required string HashPassword { get; set; }
+        public string? Picture { get; set; }
+        public Guid SocietyId { get; set; }
+    }
+
     public class UpdateMemberProfileDto
     {
         [Required(ErrorMessage = "Id is required")]
@@ -49,6 +57,19 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Username is required")]
         public required string Username { get; set; }
 
-        public required string Picture { get; set; }
+        [Required(ErrorMessage = "OldHashPassword is required")]
+        public required string OldHashPassword { get; set; }
+
+        [Required(ErrorMessage = "NewHashPassword is required")]
+        public required string NewHashPassword { get; set; }
+
+        public string? Picture { get; set; }
+    }
+
+    public class ChairpersonDetailForRequisitionDto
+    {
+        public required string Name { get; set; }
+        public required string Role { get; set; }
+        public required string SocietyName { get; set; }
     }
 }

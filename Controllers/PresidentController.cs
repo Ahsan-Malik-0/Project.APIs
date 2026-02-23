@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
+using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 using Project.APIs.Services;
+using System.ComponentModel;
 
 namespace Project.APIs.Controllers
 {
@@ -53,19 +55,19 @@ namespace Project.APIs.Controllers
             return NoContent(); // 204
         }
 
-        //Get all Events
+        //Get all accepted Events for history
         [HttpGet("history")]
-        public async Task<IActionResult> GetAllEvents()
+        public async Task<IActionResult> GetAllAcceptedEvents(Guid memberId)
         {
-            var events = await _eventService.GetAllEvents();
+            var events = await _eventService.GetAllAcceptedEvents(memberId);
             return Ok(events);
         }
 
         // View Profile
-        [HttpGet("viewProfile/{id:guid}")]
-        public async Task<IActionResult> GetProfile(Guid id)
+        [HttpGet("viewProfile")]
+        public async Task<IActionResult> GetProfile(Guid memberId)
         {
-            var member = await memberService.ViewProfile(id);
+            var member = await memberService.ViewProfile(memberId);
             return Ok(member);
         }
 
