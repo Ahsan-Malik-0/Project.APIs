@@ -13,8 +13,8 @@ namespace Project.APIs.Controllers
         //[HttpGet("pendingRequisitions")]
 
         //Create Requisition
-        [HttpPost("createRequisition")]
-        public async Task<IActionResult> CreateRequisition([FromBody] CreateEventRequisitionDto requisitionDto)
+        [HttpPost("createEventRequisition")]
+        public async Task<IActionResult> CreateEventRequisition([FromBody] CreateEventRequisitionDto requisitionDto)
         {
             if (!ModelState.IsValid)
             {
@@ -39,6 +39,12 @@ namespace Project.APIs.Controllers
         }
 
         //Pending Requisitions
+        [HttpGet("getPendingRequisitions")]
+        public async Task<IActionResult> PendingRequisitions(Guid memberId)
+        {
+            var pendingRequisitions = await eventRequisitionService.GetPendingRequisitions(memberId);
+            return Ok(pendingRequisitions);
+        }
 
         //Get event Requirements
 
