@@ -59,7 +59,7 @@ namespace Project.APIs.Controllers
         [HttpGet("history")]
         public async Task<IActionResult> GetAllAcceptedEvents(Guid memberId)
         {
-            var events = await _eventService.GetAllAcceptedEvents(memberId);
+            var events = await _eventService.GetAllAcceptedEvents (memberId);
             return Ok(events);
         }
 
