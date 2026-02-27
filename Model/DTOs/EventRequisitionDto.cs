@@ -33,6 +33,6 @@ namespace Project.APIs.Model.DTOs
         public required string Subject { get; set; }
         public required string Body { get; set; }
         public required string Status { get; set; }
-        public required ICollection<EventRequirementDto> EventRequirement { get; set; }
+        public required ICollection<EventRequirementDto> EventRequirements { get; set; }
     }
 }
