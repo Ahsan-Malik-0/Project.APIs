@@ -5,6 +5,8 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
+using System.Diagnostics.Metrics;
+using System.Dynamic;
 using System.Globalization;
 
 namespace Project.APIs.Services
@@ -51,28 +53,97 @@ namespace Project.APIs.Services
         }
 
         //Edit Profile by President
+        //public async Task EditProfile(UpdateMemberProfileDto updatedMember)
+        //{
+        //    var oldMember = await _dB.Members.FindAsync(updatedMember.Id);
+
+        //    if (oldMember == null)
+        //        throw new NotFoundException("Member not found");
+
+        //    if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
+        //        throw new BusinessRuleException("Old password must be provided.");
+
+        //    // Verify password by comparing 
+        //    var passVerify = _passwordHasher.VerifyHashedPassword(
+        //        oldMember,
+        //        oldMember.HashPassword!,
+        //        updatedMember.OldHashPassword
+        //    );
+
+        //    if (passVerify == PasswordVerificationResult.Failed)
+        //    {
+        //        throw new BusinessRuleException("Password did not matched.");
+        //    }
+
+
+        //    // image handling
+
+        //    if (!string.IsNullOrEmpty(updatedMember.Picture))
+        //    {
+        //        // Delete old image (if exists)
+        //        if (!string.IsNullOrEmpty(oldMember.Picture))
+        //        {
+        //            var oldImagePath = Path.Combine(_env.WebRootPath,oldMember.Picture.TrimStart('/'));
+
+        //            if (File.Exists(oldImagePath))
+        //                File.Delete(oldImagePath);
+        //        }
+
+        //        // Create folder if not exists
+        //        var folderPath = Path.Combine(_env.WebRootPath, "profiles");
+        //        Directory.CreateDirectory(folderPath);
+
+        //        // Generate unique file name
+        //        var fileName = $"{Guid.NewGuid()}.png";
+        //        var fullPath = Path.Combine(folderPath, fileName);
+
+        //        // Convert Base64 → byte[]
+        //        byte[] imageBytes = Convert.FromBase64String(updatedMember.Picture);
+
+        //        // Save file
+        //        await File.WriteAllBytesAsync(fullPath, imageBytes);
+
+        //        // Save relative path in DB
+        //        oldMember.Picture = $"/profiles/{fileName}";
+        //    }
+
+
+        //    oldMember.Name = updatedMember.Name;
+        //    oldMember.Username = updatedMember.Username;
+        //    oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
+
+        //    _dB.Members.Update(oldMember);
+        //    await _dB.SaveChangesAsync();
+        //}
+
         public async Task EditProfile(UpdateMemberProfileDto updatedMember)
         {
             var oldMember = await _dB.Members.FindAsync(updatedMember.Id);
 
-            if (oldMember == null)
-                throw new NotFoundException("Member not found");
+            // ==============================
+            // 🔐 PASSWORD CHANGE (OPTIONAL)
+            // ==============================
 
-            if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
-                throw new BusinessRuleException("Old password must be provided.");
-
-            // Verify password by comparing 
-            var passVerify = _passwordHasher.VerifyHashedPassword(
-                oldMember,
-                oldMember.HashPassword!,
-                updatedMember.OldHashPassword
-            );
-
-            if (passVerify == PasswordVerificationResult.Failed)
+            if (!string.IsNullOrEmpty(updatedMember.NewHashPassword))
             {
-                throw new BusinessRuleException("Password did not matched.");
-            }
+                if (string.IsNullOrEmpty(updatedMember.OldHashPassword))
+                    throw new BusinessRuleException("Old password must be provided.");
 
+                var passVerify = _passwordHasher.VerifyHashedPassword(
+                    oldMember,
+                    oldMember.HashPassword!,
+                    updatedMember.OldHashPassword
+                );
+
+                if (passVerify == PasswordVerificationResult.Failed)
+                    throw new BusinessRuleException("Old password is incorrect.");
+
+                // Hash and update new password
+                oldMember.HashPassword = _passwordHasher.HashPassword(
+                    oldMember,
+                    updatedMember.NewHashPassword
+                );
+            }
 
             // image handling
 
@@ -81,7 +152,7 @@ namespace Project.APIs.Services
                 // Delete old image (if exists)
                 if (!string.IsNullOrEmpty(oldMember.Picture))
                 {
-                    var oldImagePath = Path.Combine(_env.WebRootPath,oldMember.Picture.TrimStart('/'));
+                    var oldImagePath = Path.Combine(_env.WebRootPath, oldMember.Picture.TrimStart('/'));
 
                     if (File.Exists(oldImagePath))
                         File.Delete(oldImagePath);
@@ -108,10 +179,13 @@ namespace Project.APIs.Services
 
             oldMember.Name = updatedMember.Name;
             oldMember.Username = updatedMember.Username;
-            oldMember.HashPassword = _passwordHasher.HashPassword(oldMember, updatedMember.NewHashPassword!);
-            
-            _dB.Members.Update(oldMember);
+
             await _dB.SaveChangesAsync();
+
+
+              // 👉 We removed _dB.Members.Update(oldMember);
+            // Because EF Core is already tracking oldMember after FindAsync.
+            // Calling Update is unnecessary and can sometimes cause issues.
         }
 
         public async Task<Guid?> GetSocietyIdAsync(Guid memberId)

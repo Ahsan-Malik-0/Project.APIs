@@ -12,7 +12,7 @@ namespace Project.APIs.Model
         public decimal RequestAmount { get; set; }
         public decimal AllocatedAmount { get; set; }
         public decimal BiitContribution { get; set; }
-        public Guid SocietyId { get; set; }
+        public Guid EventId { get; set; }
         [JsonIgnore]
         public Event? _event { get; set; }
     }
