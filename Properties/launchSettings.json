@@ -24,7 +24,12 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7148;http://localhost:5022",
+      //"applicationUrl": "https://localhost:7148;http://localhost:5022",  // --- Original     // only works for local machine (doesn't works on emulator)
+
+      //"applicationUrl": "https://0.0.0.0:7148;http://0.0.0.0:5000",                        // works for any IP
+      //"applicationUrl": "https://192.168.100.12:7148;http://192.168.100.12:5000",          // works only for my IP (Jason) 
+
+      "applicationUrl": "https://localhost:7148;https://0.0.0.0:7148",                       // works for both (local machine & any other IP)
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

@@ -16,6 +16,7 @@ namespace Project.APIs.Controllers.CRUD
         {
             var events = await _dB.Events
                 .Include(e => e.Society)
+                .Include(e => e.Requirements) /// Add by jason on Wednesday at 4:16 PM
                 .ToListAsync();
             return Ok(events);
         }
