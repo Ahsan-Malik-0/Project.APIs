@@ -51,8 +51,23 @@ namespace Project.APIs.Controllers
         //View Rquisitions History
 
         //View Profile
+        [HttpGet("viewProfile")]
+        public async Task<IActionResult> GetProfile(Guid memberId)
+        {
+            var member = await memberService.ViewProfile(memberId);
+            return Ok(member);
+        }
 
         //Edit Profile
+        [HttpPut("updateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateMemberProfileDto updateMemberProfileDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Fill the credentials");
+
+            await memberService.EditProfile(updateMemberProfileDto);
+            return Ok();
+        }
 
         //Accept or reject event
 
