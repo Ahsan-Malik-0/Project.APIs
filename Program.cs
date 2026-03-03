@@ -77,6 +77,8 @@ app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFlutterWeb");  /// Add by Jason on 3rd March 8:30 PM
+
 app.UseAuthorization();
 
 app.MapControllers();

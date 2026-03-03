@@ -81,18 +81,19 @@ namespace Project.APIs.Services
                                                 m.SocietyId == e.SocietyId))) 
             .Select(er => new PendingEventRequisitionsDto
             {
-            Body = er.Body,
-            Subject = er.Subject,
-            Status = er.Status,
-            EventRequirement = _dB.EventRequirements
-                .Where(req => req.EventId == er.EventId)
-                .Select(req => new EventRequirementDto
-                {
-                    Type = req.Type,
-                    Name = req.Name,
-                    Quantity = req.Quantity,
-                    Price = req.Price
-                }).ToList()
+                Id = er.Id,
+                Body = er.Body,
+                Subject = er.Subject,
+                Status = er.Status,
+                EventRequirements = _dB.EventRequirements
+                    .Where(req => req.EventId == er.EventId)
+                    .Select(req => new EventRequirementDto
+                    {
+                        Type = req.Type,
+                        Name = req.Name,
+                        Quantity = req.Quantity,
+                        Price = req.Price
+                    }).ToList()
             })
             .ToListAsync();
 
