@@ -10,7 +10,58 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
     {
-        //[HttpGet("pendingRequisitions")]
+        // Event Endpoints
+        // Pending Events
+        [HttpGet("pendingEvents")]
+        public async Task<IActionResult> GetPendingEvents(Guid memberId)
+        {
+            var pendingEvents = await _eventService.GetPendingEvents(memberId);
+            return Ok(pendingEvents);
+        }
+
+        //Update Existing 
+        [HttpPut("updateEvent")]
+        public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventDto updateEventDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _eventService.UpdateEventWithRequirements(updateEventDto);
+            return Ok();
+        }
+
+        //Delete Event
+        [HttpDelete("deleteEvent/{id}")]
+        public async Task<IActionResult> DeleteEvent(Guid id)
+        {
+            await _eventService.DeleteEventWithRequirements(id);
+            return NoContent(); // 204
+        }
+
+        // Get specific event (use for edit event)
+        [HttpGet("getEventById")]
+        public async Task<IActionResult> GetEventById(Guid eventId)
+        {
+            if (eventId == Guid.Empty)
+                return BadRequest();
+
+            var @event = await _eventService.GetEventById(eventId);
+
+            return Ok(@event);
+        }
+
+
+
+
+        //Pending Requisitions
+        [HttpGet("getPendingRequisitions")]
+        public async Task<IActionResult> PendingRequisitions(Guid memberId)
+        {
+            var pendingRequisitions = await eventRequisitionService.GetPendingRequisitions(memberId);
+            return Ok(pendingRequisitions);
+        }
 
         //Create Requisition
         [HttpPost("createEventRequisition")]
@@ -38,13 +89,6 @@ namespace Project.APIs.Controllers
             return Ok(chairpersonDetail);
         }
 
-        //Pending Requisitions
-        [HttpGet("getPendingRequisitions")]
-        public async Task<IActionResult> PendingRequisitions(Guid memberId)
-        {
-            var pendingRequisitions = await eventRequisitionService.GetPendingRequisitions(memberId);
-            return Ok(pendingRequisitions);
-        }
 
         //Get event Requirements
 
