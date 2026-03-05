@@ -8,6 +8,7 @@ namespace Project.APIs.Model
         public required string Subject { get; set; }
         public required string Body { get; set; }
         public required string Status { get; set; }
+        public string? ReviewMessage { get; set; }
         public DateTime RequestedDate { get; set; }
         public DateTime AllocatedDate { get; set; }
         public decimal RequestAmount { get; set; }

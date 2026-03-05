@@ -24,6 +24,11 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
+        // Event name
+        // event date
+        // Status
+        // Review Message (if any)
+
         public async Task<List<PendingEventRequisitionsDto>> GetPendingRequisitions(Guid memberId)
         {
             // var eventsIds = await _dB.Events
