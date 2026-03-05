@@ -13,7 +13,6 @@ namespace Project.APIs.Services
             EventRequisition eventRequisition = new EventRequisition()
             {
                 Subject = newRequisition.Subject,
-                RequestedDate = newRequisition.ReqestedDate ?? DateTime.Now,
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
                 RequestAmount = newRequisition.RequestedAmount,
@@ -23,11 +22,6 @@ namespace Project.APIs.Services
             await _dB.EventRequisitions.AddAsync(eventRequisition);
             await _dB.SaveChangesAsync();
         }
-
-        // Event name
-        // event date
-        // Status
-        // Review Message (if any)
 
         public async Task<List<PendingEventRequisitionsDto>> GetPendingRequisitions(Guid memberId)
         {
