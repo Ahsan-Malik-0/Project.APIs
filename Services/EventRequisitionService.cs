@@ -13,6 +13,7 @@ namespace Project.APIs.Services
             EventRequisition eventRequisition = new EventRequisition()
             {
                 Subject = newRequisition.Subject,
+                RequestedDate = newRequisition.ReqestedDate ?? DateTime.Now,
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
                 RequestAmount = newRequisition.RequestedAmount,
