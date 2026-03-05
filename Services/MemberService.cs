@@ -130,8 +130,8 @@ namespace Project.APIs.Services
                     throw new BusinessRuleException("Old password must be provided.");
 
                 var passVerify = _passwordHasher.VerifyHashedPassword(
-                    oldMember,
-                    oldMember.HashPassword!,
+                    oldMember!,
+                    oldMember!.HashPassword!,
                     updatedMember.OldHashPassword
                 );
 
@@ -150,7 +150,7 @@ namespace Project.APIs.Services
             if (!string.IsNullOrEmpty(updatedMember.Picture))
             {
                 // Delete old image (if exists)
-                if (!string.IsNullOrEmpty(oldMember.Picture))
+                if (!string.IsNullOrEmpty(oldMember!.Picture))
                 {
                     var oldImagePath = Path.Combine(_env.WebRootPath, oldMember.Picture.TrimStart('/'));
 
@@ -177,7 +177,7 @@ namespace Project.APIs.Services
             }
 
 
-            oldMember.Name = updatedMember.Name;
+            oldMember!.Name = updatedMember.Name;
             oldMember.Username = updatedMember.Username;
 
             await _dB.SaveChangesAsync();

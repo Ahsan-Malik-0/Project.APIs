@@ -11,6 +11,7 @@ namespace Project.APIs.Model.DTOs
 
     public class CreateEventRequisitionDto
     {
+        public DateTime? ReqestedDate { get; set; }
         public required string Subject { get; set; }
         public required string Body { get; set; }
         public decimal RequestedAmount { get; set; }
