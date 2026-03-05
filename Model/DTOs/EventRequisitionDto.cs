@@ -28,12 +28,19 @@ namespace Project.APIs.Model.DTOs
         
     }
 
-    public class PendingEventRequisitionsDto
+    public class EventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
         public required string Subject { get; set; }
         public required string Body { get; set; }
-        public required string Status { get; set; }
         public required ICollection<EventRequirementDto> EventRequirements { get; set; }
+    }
+
+    public class PendingEventRequisitionDetailsDto
+    {
+        public Guid Id { get; set; }
+        public required string EventName { get; set; }
+        public DateTime EventDate { get; set; }
+        public required string Status { get; set; }
     }
 }
