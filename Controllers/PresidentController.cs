@@ -48,18 +48,25 @@ namespace Project.APIs.Controllers
         }
 
         //Delete Event
-        [HttpDelete("deleteEvent/{id}")]
-        public async Task<IActionResult> DeleteEvent(Guid id)
+        [HttpPut("softDeleteEvent")]
+        public async Task<IActionResult> SoftDeleteEvent([FromBody] Event @event)
         {
-            await _eventService.DeleteEventWithRequirements(id);
+            await _eventService.SoftDeleteEventWithRequirements(@event.Id);
+            return Ok(); // 204
+        }
+
+        [HttpDelete("permanetDeleteEvent/{id}")]
+        public async Task<IActionResult> PermanentDeleteEvent(Guid eventId)
+        {
+            await _eventService.PermanentDeleteEventWithRequirements(eventId);
             return NoContent(); // 204
         }
 
         //Get all accepted Events for history
         [HttpGet("history")]
-        public async Task<IActionResult> GetAllAcceptedEvents(Guid memberId)
+        public async Task<IActionResult> GetEventsHistory(Guid memberId)
         {
-            var events = await _eventService.GetAllAcceptedEvents (memberId);
+            var events = await _eventService.GetEventsHistory(memberId);
             return Ok(events);
         }
 

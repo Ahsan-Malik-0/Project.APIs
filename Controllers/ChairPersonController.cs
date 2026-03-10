@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 using Project.APIs.Services;
 
@@ -33,10 +34,10 @@ namespace Project.APIs.Controllers
         }
 
         //Delete Event
-        [HttpDelete("deleteEvent/{id}")]
-        public async Task<IActionResult> DeleteEvent(Guid id)
+        [HttpPut("softDeleteEvent")]
+        public async Task<IActionResult> SoftDeleteEvent([FromBody] Event @event)
         {
-            await _eventService.DeleteEventWithRequirements(id);
+            await _eventService.SoftDeleteEventWithRequirements(@event.Id);
             return NoContent(); // 204
         }
 

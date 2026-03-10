@@ -142,9 +142,22 @@ namespace Project.APIs.Services
         }
 
         //Delete Event
-        public async Task DeleteEventWithRequirements(Guid eventId)
+        public async Task SoftDeleteEventWithRequirements(Guid eventId)
         {
+            var deleteEvent = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (deleteEvent == null)
+            {
+                throw new NotFoundException("Event Not Found");
+            }
 
+            deleteEvent.Status = "deleted";
+
+            await _dB.SaveChangesAsync();
+
+        }
+
+        public async Task PermanentDeleteEventWithRequirements(Guid eventId)
+        {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
             try
@@ -178,22 +191,24 @@ namespace Project.APIs.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+
         }
 
         // Get all accepted events
-        public async Task<List<Event>> GetAllAcceptedEvents(Guid memberId)
+        public async Task<List<Event>> GetEventsHistory(Guid memberId)
         {
-            var acceptedEvents = await _dB.Events
-                                 .Include(e => e.Requirements)
-                                 .Where(e => e.Status == "accepted")
-                                 .Where(e => _dB.Members
-                                    .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
-                                 .ToListAsync();
+            var events = await _dB.Events
+                .Include(e => e.Requirements)
+                .Where(e => e.Status == "accepted" || e.Status == "deleted")
+                .Where(e => _dB.Members
+                    .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
+                .OrderByDescending(e => e.Date) // Order by date
+                .ToListAsync();
 
-            if (!acceptedEvents.Any())
+            if (!events.Any())
                 throw new NotFoundException("Events not found");
 
-            return acceptedEvents;
+            return events;
         }
 
         // Accept of Reject Event
