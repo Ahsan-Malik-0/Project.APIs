@@ -58,7 +58,15 @@ namespace Project.APIs.Controllers
         [HttpGet("getPendingRequisitions")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
         {
-            var pendingRequisitions = await eventRequisitionService.GetPendingRequisitions(memberId);
+            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
+            return Ok(pendingRequisitions);
+        }
+
+        //Requisition Detail
+        [HttpGet("getEventRequisitionDetail")]
+        public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
+        {
+            var pendingRequisitions = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
             return Ok(pendingRequisitions);
         }
 
