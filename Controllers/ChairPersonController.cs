@@ -122,18 +122,16 @@ namespace Project.APIs.Controllers
         }
 
         //Accept or reject event
-
-        //Add an event
-        [HttpPost("addEvent")]
-        public async Task<IActionResult> AddEvent([FromBody] AddEventDto newEvent)
+        [HttpPut("acceptRejectEvent")]
+        public async Task<IActionResult> AcceptRejectEvent([FromBody] AcceptRejectEventDto acceptRejectEventDto)
         {
-            if (!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Fill the credentials");
             }
 
-            await _eventService.AddEvent(newEvent, "accept");
-            return Created();
+            await _eventService.AcceptRejectEvent(acceptRejectEventDto);
+            return Ok();
         }
     }
 }

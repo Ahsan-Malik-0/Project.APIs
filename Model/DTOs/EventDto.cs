@@ -52,12 +52,13 @@ namespace Project.APIs.Model.DTOs
 
     }
 
-    public class Accept_RejectEvent
+    public class AcceptRejectEventDto
     {
         [Required(ErrorMessage = "Id is required")]
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
         public required string Status { get; set; }
+        public string? Message { get; set; }
     }
 }

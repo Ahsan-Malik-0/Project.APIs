@@ -212,16 +212,18 @@ namespace Project.APIs.Services
         }
 
         // Accept of Reject Event
-        public async Task Accept_Reject(Accept_RejectEvent accept_RejectEvent)
+        public async Task AcceptRejectEvent(AcceptRejectEventDto acceptRejectEventDto)
         {
-            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == accept_RejectEvent.Id);
+            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == acceptRejectEventDto.Id);
 
             if (_event == null)
                 throw new NotFoundException("Event not found");
 
-            _event.Status = accept_RejectEvent.Status;
+            if(!string.IsNullOrEmpty(acceptRejectEventDto.Message))
+                _event.Message = acceptRejectEventDto.Message;
 
-            _dB.Update(_event);
+            _event.Status = acceptRejectEventDto.Status;
+
             await _dB.SaveChangesAsync();
         }
 
