@@ -42,5 +42,6 @@ namespace Project.APIs.Model.DTOs
         public required string EventName { get; set; }
         public DateTime EventDate { get; set; }
         public required string Status { get; set; }
+        public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
     }
 }

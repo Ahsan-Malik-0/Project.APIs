@@ -15,7 +15,6 @@ namespace Project.APIs.Services
             EventRequisition eventRequisition = new EventRequisition()
             {
                 Subject = newRequisition.Subject,
-                RequestedDate = newRequisition.ReqestedDate ?? DateTime.Now,
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
                 RequestAmount = newRequisition.RequestedAmount,
@@ -26,6 +25,8 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
+
+        //public async Task<List<PendingEventRequisitionsDto>> GetPendingRequisitions(Guid memberId)
         // Member Id In
         // Event name
         // event date
@@ -59,10 +60,11 @@ namespace Project.APIs.Services
                                                 m.SocietyId == e.SocietyId)))
                 .Select(er => new PendingEventRequisitionDetailsDto()
                 {
-                  Id = er.EventId,
+                  Id = er.Id, /// changed by jason  on 6 march 11:30
                   EventName = _dB.Events.Where(e=> e.Id == er.EventId).Select(e => e.Name).FirstOrDefault()!,
                   EventDate = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Date).FirstOrDefault(),
                   Status = er.Status,
+                  ReviewMessage = er.ReviewMessage /// changed by jason  on 6 march 11:32
                 })
                 .AsNoTracking()
                 .ToListAsync();
