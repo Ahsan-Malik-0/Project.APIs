@@ -27,6 +27,22 @@ namespace Project.APIs.Services
             return pendingEvents;
         }
 
+        public async Task<List<Event>> GetPendingAndRejectedEvents(Guid memberId)
+        {
+            // Fix: Get the SocietyId for the given memberId
+            var pendingEvents = await _dB.Events
+                                .Include(e => e.Requirements)
+                                .Where(e => e.Status == "pending" || e.Status == "rejected")
+                                .Where(e => _dB.Members
+                                    .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
+                                .ToListAsync();
+
+            if (!pendingEvents.Any())
+                throw new NotFoundException("Pending events not found");
+
+            return pendingEvents;
+        }
+
         //Add a new event from President
         public async Task AddEvent(AddEventDto newEvent, string status)
         {
@@ -101,6 +117,9 @@ namespace Project.APIs.Services
                 // 1️ Update event fields
                 existingEvent.Name = dto.Name;
                 existingEvent.Date = dto.Date;
+
+                if (existingEvent.Status == "rejected")
+                    existingEvent.Status = "pending";
 
                 // 2️ Delete all old requirements
                 if (existingEvent.Requirements.Any())

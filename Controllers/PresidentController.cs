@@ -15,9 +15,9 @@ namespace Project.APIs.Controllers
     {
         //Show all pending events
         [HttpGet("pendingEvents")]
-        public async Task<IActionResult> GetPendingEvents(Guid memberId)
+        public async Task<IActionResult> GetPendingAndRejectedEvents(Guid memberId)
         {
-            var pendingEvents = await _eventService.GetPendingEvents(memberId);
+            var pendingEvents = await _eventService.GetPendingAndRejectedEvents(memberId);
             return Ok(pendingEvents);
         }
 
