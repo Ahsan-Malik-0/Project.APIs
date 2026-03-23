@@ -58,7 +58,7 @@ namespace Project.APIs.Controllers
         }
 
         //Get all accepted Events for history
-        [HttpGet("history")]
+        [HttpGet("history/{memberId:guid}")]
         public async Task<IActionResult> GetEventsHistory(Guid memberId)
         {
             var events = await _eventService.GetEventsHistory(memberId);
