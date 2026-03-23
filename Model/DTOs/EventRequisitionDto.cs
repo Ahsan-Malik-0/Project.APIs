@@ -31,8 +31,10 @@ namespace Project.APIs.Model.DTOs
     public class EventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
+        public DateTime RequestedDate { get; set; }
         public required string Subject { get; set; }
         public required string Body { get; set; }
+        public required string SocietyName { get; set; }
         public required ICollection<EventRequirementDto> EventRequirements { get; set; }
     }
 

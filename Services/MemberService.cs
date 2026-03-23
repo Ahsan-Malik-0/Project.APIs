@@ -116,9 +116,9 @@ namespace Project.APIs.Services
         //    await _dB.SaveChangesAsync();
         //}
 
-        public async Task EditProfile(UpdateMemberProfileDto updatedMember)
+        public async Task EditProfile(Guid memberId, UpdateMemberProfileDto updatedMember)
         {
-            var oldMember = await _dB.Members.FindAsync(updatedMember.Id);
+            var oldMember = await _dB.Members.FindAsync(memberId);
 
             // ==============================
             // 🔐 PASSWORD CHANGE (OPTIONAL)

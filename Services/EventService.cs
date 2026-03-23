@@ -101,7 +101,7 @@ namespace Project.APIs.Services
 
 
         // Update Event with Requirements
-        public async Task UpdateEventWithRequirements(UpdateEventDto dto)
+        public async Task UpdateEventWithRequirements(Guid id, UpdateEventDto dto)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
@@ -109,7 +109,7 @@ namespace Project.APIs.Services
             {
                 var existingEvent = await _dB.Events
                     .Include(e => e.Requirements)
-                    .FirstOrDefaultAsync(e => e.Id == dto.Id);
+                    .FirstOrDefaultAsync(e => e.Id == id);
 
                 if (existingEvent == null)
                     throw new NotFoundException("Event not found.");
@@ -161,21 +161,7 @@ namespace Project.APIs.Services
         }
 
         //Delete Event
-        public async Task SoftDeleteEventWithRequirements(Guid eventId)
-        {
-            var deleteEvent = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-            if (deleteEvent == null)
-            {
-                throw new NotFoundException("Event Not Found");
-            }
-
-            deleteEvent.Status = "deleted";
-
-            await _dB.SaveChangesAsync();
-
-        }
-
-        public async Task PermanentDeleteEventWithRequirements(Guid eventId)
+        public async Task DeleteEventWithRequirements(Guid eventId)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
@@ -218,7 +204,7 @@ namespace Project.APIs.Services
         {
             var events = await _dB.Events
                 .Include(e => e.Requirements)
-                .Where(e => e.Status == "accepted" || e.Status == "deleted")
+                .Where(e => e.Status == "accepted" || e.Status == "waiting")
                 .Where(e => _dB.Members
                     .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
                 .OrderByDescending(e => e.Date) // Order by date
@@ -230,24 +216,23 @@ namespace Project.APIs.Services
             return events;
         }
 
-        // Accept of Reject Event
-        public async Task AcceptRejectEvent(AcceptRejectEventDto acceptRejectEventDto)
+        // Update Event status to accept, rejecy or waiting
+        public async Task UpdateEventStatus(UpdateEventStatusDto updateEventStatus)
         {
-            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == acceptRejectEventDto.Id);
+            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == updateEventStatus.Id);
 
             if (_event == null)
                 throw new NotFoundException("Event not found");
 
-            if(!string.IsNullOrEmpty(acceptRejectEventDto.Message))
-                _event.Message = acceptRejectEventDto.Message;
+            if(!string.IsNullOrEmpty(updateEventStatus.Message))
+                _event.Message = updateEventStatus.Message;
 
-            _event.Status = acceptRejectEventDto.Status;
+            _event.Status = updateEventStatus.Status;
 
             await _dB.SaveChangesAsync();
         }
 
         // Get specific event by id
-
         public async Task<Event> GetEventById(Guid eventId)
         {
             var _event = await _dB.Events

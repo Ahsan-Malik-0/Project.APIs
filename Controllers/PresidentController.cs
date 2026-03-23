@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
@@ -13,6 +14,8 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class PresidentController(EventService _eventService, MemberService memberService) : ControllerBase
     {
+
+        // Handling Event Endpoints --------------------------------------------------------
         //Show all pending events
         [HttpGet("pendingEvents")]
         public async Task<IActionResult> GetPendingAndRejectedEvents(Guid memberId)
@@ -34,31 +37,24 @@ namespace Project.APIs.Controllers
             return Created();
         }
 
-        //Update Existing 
-        [HttpPut("updateEvent")]
-        public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventDto updateEventDto)
+        //Update Existing event
+        [HttpPut("updateEvent/{eventId:guid}")]
+        public async Task<IActionResult> UpdateEvent(Guid eventId, [FromBody] UpdateEventDto updateEventDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _eventService.UpdateEventWithRequirements(updateEventDto);
+            await _eventService.UpdateEventWithRequirements(eventId, updateEventDto);
             return Ok();
         }
 
-        //Delete Event
-        [HttpPut("softDeleteEvent")]
-        public async Task<IActionResult> SoftDeleteEvent([FromBody] Event @event)
+        //Delete pending event
+        [HttpDelete("deletePendingEvent/{eventId:guid}")]
+        public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
-            await _eventService.SoftDeleteEventWithRequirements(@event.Id);
-            return Ok(); // 204
-        }
-
-        [HttpDelete("permanetDeleteEvent/{id}")]
-        public async Task<IActionResult> PermanentDeleteEvent(Guid eventId)
-        {
-            await _eventService.PermanentDeleteEventWithRequirements(eventId);
+            await _eventService.DeleteEventWithRequirements(eventId);
             return NoContent(); // 204
         }
 
@@ -70,26 +66,42 @@ namespace Project.APIs.Controllers
             return Ok(events);
         }
 
+        // Get specific event (use for edit event)
+        [HttpGet("getEventById/{eventId:guid}")]
+        public async Task<IActionResult> GetEventById(Guid eventId)
+        {
+            if (eventId == Guid.Empty)
+                return BadRequest();
+
+            var @event = await _eventService.GetEventById(eventId);
+
+            return Ok(@event);
+        }
+
+
+        // Handling Profile Endpoints ----------------------------------------------------------
         // View Profile
-        [HttpGet("viewProfile")]
+        [HttpGet("viewProfile/{memberId:guid}")]
         public async Task<IActionResult> GetProfile(Guid memberId)
         {
             var member = await memberService.ViewProfile(memberId);
             return Ok(member);
         }
 
-        [HttpPut("updateProfile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateMemberProfileDto updateMemberProfileDto)
+        [HttpPut("updateProfile/{memberId:guid}")]
+        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateMemberProfileDto updateMemberProfileDto)
         {
             if (!ModelState.IsValid) 
                 return BadRequest("Fill the credentials");
 
-            await memberService.EditProfile(updateMemberProfileDto);
+            await memberService.EditProfile(memberId, updateMemberProfileDto);
             return Ok();
         }
 
+
+        // Handling Society Endpoints ---------------------------------------------------------------
         // Get society id using member's id
-        [HttpGet("getSocietyId")]
+        [HttpGet("getSocietyId/{memberId:guid}")]
         public async Task<IActionResult> GetSocietyId(Guid memberId)
         {
             if (memberId == Guid.Empty)
@@ -99,18 +111,5 @@ namespace Project.APIs.Controllers
 
             return Ok(societyId);
         }
-
-        // Get specific event (use for edit event)
-        [HttpGet("getEventById")]
-        public async Task<IActionResult> GetEventById(Guid eventId)
-        {
-            if(eventId == Guid.Empty)
-                return BadRequest();
-
-            var @event = await _eventService.GetEventById(eventId);
-
-            return Ok(@event);
-        }
-
     }
 }

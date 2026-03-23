@@ -11,7 +11,7 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
     {
-        // Event Endpoints
+        // Handling Event Endpoints -------------------------------------------------------
         // Pending Events
         [HttpGet("pendingEvents")]
         public async Task<IActionResult> GetPendingEvents(Guid memberId)
@@ -21,24 +21,52 @@ namespace Project.APIs.Controllers
         }
 
         //Update Existing 
-        [HttpPut("updateEvent")]
-        public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventDto updateEventDto)
+        [HttpPut("updateEvent/{eventId:guid}")]
+        public async Task<IActionResult> UpdateEvent(Guid eventId, [FromBody] UpdateEventDto updateEventDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _eventService.UpdateEventWithRequirements(updateEventDto);
+            await _eventService.UpdateEventWithRequirements(eventId, updateEventDto);
             return Ok();
         }
 
         //Delete Event
-        [HttpPut("softDeleteEvent")]
-        public async Task<IActionResult> SoftDeleteEvent([FromBody] Event @event)
+        [HttpDelete("deleteRequestedEvent")]
+        public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
-            await _eventService.SoftDeleteEventWithRequirements(@event.Id);
+            await _eventService.DeleteEventWithRequirements(eventId);
             return NoContent(); // 204
+        }
+
+        // Reject Event
+        [HttpPut("rejectEvent")]
+        public async Task<IActionResult> RejectEvent([FromBody] UpdateEventStatusDto updateEventStatus)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Fill the credentials");
+            }
+
+            await _eventService.UpdateEventStatus(updateEventStatus);
+            return Ok();
+        }
+
+        // Temperory Delete Event
+        [HttpPut("temperoryDeleteEvent")]
+        public async Task<IActionResult> PutEventInWaititngState(Guid eventId)
+        {
+
+            UpdateEventStatusDto updateEventStatus = new UpdateEventStatusDto()
+            {
+                Id = eventId,
+                Status = "waiting",
+            };
+
+            await _eventService.UpdateEventStatus(updateEventStatus);
+            return Ok();
         }
 
         // Get specific event (use for edit event)
@@ -55,6 +83,8 @@ namespace Project.APIs.Controllers
 
 
 
+
+        // Handling Requisition Endpoints -----------------------------------------------------
         //Pending Requisitions
         [HttpGet("getPendingRequisitions")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
@@ -67,8 +97,8 @@ namespace Project.APIs.Controllers
         [HttpGet("getEventRequisitionDetail")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
-            var pendingRequisitions = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
-            return Ok(pendingRequisitions);
+            var requisitionsDetails= await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
+            return Ok(requisitionsDetails);
         }
 
         //Create Requisition
@@ -111,27 +141,16 @@ namespace Project.APIs.Controllers
         }
 
         //Edit Profile
-        [HttpPut("updateProfile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateMemberProfileDto updateMemberProfileDto)
+        [HttpPut("updateProfile/{memberId:guid}")]
+        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateMemberProfileDto updateMemberProfileDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Fill the credentials");
 
-            await memberService.EditProfile(updateMemberProfileDto);
+            await memberService.EditProfile(memberId, updateMemberProfileDto);
             return Ok();
         }
 
-        //Accept or reject event
-        [HttpPut("acceptRejectEvent")]
-        public async Task<IActionResult> AcceptRejectEvent([FromBody] AcceptRejectEventDto acceptRejectEventDto)
-        {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest("Fill the credentials");
-            }
-
-            await _eventService.AcceptRejectEvent(acceptRejectEventDto);
-            return Ok();
-        }
+        
     }
 }

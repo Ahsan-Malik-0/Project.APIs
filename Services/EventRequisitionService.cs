@@ -12,8 +12,13 @@ namespace Project.APIs.Services
     {
         public async Task CreateRequisition(CreateEventRequisitionDto newRequisition)
         {
+            var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
+
+            @event!.Status = "accepted";
+
             EventRequisition eventRequisition = new EventRequisition()
             {
+                RequestedDate = newRequisition.ReqestedDate ?? DateTime.Now,
                 Subject = newRequisition.Subject,
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
@@ -35,6 +40,7 @@ namespace Project.APIs.Services
 
         public async Task<List<PendingEventRequisitionDetailsDto>> GetPendingEventRequisitions(Guid memberId)
         {
+            // By joining method
             //var result = await (
             //    from er in _dB.EventRequisitions
             //    join e in _dB.Events on er.EventId equals e.Id
@@ -52,19 +58,34 @@ namespace Project.APIs.Services
             //.AsNoTracking()
             //.ToListAsync();
 
+            // By sub query method
+            //var result = await _dB.EventRequisitions
+            //    .Where(er => er.Status == "pending" &&
+            //        _dB.Events.Any(e => e.Id == er.EventId &&
+            //                _dB.Members.Any(m => m.Id == memberId &&
+            //                                    m.SocietyId == e.SocietyId)))
+            //    .Select(er => new PendingEventRequisitionDetailsDto()
+            //    {
+            //      Id = er.Id, /// changed by jason  on 6 march 11:30
+            //      EventName = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Name).FirstOrDefault()!,
+            //      EventDate = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Date).FirstOrDefault(),
+            //      Status = er.Status,
+            //      ReviewMessage = er.ReviewMessage /// changed by jason  on 6 march 11:32
+            //    })
+            //    .AsNoTracking()
+            //    .ToListAsync();
 
+            // By chaining method
             var result = await _dB.EventRequisitions
-                .Where(er => er.Status == "pending" &&
-                    _dB.Events.Any(e => e.Id == er.EventId &&
-                            _dB.Members.Any(m => m.Id == memberId &&
-                                                m.SocietyId == e.SocietyId)))
+                .Where(er => er.Status == "pending"
+                    && er._event!.Society!.Members.Any(m => m.Id == memberId))
                 .Select(er => new PendingEventRequisitionDetailsDto()
                 {
-                  Id = er.Id, /// changed by jason  on 6 march 11:30
-                  EventName = _dB.Events.Where(e=> e.Id == er.EventId).Select(e => e.Name).FirstOrDefault()!,
-                  EventDate = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Date).FirstOrDefault(),
-                  Status = er.Status,
-                  ReviewMessage = er.ReviewMessage /// changed by jason  on 6 march 11:32
+                    Id = er.Id,
+                    EventName = er._event!.Name,
+                    EventDate = er._event.Date,
+                    Status = er.Status,
+                    ReviewMessage = er.ReviewMessage
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -122,7 +143,7 @@ namespace Project.APIs.Services
             //     pendingEventRequisitionsList.Add(pendingEventRequisitions);
             // }
             // return pendingEventRequisitionsList;
-        
+
 
             //var result = await _dB.EventRequisitions
             //.Where(er => er.Status == "pending" &&
@@ -148,12 +169,17 @@ namespace Project.APIs.Services
             //.ToListAsync();
 
             var result = await _dB.EventRequisitions
-                .Where(er => er.Id == requisitionId )
+                .Where(er => er.Id == requisitionId)
                 .Select(er => new EventRequisitionDetailsDto()
-                { 
+                {
                     Id = er.Id,
+                    RequestedDate = er.RequestedDate,
                     Subject = er.Subject,
                     Body = er.Body,
+                    SocietyName = _dB.EventRequisitions
+                            .Where(er => er.Id == requisitionId)
+                            .Select(er => er._event!.Society!.Name)  // If navigation properties are set up
+                            .FirstOrDefault()!,
                     EventRequirements = _dB.EventRequirements
                             .Where(req => req.EventId == er.EventId)
                             .Select(req => new EventRequirementDto
