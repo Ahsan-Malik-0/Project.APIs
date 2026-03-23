@@ -14,10 +14,9 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class PresidentController(EventService _eventService, MemberService memberService) : ControllerBase
     {
-
         // Handling Event Endpoints --------------------------------------------------------
         //Show all pending events
-        [HttpGet("pendingEvents")]
+        [HttpGet("pendingEvents/{memberId:guid}")]
         public async Task<IActionResult> GetPendingAndRejectedEvents(Guid memberId)
         {
             var pendingEvents = await _eventService.GetPendingAndRejectedEvents(memberId);
