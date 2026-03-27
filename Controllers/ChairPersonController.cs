@@ -13,7 +13,7 @@ namespace Project.APIs.Controllers
     {
         // Handling Event Endpoints -------------------------------------------------------
         // Pending Events
-        [HttpGet("pendingEvents")]
+        [HttpGet("pendingEvents/{memberId:guid}")]
         public async Task<IActionResult> GetPendingEvents(Guid memberId)
         {
             var pendingEvents = await _eventService.GetPendingEvents(memberId);
@@ -34,7 +34,7 @@ namespace Project.APIs.Controllers
         }
 
         //Delete Event
-        [HttpDelete("deleteRequestedEvent")]
+        [HttpDelete("deleteRequestedEvent/{eventId:guid}")]
         public async Task<IActionResult> DeleteEvent(Guid eventId)
         {
             await _eventService.DeleteEventWithRequirements(eventId);
@@ -42,35 +42,33 @@ namespace Project.APIs.Controllers
         }
 
         // Reject Event
-        [HttpPut("rejectEvent")]
-        public async Task<IActionResult> RejectEvent([FromBody] UpdateEventStatusDto updateEventStatus)
+        [HttpPut("rejectEvent/{eventId:guid}")]
+        public async Task<IActionResult> RejectEvent(Guid eventId, [FromBody] UpdateEventStatusDto updateEventStatus)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest("Fill the credentials");
             }
 
-            await _eventService.UpdateEventStatus(updateEventStatus);
+            await _eventService.UpdateEventStatus(eventId, updateEventStatus);
             return Ok();
         }
 
-        // Temperory Delete Event
-        [HttpPut("temperoryDeleteEvent")]
+        // Put event in waiting state
+        [HttpPut("temperoryRemoveEvent/{eventId:guid}")]
         public async Task<IActionResult> PutEventInWaititngState(Guid eventId)
         {
-
             UpdateEventStatusDto updateEventStatus = new UpdateEventStatusDto()
             {
-                Id = eventId,
                 Status = "waiting",
             };
 
-            await _eventService.UpdateEventStatus(updateEventStatus);
+            await _eventService.UpdateEventStatus(eventId, updateEventStatus);
             return Ok();
         }
 
         // Get specific event (use for edit event)
-        [HttpGet("getEventById")]
+        [HttpGet("getEventById/{eventId:guid}")]
         public async Task<IActionResult> GetEventById(Guid eventId)
         {
             if (eventId == Guid.Empty)
@@ -82,11 +80,9 @@ namespace Project.APIs.Controllers
         }
 
 
-
-
         // Handling Requisition Endpoints -----------------------------------------------------
         //Pending Requisitions
-        [HttpGet("getPendingRequisitions")]
+        [HttpGet("getPendingRequisitions/{memberId:guid}")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
         {
             var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
@@ -94,7 +90,7 @@ namespace Project.APIs.Controllers
         }
 
         //Requisition Detail
-        [HttpGet("getEventRequisitionDetail")]
+        [HttpGet("getEventRequisitionDetail/{requisitionId:guid}")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
             var requisitionsDetails= await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
@@ -115,15 +111,15 @@ namespace Project.APIs.Controllers
         }
 
         //Get Chairperson details for requisition form
-        [HttpGet("detailsForRequisition")]
-        public async Task<IActionResult> GetDetailsForRequisitionForm(Guid id)
+        [HttpGet("detailsForRequisition/{memberId:guid}")]
+        public async Task<IActionResult> GetDetailsForRequisitionForm(Guid memberId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var chairpersonDetail = await memberService.GetChairpersonDetailsForRequisitionForm(id);
+            var chairpersonDetail = await memberService.GetChairpersonDetailsForRequisitionForm(memberId);
             return Ok(chairpersonDetail);
         }
 
@@ -133,7 +129,7 @@ namespace Project.APIs.Controllers
         //View Rquisitions History
 
         //View Profile
-        [HttpGet("viewProfile")]
+        [HttpGet("viewProfile/{memberId:guid}")]
         public async Task<IActionResult> GetProfile(Guid memberId)
         {
             var member = await memberService.ViewProfile(memberId);

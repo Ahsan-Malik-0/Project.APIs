@@ -15,7 +15,7 @@ namespace Project.APIs.Controllers
     public class PresidentController(EventService _eventService, MemberService memberService) : ControllerBase
     {
         // Handling Event Endpoints --------------------------------------------------------
-        //Show all pending events
+        //Show all pending and rejected events
         [HttpGet("pendingEvents/{memberId:guid}")]
         public async Task<IActionResult> GetPendingAndRejectedEvents(Guid memberId)
         {
@@ -63,6 +63,19 @@ namespace Project.APIs.Controllers
         {
             var events = await _eventService.GetEventsHistory(memberId);
             return Ok(events);
+        }
+
+        // Resubmit waiting events
+        [HttpPut("resubmitEvent/{eventId:guid}")]
+        public async Task<IActionResult> PutEventInWaititngState(Guid eventId)
+        {
+            UpdateEventStatusDto updateEventStatus = new UpdateEventStatusDto()
+            {
+                Status = "pending",
+            };
+
+            await _eventService.UpdateEventStatus(eventId, updateEventStatus);
+            return Ok();
         }
 
         // Get specific event (use for edit event)

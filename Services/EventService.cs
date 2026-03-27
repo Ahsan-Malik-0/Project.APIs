@@ -118,7 +118,7 @@ namespace Project.APIs.Services
                 existingEvent.Name = dto.Name;
                 existingEvent.Date = dto.Date;
 
-                if (existingEvent.Status == "rejected")
+                if (existingEvent.Status == "rejected" || existingEvent.Status == "waiting")
                     existingEvent.Status = "pending";
 
                 // 2️ Delete all old requirements
@@ -217,9 +217,9 @@ namespace Project.APIs.Services
         }
 
         // Update Event status to accept, rejecy or waiting
-        public async Task UpdateEventStatus(UpdateEventStatusDto updateEventStatus)
+        public async Task UpdateEventStatus(Guid eventId, UpdateEventStatusDto updateEventStatus)
         {
-            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == updateEventStatus.Id);
+            var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (_event == null)
                 throw new NotFoundException("Event not found");
