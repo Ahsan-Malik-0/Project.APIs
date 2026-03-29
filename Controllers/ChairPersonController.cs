@@ -55,7 +55,7 @@ namespace Project.APIs.Controllers
         }
 
         // Put event in waiting state
-        [HttpPut("temperoryRemoveEvent/{eventId:guid}")]
+        [HttpPut("temperaryRemoveEvent/{eventId:guid}")]
         public async Task<IActionResult> PutEventInWaititngState(Guid eventId)
         {
             UpdateEventStatusDto updateEventStatus = new UpdateEventStatusDto()
@@ -81,7 +81,7 @@ namespace Project.APIs.Controllers
 
 
         // Handling Requisition Endpoints -----------------------------------------------------
-        //Pending Requisitions
+        // Pending Requisitions
         [HttpGet("getPendingRequisitions/{memberId:guid}")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
         {
@@ -89,7 +89,7 @@ namespace Project.APIs.Controllers
             return Ok(pendingRequisitions);
         }
 
-        //Requisition Detail
+        // Requisition Detail
         [HttpGet("getEventRequisitionDetail/{requisitionId:guid}")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
@@ -97,7 +97,7 @@ namespace Project.APIs.Controllers
             return Ok(requisitionsDetails);
         }
 
-        //Create Requisition
+        // Create Requisition
         [HttpPost("createEventRequisition")]
         public async Task<IActionResult> CreateEventRequisition([FromBody] CreateEventRequisitionDto requisitionDto)
         {
@@ -110,23 +110,19 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        //Get Chairperson details for requisition form
-        [HttpGet("detailsForRequisition/{memberId:guid}")]
-        public async Task<IActionResult> GetDetailsForRequisitionForm(Guid memberId)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var chairpersonDetail = await memberService.GetChairpersonDetailsForRequisitionForm(memberId);
-            return Ok(chairpersonDetail);
-        }
-
 
         //Get event Requirements
 
         //View Rquisitions History
+
+        // View President Profile
+        [HttpGet("viewPresidentProfle/{memberId:guid}")]
+        public async Task<IActionResult> GetPresidentProfile(Guid memberId)
+        {
+            var presidnet = await memberService.GetMemberProfile(memberId);
+            return Ok(presidnet);
+        }
+        // Edit Presidrent Profile
 
         //View Profile
         [HttpGet("viewProfile/{memberId:guid}")]

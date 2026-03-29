@@ -196,24 +196,25 @@ namespace Project.APIs.Services
                 .FirstOrDefaultAsync();
         }
 
-
-        public async Task<ChairpersonDetailForRequisitionDto> GetChairpersonDetailsForRequisitionForm(Guid memberId)
+        public async Task<ViewMemberProfileDto> GetMemberProfile(Guid memberId)
         {
             var member = await _dB.Members
-                .Include(m => m.Society)
-                .FirstOrDefaultAsync(m => m.Id == memberId);
+                .Where(m => m.Role == "president"
+                    && _dB.Members.Any(m2 => m2.Id == memberId
+                        && m2.SocietyId == m.SocietyId))
+                .FirstOrDefaultAsync();
 
             if (member == null)
-                throw new NotFoundException("Member not found");
+                throw new NotFoundException("President not found");
 
-            ChairpersonDetailForRequisitionDto memberDetail = new ChairpersonDetailForRequisitionDto()
+            ViewMemberProfileDto memberProfile = new ViewMemberProfileDto()
             {
+                Id = member.Id,
                 Name = member.Name,
-                Role = member.Role,
-                SocietyName = member.Society!.Name,
+                Username = member.Username,
             };
 
-            return memberDetail;
+            return memberProfile;
         }
 
     }

@@ -173,6 +173,10 @@ namespace Project.APIs.Services
                 .Select(er => new EventRequisitionDetailsDto()
                 {
                     Id = er.Id,
+                    EventDate = _dB.EventRequisitions
+                            .Where(er => er.Id == requisitionId)
+                            .Select(er => er._event!.Date)
+                            .FirstOrDefault(),
                     RequestedDate = er.RequestedDate,
                     Subject = er.Subject,
                     Body = er.Body,

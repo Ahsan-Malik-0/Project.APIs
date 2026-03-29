@@ -66,10 +66,18 @@ namespace Project.APIs.Model.DTOs
         public string? Picture { get; set; }
     }
 
-    public class ChairpersonDetailForRequisitionDto
+    public class ViewMemberProfileDto
     {
+        public Guid Id { get; set; }
         public required string Name { get; set; }
-        public required string Role { get; set; }
-        public required string SocietyName { get; set; }
+        public required string Username { get; set; }
     }
+
+    public class EditMemberProfileDto
+    {
+        public Guid Id { get; set; }
+        public required string Username { get; set; }
+        public required string NewHashPassword { get; set; }
+    }
+
 }

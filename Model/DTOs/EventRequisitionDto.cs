@@ -18,26 +18,6 @@ namespace Project.APIs.Model.DTOs
         public Guid EventId { get; set; }
     }
 
-    public class RequisitoinDetailForChairperosnDto
-    {
-        public required string Subject { get; set; }
-        public required string Body { get; set; }
-        public required string Status { get; set; }
-        public Guid EventId { get; set; }
-        public required ICollection<EventRequirementDto> EventRequirement { get; set; }
-        
-    }
-
-    public class EventRequisitionDetailsDto
-    {
-        public Guid Id { get; set; }
-        public DateTime RequestedDate { get; set; }
-        public required string Subject { get; set; }
-        public required string Body { get; set; }
-        public required string SocietyName { get; set; }
-        public required ICollection<EventRequirementDto> EventRequirements { get; set; }
-    }
-
     public class PendingEventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
@@ -45,5 +25,16 @@ namespace Project.APIs.Model.DTOs
         public DateTime EventDate { get; set; }
         public required string Status { get; set; }
         public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
+    }
+
+    public class EventRequisitionDetailsDto
+    {
+        public Guid Id { get; set; }
+        public DateTime EventDate { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public required string Subject { get; set; }
+        public required string Body { get; set; }
+        public required string SocietyName { get; set; }
+        public required ICollection<EventRequirementDto> EventRequirements { get; set; }
     }
 }
