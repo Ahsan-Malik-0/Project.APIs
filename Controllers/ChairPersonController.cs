@@ -93,7 +93,7 @@ namespace Project.APIs.Controllers
         [HttpGet("getEventRequisitionDetail/{requisitionId:guid}")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
-            var requisitionsDetails= await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
+            var requisitionsDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
             return Ok(requisitionsDetails);
         }
 
@@ -110,19 +110,31 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-
-        //Get event Requirements
-
         //View Rquisitions History
-
-        // View President Profile
-        [HttpGet("viewPresidentProfle/{memberId:guid}")]
-        public async Task<IActionResult> GetPresidentProfile(Guid memberId)
+        [HttpGet("eventRequisitionHistory/{memberId:guid}")]
+        public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
         {
-            var presidnet = await memberService.GetMemberProfile(memberId);
+            var pastRequisitionList = await eventRequisitionService.RequisitionHistory(memberId);
+            return Ok(pastRequisitionList);
+        }
+
+
+        // Handling Profiles ----------------------------------------------------------------
+        // View President Profile
+        [HttpGet("viewPresidentProfle/{chairpersonId:guid}")]
+        public async Task<IActionResult> GetPresidentProfile(Guid chairpersonId)
+        {
+            var presidnet = await memberService.GetMemberProfile(chairpersonId);
             return Ok(presidnet);
         }
+
         // Edit Presidrent Profile
+        [HttpPut("updatePresidentProfile/{presidentId:guid}")]
+        public async Task<IActionResult> UpdatePresidentProfile(Guid presidentId, EditMemberProfileDto editMemberProfile)
+        {
+            await memberService.UpdateMemberProfile(presidentId, editMemberProfile);
+            return Ok();
+        }
 
         //View Profile
         [HttpGet("viewProfile/{memberId:guid}")]
