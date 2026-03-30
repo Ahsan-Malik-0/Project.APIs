@@ -18,7 +18,7 @@ namespace Project.APIs.Model.DTOs
         public Guid EventId { get; set; }
     }
 
-    public class PendingEventRequisitionDetailsDto
+    public class EventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
         public required string EventName { get; set; }
@@ -27,7 +27,7 @@ namespace Project.APIs.Model.DTOs
         public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
     }
 
-    public class EventRequisitionDetailsDto
+    public class SingleEventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
         public DateTime EventDate { get; set; }

@@ -76,6 +76,7 @@ namespace Project.APIs.Model.DTOs
     public class EditMemberProfileDto
     {
         public Guid Id { get; set; }
+        public required string Name { get; set; }
         public required string Username { get; set; }
         public required string NewHashPassword { get; set; }
     }

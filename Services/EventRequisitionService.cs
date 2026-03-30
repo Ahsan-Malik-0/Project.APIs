@@ -38,7 +38,7 @@ namespace Project.APIs.Services
         // Status
         // Review Message (if any)
 
-        public async Task<List<PendingEventRequisitionDetailsDto>> GetPendingEventRequisitions(Guid memberId)
+        public async Task<List<EventRequisitionDetailsDto>> GetPendingEventRequisitions(Guid memberId)
         {
             // By joining method
             //var result = await (
@@ -79,7 +79,7 @@ namespace Project.APIs.Services
             var result = await _dB.EventRequisitions
                 .Where(er => er.Status == "pending"
                     && er._event!.Society!.Members.Any(m => m.Id == memberId))
-                .Select(er => new PendingEventRequisitionDetailsDto()
+                .Select(er => new EventRequisitionDetailsDto()
                 {
                     Id = er.Id,
                     EventName = er._event!.Name,
@@ -94,7 +94,7 @@ namespace Project.APIs.Services
         }
 
 
-        public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
+        public async Task<SingleEventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         {
             // var eventsIds = await _dB.Events
             //     .Where(e => _dB.Members
@@ -170,7 +170,7 @@ namespace Project.APIs.Services
 
             var result = await _dB.EventRequisitions
                 .Where(er => er.Id == requisitionId)
-                .Select(er => new EventRequisitionDetailsDto()
+                .Select(er => new SingleEventRequisitionDetailsDto()
                 {
                     Id = er.Id,
                     EventDate = _dB.EventRequisitions
@@ -200,6 +200,33 @@ namespace Project.APIs.Services
                 throw new NotFoundException("Requisition Not Found");
 
             return result;
+        }
+
+        public async Task<List<EventRequisitionDetailsDto>> RequisitionHistory(Guid memberId)
+        {
+            var societyId = await _dB.Members
+                    .Where(m => memberId == m.Id)
+                    .Select(m => m.SocietyId)
+                    .FirstOrDefaultAsync();
+
+            if (societyId == Guid.Empty)
+                throw new NotFoundException("Society not found");
+
+            var acceptedRequisition = await _dB.EventRequisitions
+                    .Where(er => er.Status == "budgetAllocated"
+                    && er._event!.SocietyId == societyId)
+                    .Select(er => new EventRequisitionDetailsDto()
+                    {
+                        Id = er.Id,
+                        EventName = er._event!.Name,
+                        EventDate = er._event.Date,
+                        Status = er.Status,
+                        ReviewMessage = ""
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+            return acceptedRequisition;
         }
     }
     

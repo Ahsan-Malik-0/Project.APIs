@@ -217,5 +217,19 @@ namespace Project.APIs.Services
             return memberProfile;
         }
 
+        public async Task UpdateMemberProfile(Guid memberId, EditMemberProfileDto editMemberProfile)
+        {
+            var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == memberId);
+
+            if (member == null)
+                throw new NotFoundException("President not found");
+
+            member.Name = editMemberProfile.Name;
+            member.Username = editMemberProfile.Username;
+            member.HashPassword = _passwordHasher.HashPassword(member, editMemberProfile.NewHashPassword);
+
+            await _dB.SaveChangesAsync();
+        }
+
     }
 }
