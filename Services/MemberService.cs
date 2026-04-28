@@ -231,5 +231,20 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
+        public async Task<ChairpersonDetailsForRequisitionDto> GetChairpersonDetailsForRequisition(Guid chairpersonId)
+        {
+            var chairpersonDetails = await _dB.Members.Where(m => m.Id == chairpersonId)
+                .Select(m => new ChairpersonDetailsForRequisitionDto()
+                {
+                    ChaipersonName = m.Name,
+                    SocietyName = m.Society!.Name
+                }).FirstOrDefaultAsync();
+
+            if(chairpersonDetails == null)
+                throw new NotFoundException("Chairperson not found");
+
+            return chairpersonDetails;
+        }
+
     }
 }

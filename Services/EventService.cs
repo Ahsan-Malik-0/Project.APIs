@@ -117,8 +117,9 @@ namespace Project.APIs.Services
                 // 1️ Update event fields
                 existingEvent.Name = dto.Name;
                 existingEvent.Date = dto.Date;
+                existingEvent.Message = "";
 
-                if (existingEvent.Status == "rejected" || existingEvent.Status == "waiting")
+                if (existingEvent.Status == "rejected" || existingEvent.Status == "postponed")
                     existingEvent.Status = "pending";
 
                 // 2️ Delete all old requirements
@@ -199,12 +200,12 @@ namespace Project.APIs.Services
 
         }
 
-        // Get all accepted events
+        // Event history for president
         public async Task<List<Event>> GetEventsHistory(Guid memberId)
         {
             var events = await _dB.Events
                 .Include(e => e.Requirements)
-                .Where(e => e.Status == "accepted" || e.Status == "waiting")
+                .Where(e => e.Status == "accepted" || e.Status == "postponed")
                 .Where(e => _dB.Members
                     .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
                 .OrderByDescending(e => e.Date) // Order by date
@@ -216,7 +217,7 @@ namespace Project.APIs.Services
             return events;
         }
 
-        // Update Event status to accept, rejecy or waiting
+        // Update Event status to accept, rejecy or postponed
         public async Task UpdateEventStatus(Guid eventId, UpdateEventStatusDto updateEventStatus)
         {
             var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);

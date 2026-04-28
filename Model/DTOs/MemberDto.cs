@@ -81,4 +81,9 @@ namespace Project.APIs.Model.DTOs
         public required string NewHashPassword { get; set; }
     }
 
+    public class ChairpersonDetailsForRequisitionDto
+    {
+        public string? ChaipersonName { get; set; }
+        public string? SocietyName { get; set; }
+    }
 }

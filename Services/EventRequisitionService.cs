@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
-using System.Runtime.CompilerServices;
 
 namespace Project.APIs.Services
 {
@@ -14,11 +12,14 @@ namespace Project.APIs.Services
         {
             var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
 
-            @event!.Status = "accepted";
+            if(@event == null)
+                throw new NotFoundException("Event Not Found");
+
+            @event.Status = "accepted";
 
             EventRequisition eventRequisition = new EventRequisition()
             {
-                RequestedDate = newRequisition.ReqestedDate ?? DateTime.Now,
+                RequestedDate = newRequisition.RequestedDate,
                 Subject = newRequisition.Subject,
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
@@ -38,7 +39,7 @@ namespace Project.APIs.Services
         // Status
         // Review Message (if any)
 
-        public async Task<List<EventRequisitionDetailsDto>> GetPendingEventRequisitions(Guid memberId)
+        public async Task<List<EventRequisitionPendingDto>> GetPendingEventRequisitions(Guid memberId)
         {
             // By joining method
             //var result = await (
@@ -79,7 +80,7 @@ namespace Project.APIs.Services
             var result = await _dB.EventRequisitions
                 .Where(er => er.Status == "pending"
                     && er._event!.Society!.Members.Any(m => m.Id == memberId))
-                .Select(er => new EventRequisitionDetailsDto()
+                .Select(er => new EventRequisitionPendingDto()
                 {
                     Id = er.Id,
                     EventName = er._event!.Name,
@@ -202,7 +203,7 @@ namespace Project.APIs.Services
             return result;
         }
 
-        public async Task<List<EventRequisitionDetailsDto>> RequisitionHistory(Guid memberId)
+        public async Task<List<EventRequisitionHistoryDto>> GetEventRequisitionHistory(Guid memberId)
         {
             var societyId = await _dB.Members
                     .Where(m => memberId == m.Id)
@@ -215,13 +216,15 @@ namespace Project.APIs.Services
             var acceptedRequisition = await _dB.EventRequisitions
                     .Where(er => er.Status == "budgetAllocated"
                     && er._event!.SocietyId == societyId)
-                    .Select(er => new EventRequisitionDetailsDto()
+                    .Select(er => new EventRequisitionHistoryDto()
                     {
                         Id = er.Id,
                         EventName = er._event!.Name,
-                        EventDate = er._event.Date,
-                        Status = er.Status,
-                        ReviewMessage = ""
+                        RequestedDate = er.RequestedDate,
+                        AllocatedDate = er.AllocatedDate,
+                        RequestedAmount = er.RequestAmount,
+                        AllocatedAmount = er.RequestAmount,
+                        BiitContribution = er.BiitContribution
                     })
                     .AsNoTracking()
                     .ToListAsync();

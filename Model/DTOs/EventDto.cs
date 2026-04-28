@@ -35,8 +35,6 @@ namespace Project.APIs.Model.DTOs
 
     public class UpdateEventDto
     {
-        [Required(ErrorMessage = "Id is required")]
-        public Guid Id { get; set; }
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
 
@@ -47,15 +45,8 @@ namespace Project.APIs.Model.DTOs
         public required ICollection<EventRequirementDto> Requirements { get; set; }
     }
 
-    public class CreateEventByChairperson
-    {
-
-    }
-
     public class UpdateEventStatusDto
     {
-        [Required(ErrorMessage = "Id is required")]
-        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
         public required string Status { get; set; }

@@ -55,12 +55,12 @@ namespace Project.APIs.Controllers
         }
 
         // Put event in waiting state
-        [HttpPut("temperaryRemoveEvent/{eventId:guid}")]
-        public async Task<IActionResult> PutEventInWaititngState(Guid eventId)
+        [HttpPut("postponeEvent/{eventId:guid}")]
+        public async Task<IActionResult> PostponeEvent(Guid eventId)
         {
             UpdateEventStatusDto updateEventStatus = new UpdateEventStatusDto()
             {
-                Status = "waiting",
+                Status = "postponed",
             };
 
             await _eventService.UpdateEventStatus(eventId, updateEventStatus);
@@ -80,8 +80,8 @@ namespace Project.APIs.Controllers
         }
 
 
-        // Handling Requisition Endpoints -----------------------------------------------------
-        // Pending Requisitions
+        // Handling Events Requisition Endpoints -----------------------------------------------------
+        // Pending Envents Requisitions
         [HttpGet("getPendingRequisitions/{memberId:guid}")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
         {
@@ -89,7 +89,7 @@ namespace Project.APIs.Controllers
             return Ok(pendingRequisitions);
         }
 
-        // Requisition Detail
+        // Events Requisitions Detail
         [HttpGet("getEventRequisitionDetail/{requisitionId:guid}")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
@@ -97,7 +97,14 @@ namespace Project.APIs.Controllers
             return Ok(requisitionsDetails);
         }
 
-        // Create Requisition
+        [HttpGet("getChaipersonDetailsForRequisition/{chairpersonId:guid}")]
+        public async Task<IActionResult> GetChaipersonDetailsForRequisition(Guid chairpersonId)
+        {
+            var chairpersonDetails = await memberService.GetChairpersonDetailsForRequisition(chairpersonId);
+            return Ok(chairpersonDetails);
+        }
+
+        // Create Events Requisitions
         [HttpPost("createEventRequisition")]
         public async Task<IActionResult> CreateEventRequisition([FromBody] CreateEventRequisitionDto requisitionDto)
         {
@@ -110,16 +117,32 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        //View Rquisitions History
+        //View Events Rquisitions History
         [HttpGet("eventRequisitionHistory/{memberId:guid}")]
         public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
         {
-            var pastRequisitionList = await eventRequisitionService.RequisitionHistory(memberId);
-            return Ok(pastRequisitionList);
+            var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
+            return Ok(RequisitionList);
         }
 
+        // Handling Event Audits Endpoints ----------------------------------------------------
+        // Create Audit of events
+        //[HttpPost("createEventAudit")]
+        //public async Task<IActionResult> CreateEventAudit([FromBody] CreateEventAuditDto eventAuditDto)
+        //{
+            
+        //}
+        // View audits of events
+        // Update audits of events
+        // Delete audits of events
 
-        // Handling Profiles ----------------------------------------------------------------
+        // Handling Yearly Events Requisitions Endponts ---------------------------------------
+        // Create yearly events requisitions
+        // View yearly events requisitions
+        // 
+
+
+        // Handling Profiles Endponts ---------------------------------------------------------
         // View President Profile
         [HttpGet("viewPresidentProfle/{chairpersonId:guid}")]
         public async Task<IActionResult> GetPresidentProfile(Guid chairpersonId)
