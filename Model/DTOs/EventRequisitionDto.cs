@@ -2,14 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.APIs.Model.DTOs
-{
-    public class EventRequisitionDto
-    {
-        public required string Subject { get; set; }
-        public required string Body { get; set; }
-        public Guid SocietyId { get; set; }
-    }
-
+{ 
     public class CreateEventRequisitionDto
     {
         public required string Subject { get; set; } = string.Empty;
@@ -19,7 +12,9 @@ namespace Project.APIs.Model.DTOs
         public required Guid EventId { get; set; }
     }
 
-    public class EventRequisitionPendingDto
+
+    // For pending requisition list
+    public class PendingEventRequisitionDto
     {
         public Guid Id { get; set; }
         public required string EventName { get; set; }
@@ -28,15 +23,17 @@ namespace Project.APIs.Model.DTOs
         public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
     }
 
-    public class SingleEventRequisitionDetailsDto
+    // For more details after selecting a specific requisition
+    public class EventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
+        public required string Subject { get; set; }
         public DateTime EventDate { get; set; }
         public DateTime RequestedDate { get; set; }
-        public required string Subject { get; set; }
         public required string Body { get; set; }
-        public required string SocietyName { get; set; }
         public required ICollection<EventRequirementDto> EventRequirements { get; set; }
+        public required string ChairpersonName { get; set;}
+        public required string SocietyName { get; set;}
     }
 
     public class EventRequisitionHistoryDto

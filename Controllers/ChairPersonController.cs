@@ -82,7 +82,7 @@ namespace Project.APIs.Controllers
 
         // Handling Events Requisition Endpoints -----------------------------------------------------
         // Pending Envents Requisitions
-        [HttpGet("getPendingRequisitions/{memberId:guid}")]
+        [HttpGet("getPendingEventRequisitions/{memberId:guid}")]
         public async Task<IActionResult> PendingRequisitions(Guid memberId)
         {
             var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
@@ -90,14 +90,14 @@ namespace Project.APIs.Controllers
         }
 
         // Events Requisitions Detail
-        [HttpGet("getEventRequisitionDetail/{requisitionId:guid}")]
+        [HttpGet("getEventRequisitionDetails/{requisitionId:guid}")]
         public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
         {
             var requisitionsDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
             return Ok(requisitionsDetails);
         }
 
-        [HttpGet("getChaipersonDetailsForRequisition/{chairpersonId:guid}")]
+        [HttpGet("getChairpersonDetailsForRequisition/{chairpersonId:guid}")]
         public async Task<IActionResult> GetChaipersonDetailsForRequisition(Guid chairpersonId)
         {
             var chairpersonDetails = await memberService.GetChairpersonDetailsForRequisition(chairpersonId);
@@ -113,8 +113,16 @@ namespace Project.APIs.Controllers
                 return BadRequest();
             }
 
-            await eventRequisitionService.CreateRequisition(requisitionDto);
+            await eventRequisitionService.CreateEventRequisition(requisitionDto);
             return Ok();
+        }
+
+        // Delete Events Requisitions
+        [HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)
+        {
+            await eventRequisitionService.DeleteEventRequisition(requisitionId);
+            return NoContent();
         }
 
         //View Events Rquisitions History

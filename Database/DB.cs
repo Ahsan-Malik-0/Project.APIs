@@ -12,6 +12,10 @@ namespace Project.APIs.Database
         public DbSet<EventRequisition> EventRequisitions { get; set; }
         public DbSet<EventAudit> EventAudits { get; set; }
         public DbSet<AuditSpend> AuditSpends { get; set; }
+        public DbSet<YearlyBudget> YearlyBudgets { get; set; }
+        public DbSet<YearlyEvent> YearlyEvents { get; set; }
+        public DbSet<YearlyEventRequirement> YearlyEventRequirements { get; set; }
+        
         
     }
 }

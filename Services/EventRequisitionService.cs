@@ -8,7 +8,7 @@ namespace Project.APIs.Services
 {
     public class EventRequisitionService(DB _dB)
     {
-        public async Task CreateRequisition(CreateEventRequisitionDto newRequisition)
+        public async Task CreateEventRequisition(CreateEventRequisitionDto newRequisition)
         {
             var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
 
@@ -39,7 +39,7 @@ namespace Project.APIs.Services
         // Status
         // Review Message (if any)
 
-        public async Task<List<EventRequisitionPendingDto>> GetPendingEventRequisitions(Guid memberId)
+        public async Task<List<PendingEventRequisitionDto>> GetPendingEventRequisitions(Guid memberId)
         {
             // By joining method
             //var result = await (
@@ -80,7 +80,7 @@ namespace Project.APIs.Services
             var result = await _dB.EventRequisitions
                 .Where(er => er.Status == "pending"
                     && er._event!.Society!.Members.Any(m => m.Id == memberId))
-                .Select(er => new EventRequisitionPendingDto()
+                .Select(er => new PendingEventRequisitionDto()
                 {
                     Id = er.Id,
                     EventName = er._event!.Name,
@@ -95,7 +95,7 @@ namespace Project.APIs.Services
         }
 
 
-        public async Task<SingleEventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
+        public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         {
             // var eventsIds = await _dB.Events
             //     .Where(e => _dB.Members
@@ -171,20 +171,16 @@ namespace Project.APIs.Services
 
             var result = await _dB.EventRequisitions
                 .Where(er => er.Id == requisitionId)
-                .Select(er => new SingleEventRequisitionDetailsDto()
+                .Select(er => new EventRequisitionDetailsDto()
                 {
                     Id = er.Id,
+                    Subject = er.Subject,
                     EventDate = _dB.EventRequisitions
                             .Where(er => er.Id == requisitionId)
                             .Select(er => er._event!.Date)
                             .FirstOrDefault(),
                     RequestedDate = er.RequestedDate,
-                    Subject = er.Subject,
                     Body = er.Body,
-                    SocietyName = _dB.EventRequisitions
-                            .Where(er => er.Id == requisitionId)
-                            .Select(er => er._event!.Society!.Name)  // If navigation properties are set up
-                            .FirstOrDefault()!,
                     EventRequirements = _dB.EventRequirements
                             .Where(req => req.EventId == er.EventId)
                             .Select(req => new EventRequirementDto
@@ -193,7 +189,20 @@ namespace Project.APIs.Services
                                 Name = req.Name,
                                 Quantity = req.Quantity,
                                 Price = req.Price
-                            }).ToList()
+                            }).ToList(),
+                    SocietyName = _dB.EventRequisitions
+                            .Where(er => er.Id == requisitionId)
+                            .Select(er => er._event!.Society!.Name)  // If navigation properties are set up
+                            .FirstOrDefault()!,
+                    ChairpersonName = _dB.Members
+                            .Where(m => m.Role == "chairperson" &&
+                                       m.SocietyId == _dB.Events
+                                           .Where(e => e.Id == er.EventId)
+                                           .Select(e => e.SocietyId)
+                                           .FirstOrDefault())
+                            .Select(m => m.Name)
+                            .FirstOrDefault()!
+
                 })
                 .FirstOrDefaultAsync();
 
@@ -201,6 +210,17 @@ namespace Project.APIs.Services
                 throw new NotFoundException("Requisition Not Found");
 
             return result;
+        }
+
+        public async Task DeleteEventRequisition(Guid requisitionId)
+        {
+            var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+
+            if (requisition == null)
+                throw new NotFoundException("Requisition Not Found");
+
+            _dB.EventRequisitions.Remove(requisition);
+            await _dB.SaveChangesAsync();
         }
 
         public async Task<List<EventRequisitionHistoryDto>> GetEventRequisitionHistory(Guid memberId)
