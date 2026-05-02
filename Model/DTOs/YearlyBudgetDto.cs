@@ -7,6 +7,4 @@ namespace Project.APIs.Model.DTOs
         public required DateTime RequestedDate { get; set; }
         public ICollection<CreateYearlyEventDto>? YearlyEvents { get; set; }
     }
-
-
 }
