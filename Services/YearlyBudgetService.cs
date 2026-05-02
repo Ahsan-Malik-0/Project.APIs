@@ -60,11 +60,16 @@ namespace Project.APIs.Services
                 .ToListAsync();
         }
 
-        public async Task CreateYearlyBudget(CreateYearlyBudgetDto newYearlyBudget)
+        public async Task CreateYearlyBudget(CreateYearlyBudgetDto newYearlyBudget, Guid chairpersonId)
         {
-            var societyExists = await _dB.Societies.AnyAsync(s => s.Id == newYearlyBudget.SocietyId);
-            if (!societyExists)
-                throw new NotFoundException("Society not found with the provided ID.");
+            // Get society ID of the chairperson
+            var societyId = await _dB.Members
+                .Where(m => m.Id == chairpersonId && m.Role == "chairperson")
+                .Select(m => m.SocietyId)
+                .FirstOrDefaultAsync();
+
+            if (societyId == Guid.Empty)
+                throw new NotFoundException("Chairperson not found or does not belong to any society.");
 
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -74,7 +79,7 @@ namespace Project.APIs.Services
                     Session = newYearlyBudget.Session,
                     RequestedAmount = newYearlyBudget.RequestedAmount,
                     RequestedDate = newYearlyBudget.RequestedDate,
-                    SocietyId = newYearlyBudget.SocietyId
+                    SocietyId = societyId
                 };
 
                 await _dB.YearlyBudgets.AddAsync(yearlyBudget);

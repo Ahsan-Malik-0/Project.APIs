@@ -146,15 +146,15 @@ namespace Project.APIs.Controllers
 
         // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions
-        [HttpPost("createYearlyBudgetRequisition")]
-        public async Task<IActionResult> CreateYearlyBudget([FromBody] CreateYearlyBudgetDto newYearlyBudget)
+        [HttpPost("createYearlyBudgetRequisition/{chairpersonId:guid}")]
+        public async Task<IActionResult> CreateYearlyBudget([FromBody] CreateYearlyBudgetDto newYearlyBudget, Guid chairpersonId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            await yearlyBudgetService.CreateYearlyBudget(newYearlyBudget);
+            await yearlyBudgetService.CreateYearlyBudget(newYearlyBudget, chairpersonId);
             return Ok();
         }
 
