@@ -9,7 +9,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
+    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService, YearlyBudgetService yearlyBudgetService) : ControllerBase
     {
         // Handling Event Endpoints -------------------------------------------------------
         // Pending Events
@@ -138,28 +138,48 @@ namespace Project.APIs.Controllers
         //[HttpPost("createEventAudit")]
         //public async Task<IActionResult> CreateEventAudit([FromBody] CreateEventAuditDto eventAuditDto)
         //{
-            
+
         //}
         // View audits of events
         // Update audits of events
         // Delete audits of events
 
-        // Handling Yearly Events Requisitions Endponts ---------------------------------------
+        // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions
+        [HttpPost("createYearlyBudgetRequisition")]
+        public async Task<IActionResult> CreateYearlyBudget([FromBody] CreateYearlyBudgetDto newYearlyBudget)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            await yearlyBudgetService.CreateYearlyBudget(newYearlyBudget);
+            return Ok();
+        }
+
+        // View All yearly events budget
+        [HttpGet("getAllYearlyBudgetRequisitions/{memberId:guid}")]
+        public async Task<IActionResult> GetAllYearlyBudget(Guid memberId)
+        {
+            var yearlyBudgets = await yearlyBudgetService.GetAllYearlyBudgets(memberId);
+            return Ok(yearlyBudgets);
+        }
+
         // View yearly events requisitions
         // 
 
 
-        // Handling Profiles Endponts ---------------------------------------------------------
+        // Handling Profiles Endpoints ---------------------------------------------------------
         // View President Profile
-        [HttpGet("viewPresidentProfle/{chairpersonId:guid}")]
+        [HttpGet("viewPresidentProfile/{chairpersonId:guid}")]
         public async Task<IActionResult> GetPresidentProfile(Guid chairpersonId)
         {
-            var presidnet = await memberService.GetMemberProfile(chairpersonId);
-            return Ok(presidnet);
+            var president = await memberService.GetMemberProfile(chairpersonId);
+            return Ok(president);
         }
 
-        // Edit Presidrent Profile
+        // Edit President Profile
         [HttpPut("updatePresidentProfile/{presidentId:guid}")]
         public async Task<IActionResult> UpdatePresidentProfile(Guid presidentId, EditMemberProfileDto editMemberProfile)
         {
