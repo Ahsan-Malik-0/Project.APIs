@@ -5,7 +5,6 @@ namespace Project.APIs.Model.DTOs
         public required string Name { get; set; }
         public decimal? EstimateAmount { get; set; }
         public required string EstimateMonth { get; set; }
-        public Guid YearlyBudgetId { get; set; }
         public ICollection<CreateYearlyEventRequirementDto>? YearlyEventRequirements { get; set; }
     }
 }
