@@ -413,7 +413,7 @@ namespace Project.APIs.Migrations
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
                 {
                     b.HasOne("Project.APIs.Model.YearlyBudget", "YearlyBudget")
-                        .WithMany()
+                        .WithMany("YearlyEvents")
                         .HasForeignKey("YearlyBudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -445,6 +445,11 @@ namespace Project.APIs.Migrations
             modelBuilder.Entity("Project.APIs.Model.Society", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
+                {
+                    b.Navigation("YearlyEvents");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>

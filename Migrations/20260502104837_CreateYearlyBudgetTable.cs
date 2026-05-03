@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Project.APIs.Migrations
 {
     /// <inheritdoc />
-    public partial class HandleYearlyBudget : Migration
+    public partial class CreateYearlyBudgetTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

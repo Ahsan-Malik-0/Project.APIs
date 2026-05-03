@@ -32,7 +32,7 @@ namespace Project.APIs.Services
             return recentYearlyBudget;
         }
         
-        public async Task<List<YearlyBudget>> GetAllYearlyBudgets(Guid memberId)
+        public async Task<List<YearlyBudgetResponseDto>> GetAllYearlyBudgets(Guid memberId)
         {
             var societyId = await _dB.Members
                 .Where(m => m.Id == memberId && m.Role == "chairperson")
@@ -42,12 +42,44 @@ namespace Project.APIs.Services
             if (societyId == Guid.Empty)
                 throw new NotFoundException("Chairperson not found or does not belong to any society.");
 
-            return await _dB.YearlyBudgets
-                .Include(yb => yb.YearlyEvents)!
-                    .ThenInclude(ye => ye.YearlyEventRequirements)
-                .Where(yb => yb.SocietyId == societyId)
-                .OrderByDescending(yb => yb.RequestedDate)
-                .ToListAsync();
+            //return await _dB.YearlyBudgets
+            //    .Include(yb => yb.YearlyEvents)!
+            //        .ThenInclude(ye => ye.YearlyEventRequirements)
+            //    .Where(yb => yb.SocietyId == societyId)
+            //    .OrderByDescending(yb => yb.RequestedDate)
+            //    .ToListAsync();
+
+            var yearlyBudgets = await _dB.YearlyBudgets
+                    .Include(yb => yb.YearlyEvents)!
+                        .ThenInclude(ye => ye.YearlyEventRequirements)
+                    .Where(yb => yb.SocietyId == societyId)
+                    .OrderByDescending(yb => yb.RequestedDate)
+                    .ToListAsync();
+
+            return yearlyBudgets.Select(yb => new YearlyBudgetResponseDto
+            {
+                Id = yb.Id,
+                Session = yb.Session,
+                RequestedAmount = yb.RequestedAmount,
+                AllotedAmount = yb.AllotedAmount,
+                RequestedDate = yb.RequestedDate,
+                AllotedDate = yb.AllotedDate,
+                Credits = yb.Credits,
+                SocietyId = yb.SocietyId,
+                YearlyEvents = yb.YearlyEvents?.Select(ye => new YearlyEventResponseDto
+                {
+                    Id = ye.Id,
+                    Name = ye.Name,
+                    EstimateAmount = ye.EstimateAmount,
+                    EstimateMonth = ye.EstimateMonth,
+                    YearlyEventRequirements = ye.YearlyEventRequirements?.Select(req => new YearlyEventRequirementResponseDto
+                    {
+                        Id = req.Id,
+                        Name = req.Name,
+                        EstimatePrice = req.EstimatePrice
+                    }).ToList()
+                }).ToList()
+            }).ToList();
         }
 
         public async Task<List<YearlyBudget>> GetYearlyBudgetsBySocietyId(Guid societyId)

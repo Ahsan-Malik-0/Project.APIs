@@ -12,8 +12,8 @@ using Project.APIs.Database;
 namespace Project.APIs.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20260429083111_HandleYearlyBudget")]
-    partial class HandleYearlyBudget
+    [Migration("20260502104837_CreateYearlyBudgetTable")]
+    partial class CreateYearlyBudgetTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -416,7 +416,7 @@ namespace Project.APIs.Migrations
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
                 {
                     b.HasOne("Project.APIs.Model.YearlyBudget", "YearlyBudget")
-                        .WithMany()
+                        .WithMany("YearlyEvents")
                         .HasForeignKey("YearlyBudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -448,6 +448,11 @@ namespace Project.APIs.Migrations
             modelBuilder.Entity("Project.APIs.Model.Society", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
+                {
+                    b.Navigation("YearlyEvents");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
