@@ -8,11 +8,21 @@ namespace Project.APIs.Services
 {
     public class EventRequisitionService(DB _dB)
     {
+
+        // Event Requisition Status List
+        // A -> Pending
+        // B -> Rejected by Admin (Message)
+        // C -> Accepted By Admin
+        // D -> Rejected By SA (Message)
+        // E -> Accepted By SA
+        // F -> Budget Released By Finance
+        // G -> Chairperson received the budget
+
         public async Task CreateEventRequisition(CreateEventRequisitionDto newRequisition)
         {
             var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
 
-            if(@event == null)
+            if (@event == null)
                 throw new NotFoundException("Event Not Found");
 
             @event.Status = "accepted";
@@ -251,6 +261,58 @@ namespace Project.APIs.Services
 
             return acceptedRequisition;
         }
+
+        // For student affairs and administration to view pending requisitions list
+        public async Task<List<ViewRequisitionRequestDetailsDto>> GetPendingEventRequisitions()
+        {
+            var result = await _dB.EventRequisitions
+                .Where(er => er.Status == "pending")
+                .Select(er => new ViewRequisitionRequestDetailsDto()
+                {
+                    Id = er.Id,
+                    EventDate = er._event!.Date,
+                    RequestedDate = er.RequestedDate,
+                    SocietyName = er._event.Society!.Name,
+                    RequestedAmount = er.RequestAmount
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            return result;
+        }
+
+        // Reject by Admin
+        // Accept by Admin
+        // Reject by SA
+        public async Task ReviewEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        {
+            var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+
+            if (requisition == null)
+                throw new NotFoundException("Requisition Not Found");
+
+            requisition.Status = reviewEventRequisitionDto.Status;
+            requisition.ReviewMessage = reviewEventRequisitionDto.ReviewMessage;
+
+            _dB.EventRequisitions.Update(requisition);
+            await _dB.SaveChangesAsync();
+        }
+
+        // Accept by SA
+        public async Task AcceptEventRequisition(Guid requisitionId, AcceptEventRequisitionDto acceptEventRequisitionDto)
+        {
+            var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+
+            if (requisition == null)
+                throw new NotFoundException("Requisition Not Found");
+
+            requisition.Status = "E";
+            requisition.AllocatedDate = acceptEventRequisitionDto.AllocatedDate;
+            requisition.RequestAmount = acceptEventRequisitionDto.AllocatedAmount;
+            requisition.BiitContribution = acceptEventRequisitionDto.BiitContribution;
+
+            _dB.EventRequisitions.Update(requisition);
+            await _dB.SaveChangesAsync();
+        }
     }
-    
 }

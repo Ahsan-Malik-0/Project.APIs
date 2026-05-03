@@ -32,8 +32,8 @@ namespace Project.APIs.Model.DTOs
         public DateTime RequestedDate { get; set; }
         public required string Body { get; set; }
         public required ICollection<EventRequirementDto> EventRequirements { get; set; }
-        public required string ChairpersonName { get; set;}
-        public required string SocietyName { get; set;}
+        public required string ChairpersonName { get; set; }
+        public required string SocietyName { get; set; }
     }
 
     public class EventRequisitionHistoryDto
@@ -46,4 +46,30 @@ namespace Project.APIs.Model.DTOs
         public decimal AllocatedAmount { get; set; }
         public decimal BiitContribution { get; set; }
     }
+
+    // For student affairs and administration to view details of a pending requisition
+    public class ViewRequisitionRequestDetailsDto
+    {
+        public Guid Id { get; set; }
+        public DateTime EventDate { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public required string SocietyName { get; set; }
+        public decimal RequestedAmount { get; set; }
+    }
+
+    public class ReviewEventRequisitionDto
+    {
+        public required string Status { get; set; }
+        public string? ReviewMessage { get; set; }
+    }
+
+    public class AcceptEventRequisitionDto
+    {
+        public required string Status { get; set; }
+        public DateTime AllocatedDate { get; set; }
+        public required decimal AllocatedAmount { get; set; }
+        public required decimal BiitContribution { get; set; }
+    }
+
+    
 }
