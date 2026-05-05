@@ -45,6 +45,18 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
+        [HttpGet("EventCompleted/{requisitionId:guid}")]
+        public async Task<IActionResult> EventCompleted(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "G",
+                ReviewMessage = "Event Completed"
+            };
+            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
+
 
         // Handle Profile Endpoints --------------------------------------------------------
         //View Profile

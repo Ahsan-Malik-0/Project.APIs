@@ -13,9 +13,9 @@ namespace Project.APIs.Controllers.CRUD
         [HttpGet("ViewEventRequisitionDetails")]
         public async Task<IActionResult> ViewPendingRequisitions()
         {
-            var pendingRequisitions = await eventRequisitionService.ViewRequisitionDetailsForFinance();
+            var eventRequisitions = await eventRequisitionService.ViewRequisitionDetailsForFinance();
             // Implementation for viewing pending requisitions
-            return Ok(pendingRequisitions);
+            return Ok(eventRequisitions);
         }
 
         //[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
