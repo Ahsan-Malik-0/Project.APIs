@@ -117,6 +117,19 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
+        // Update Events Requisitions
+        [HttpPut("updateEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> UpdateEventRequisition(Guid requisitionId, [FromBody] UpdateEventRequisitionDto updateEventRequisitionDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            await eventRequisitionService.UpdateEventRequisition(requisitionId, updateEventRequisitionDto);
+            return Ok();
+        }
+
         // Delete Events Requisitions
         [HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
         public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 using Project.APIs.Services;
+using static Project.APIs.Model.DTOs.AdministrationDto;
 
 namespace Project.APIs.Controllers
 {
@@ -24,16 +25,35 @@ namespace Project.APIs.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> GetMemberByPass(MemberLoginDto request)
-        { 
-            var token = await authService.LoginAsync(request);
+        public async Task<ActionResult<string>> GetMemberByPass(LoginDto request)
+        {
 
-            if (token == null)
+            var token1 = await authService.LoginAsync(request.Username, request.HashPassword);
+
+            if (token1 == null)
             {
-                return BadRequest("Invalid Usrename or password");
+                var token2 = await authService.LoginAdminAsync(request.Username, request.HashPassword);
+                if (token2 == null)
+                {
+                    return BadRequest("Invalid Username or password");
+                }
+                return Ok(token2);
             }
 
-            return Ok(token);
+            return Ok(token1);
+        }
+
+        [HttpPost("AdminRegister")]
+        public async Task<ActionResult<Administration>> AddAdmin([FromBody] CreateAdministrationDto administrationDto)
+        {
+            var admin = await authService.RegisterAdminAsync(administrationDto);
+
+            if (admin == null)
+            {
+                return BadRequest("User Already Exist");
+            }
+
+            return Ok(admin);
         }
 
         [Authorize]

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.APIs.Model.DTOs
-{ 
+{
     public class CreateEventRequisitionDto
     {
         public required string Subject { get; set; } = string.Empty;
@@ -10,6 +10,15 @@ namespace Project.APIs.Model.DTOs
         public required DateTime RequestedDate { get; set; }
         public required decimal RequestedAmount { get; set; }
         public required Guid EventId { get; set; }
+    }
+
+    public class UpdateEventRequisitionDto
+    {
+        public required string Subject { get; set; } = string.Empty;
+        public required string Body { get; set; } = string.Empty;
+        public required DateTime RequestedDate { get; set; }
+        public required decimal RequestedAmount { get; set; }
+        public required ICollection<EventRequirementDto> EventRequirements { get; set; } 
     }
 
 
@@ -51,6 +60,7 @@ namespace Project.APIs.Model.DTOs
     public class ViewRequisitionRequestDetailsDto
     {
         public Guid Id { get; set; }
+        public required string EventName { get; set; }
         public DateTime EventDate { get; set; }
         public DateTime RequestedDate { get; set; }
         public required string SocietyName { get; set; }
@@ -63,9 +73,8 @@ namespace Project.APIs.Model.DTOs
         public string? ReviewMessage { get; set; }
     }
 
-    public class AcceptEventRequisitionDto
+    public class ApproveEventRequisitionDto
     {
-        public required string Status { get; set; }
         public DateTime AllocatedDate { get; set; }
         public required decimal AllocatedAmount { get; set; }
         public required decimal BiitContribution { get; set; }

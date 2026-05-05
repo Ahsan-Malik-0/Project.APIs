@@ -34,11 +34,63 @@ namespace Project.APIs.Services
                 Body = newRequisition.Body,
                 EventId = newRequisition.EventId,
                 RequestAmount = newRequisition.RequestedAmount,
-                Status = "pending",
+                Status = "A",
             };
 
             await _dB.EventRequisitions.AddAsync(eventRequisition);
             await _dB.SaveChangesAsync();
+        }
+
+        public async Task UpdateEventRequisition(Guid requisitionId, UpdateEventRequisitionDto updateEventRequisitionDto)
+        {
+            var transaction = await _dB.Database.BeginTransactionAsync();
+            try
+            {
+
+                var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+
+                if (requisition == null)
+                    throw new NotFoundException("Requisition Not Found");
+
+                requisition.Subject = updateEventRequisitionDto.Subject;
+                requisition.Body = updateEventRequisitionDto.Body;
+                requisition.RequestedDate = updateEventRequisitionDto.RequestedDate;
+                requisition.RequestAmount = updateEventRequisitionDto.RequestedAmount;
+
+                if (requisition.Status == "B") requisition.Status = "A";
+                if (requisition.Status == "D") requisition.Status = "C";
+
+                // Remove existing requirements
+                var existingRequirements = _dB.EventRequirements.Where(er => er.EventId == requisition.EventId);
+
+                _dB.EventRequirements.RemoveRange(existingRequirements);
+
+                // Add new requirements
+                var newRequirements = updateEventRequisitionDto.EventRequirements.Select(er => new EventRequirement
+                {
+                    Type = er.Type,
+                    Name = er.Name,
+                    Price = er.Price,
+                    Quantity = er.Quantity,
+                    EventId = requisition.EventId
+                }).ToList();
+                await _dB.EventRequirements.AddRangeAsync(newRequirements);
+
+                _dB.EventRequisitions.Update(requisition);
+                await _dB.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                throw new BusinessRuleException("Unable to save event. Please try again.");
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw; // goes to 500 handler
+            }
         }
 
 
@@ -49,6 +101,7 @@ namespace Project.APIs.Services
         // Status
         // Review Message (if any)
 
+        // For chairperosn
         public async Task<List<PendingEventRequisitionDto>> GetPendingEventRequisitions(Guid memberId)
         {
             // By joining method
@@ -86,24 +139,38 @@ namespace Project.APIs.Services
             //    .AsNoTracking()
             //    .ToListAsync();
 
-            // By chaining method
             var result = await _dB.EventRequisitions
-                .Where(er => er.Status == "pending"
-                    && er._event!.Society!.Members.Any(m => m.Id == memberId))
-                .Select(er => new PendingEventRequisitionDto()
-                {
-                    Id = er.Id,
-                    EventName = er._event!.Name,
-                    EventDate = er._event.Date,
-                    Status = er.Status,
-                    ReviewMessage = er.ReviewMessage
-                })
-                .AsNoTracking()
-                .ToListAsync();
+                    .Where(er => er._event!.Society!.Members.Any(m => m.Id == memberId))
+                    .Select(er => new
+                    {
+                        er.Id,
+                        er._event!.Name,
+                        er._event.Date,
+                        er.Status,
+                        er.ReviewMessage
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
 
-            return result;
+            return result.Select(er => new PendingEventRequisitionDto()
+            {
+                Id = er.Id,
+                EventName = er.Name,
+                EventDate = er.Date,
+                Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                ReviewMessage = er.ReviewMessage
+            }).ToList();
         }
 
+        private static readonly Dictionary<string, string> StatusMap = new()
+        {
+            ["A"] = "Pending",
+            ["B"] = "Reject By Student Affairs",
+            ["C"] = "Approved By Student Affairs",
+            ["D"] = "Reject By Admin",
+            ["E"] = "Approved By Admin",
+            ["F"] = "Budget Released By Finance"
+        };
 
         public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         {
@@ -244,7 +311,7 @@ namespace Project.APIs.Services
                 throw new NotFoundException("Society not found");
 
             var acceptedRequisition = await _dB.EventRequisitions
-                    .Where(er => er.Status == "budgetAllocated"
+                    .Where(er => er.Status == "G"
                     && er._event!.SocietyId == societyId)
                     .Select(er => new EventRequisitionHistoryDto()
                     {
@@ -263,17 +330,18 @@ namespace Project.APIs.Services
         }
 
         // For student affairs and administration to view pending requisitions list
-        public async Task<List<ViewRequisitionRequestDetailsDto>> GetPendingEventRequisitions()
+        public async Task<List<ViewRequisitionRequestDetailsDto>> GetPendingEventRequisitions(char status)
         {
             var result = await _dB.EventRequisitions
-                .Where(er => er.Status == "pending")
+                .Where(er => er.Status == status.ToString())
                 .Select(er => new ViewRequisitionRequestDetailsDto()
                 {
                     Id = er.Id,
+                    EventName = er._event!.Name,
                     EventDate = er._event!.Date,
                     RequestedDate = er.RequestedDate,
                     SocietyName = er._event.Society!.Name,
-                    RequestedAmount = er.RequestAmount
+                    RequestedAmount = er.RequestAmount,
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -299,17 +367,17 @@ namespace Project.APIs.Services
         }
 
         // Accept by SA
-        public async Task AcceptEventRequisition(Guid requisitionId, AcceptEventRequisitionDto acceptEventRequisitionDto)
+        public async Task ApproveEventRequisition(Guid requisitionId, ApproveEventRequisitionDto approveEventRequisitionDto)
         {
             var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
 
             if (requisition == null)
                 throw new NotFoundException("Requisition Not Found");
 
-            requisition.Status = "E";
-            requisition.AllocatedDate = acceptEventRequisitionDto.AllocatedDate;
-            requisition.RequestAmount = acceptEventRequisitionDto.AllocatedAmount;
-            requisition.BiitContribution = acceptEventRequisitionDto.BiitContribution;
+            requisition.Status = "C";
+            requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
+            requisition.RequestAmount = approveEventRequisitionDto.AllocatedAmount;
+            requisition.BiitContribution = approveEventRequisitionDto.BiitContribution;
 
             _dB.EventRequisitions.Update(requisition);
             await _dB.SaveChangesAsync();

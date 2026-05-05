@@ -5,15 +5,12 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
-using System.Diagnostics.Metrics;
-using System.Dynamic;
-using System.Globalization;
 
 namespace Project.APIs.Services
 {
     public class MemberService(DB _dB, IPasswordHasher<Member> _passwordHasher, IWebHostEnvironment _env)
     {
-        // View Profile
+        // View Member Profile
         public async Task<MemberProfileDto> ViewProfile(Guid id)
         {
             var member = await _dB.Members.FindAsync(id);

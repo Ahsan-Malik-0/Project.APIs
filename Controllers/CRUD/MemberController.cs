@@ -23,7 +23,7 @@ namespace Project.APIs.Controllers.CRUD
         //    _passwordHasher = passwordHasher;
         //}
 
-        [HttpGet]
+        [HttpGet("GetMembers")]
         public async Task<IActionResult> GetMembers()
         {
             var members = await _dB.Members
@@ -32,7 +32,7 @@ namespace Project.APIs.Controllers.CRUD
             return Ok(members);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("GetMemberById/{id:guid}")]
         public async Task<IActionResult> GetMemberById(Guid id)
         {
             var member = await _dB.Members
@@ -54,7 +54,7 @@ namespace Project.APIs.Controllers.CRUD
             });
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("UpdateMember/{id:guid}")]
         public async Task<IActionResult> UpdateMember([FromBody] MemberDto memberDto, Guid id)
         {
             if (id == Guid.Empty)
@@ -90,7 +90,7 @@ namespace Project.APIs.Controllers.CRUD
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("DeleteMember/{id:guid}")]
         public async Task<IActionResult> DeleteMember([FromRoute] Guid id)
         {
             if (id == Guid.Empty)

@@ -3,31 +3,32 @@ using Microsoft.AspNetCore.Mvc;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 using Project.APIs.Services;
+using static Project.APIs.Model.DTOs.AdministrationDto;
 
 namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminController(EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
+    public class AdminController(EventRequisitionService eventRequisitionService, AdministrationService administrationService) : ControllerBase
     {
-        [HttpGet("AcceptEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> AcceptEventRequisition(Guid requisitionId)
+        [HttpGet("ApproveEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {   
-                Status = "C",
+                Status = "E",
                 ReviewMessage = null
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();
         }
 
-        [HttpGet("RejectEventRequisition/{requisitionId:guid}")]
+        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
         public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] string rejectionMessage)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
-                Status = "B",
+                Status = "D",
                 ReviewMessage = rejectionMessage
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
@@ -37,7 +38,7 @@ namespace Project.APIs.Controllers
         [HttpGet("ViewPendingRequisitions")]
         public async Task<IActionResult> ViewPendingRequisitions()
         {
-            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions();
+            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('C');
             return Ok(pendingRequisitions);
         }
 
@@ -53,18 +54,18 @@ namespace Project.APIs.Controllers
         [HttpGet("viewProfile/{memberId:guid}")]
         public async Task<IActionResult> GetProfile(Guid memberId)
         {
-            var member = await memberService.ViewProfile(memberId);
+            var member = await administrationService.ViewProfile(memberId);
             return Ok(member);
         }
 
         //Edit Profile
         [HttpPut("updateProfile/{memberId:guid}")]
-        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateMemberProfileDto updateMemberProfileDto)
+        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateAdminProfileDto updateAdminProfileDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Fill the credentials");
 
-            await memberService.EditProfile(memberId, updateMemberProfileDto);
+            await administrationService.EditProfile(memberId, updateAdminProfileDto);
             return Ok();
         }
     }

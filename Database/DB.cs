@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project.APIs.Model;
+using Project.APIs.Model.DTOs;
 
 namespace Project.APIs.Database
 {
@@ -15,6 +16,7 @@ namespace Project.APIs.Database
         public DbSet<YearlyBudget> YearlyBudgets { get; set; }
         public DbSet<YearlyEvent> YearlyEvents { get; set; }
         public DbSet<YearlyEventRequirement> YearlyEventRequirements { get; set; }
+        public DbSet<Administration> Administrations { get; set; }
         
         
     }
