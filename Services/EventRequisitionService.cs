@@ -169,7 +169,8 @@ namespace Project.APIs.Services
             ["C"] = "Approved By Student Affairs",
             ["D"] = "Reject By Admin",
             ["E"] = "Approved By Admin",
-            ["F"] = "Budget Released By Finance"
+            ["F"] = "Budget Released By Finance",
+            ["G"] = "Event completed"
         };
 
         public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
@@ -352,6 +353,7 @@ namespace Project.APIs.Services
         // Reject by Admin
         // Accept by Admin
         // Reject by SA
+        // Budget released by finance
         public async Task ReviewEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
         {
             var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
@@ -376,11 +378,29 @@ namespace Project.APIs.Services
 
             requisition.Status = "C";
             requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
-            requisition.RequestAmount = approveEventRequisitionDto.AllocatedAmount;
+            requisition.AllocatedAmount = approveEventRequisitionDto.AllocatedAmount;
             requisition.BiitContribution = approveEventRequisitionDto.BiitContribution;
 
             _dB.EventRequisitions.Update(requisition);
             await _dB.SaveChangesAsync();
+        }
+
+        public async Task<List<ViewRequisitionDetailsForFinanceDto>> ViewRequisitionDetailsForFinance()
+        {
+            var acceptedRequisition = await _dB.EventRequisitions
+                    .Where(er => er.Status == "E")
+                    .Select(er => new ViewRequisitionDetailsForFinanceDto()
+                    {
+                        RequisitionId = er.Id,
+                        SocietyName = er._event!.Society!.Name,
+                        EventName = er._event!.Name,
+                        EventDate = er._event.Date,
+                        AllotedBudget = er.AllocatedAmount
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+            return acceptedRequisition;
         }
     }
 }

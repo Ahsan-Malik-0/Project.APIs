@@ -10,44 +10,33 @@ namespace Project.APIs.Controllers.CRUD
     [ApiController]
     public class FinanceController(EventRequisitionService eventRequisitionService, AdministrationService administrationService) : ControllerBase
     {
-        [HttpGet("ViewPendingRequisitions")]
+        [HttpGet("ViewEventRequisitionDetails")]
         public async Task<IActionResult> ViewPendingRequisitions()
         {
-            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('E');
+            var pendingRequisitions = await eventRequisitionService.ViewRequisitionDetailsForFinance();
             // Implementation for viewing pending requisitions
             return Ok(pendingRequisitions);
         }
 
-        [HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
-        public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
-        {
-            var requisitionDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
-            return Ok(requisitionDetails);
-        }
+        //[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
+        //public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
+        //{
+        //    var requisitionDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
+        //    return Ok(requisitionDetails);
+        //}
 
-        [HttpGet("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
-        public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId)
+        [HttpPost("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
+        public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId, string reviewMessage)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
                 Status = "F",
-                ReviewMessage = null
+                ReviewMessage = reviewMessage
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();
         }
 
-        [HttpGet("AmountHandover/{requisitionId:guid}")]
-        public async Task<IActionResult> AmountHandover(Guid requisitionId)
-        {
-            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-            {
-                Status = "G",
-                ReviewMessage = null
-            };
-            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-            return Ok();
-        }
 
         // Handle Profile Endpoints --------------------------------------------------------
         //View Profile

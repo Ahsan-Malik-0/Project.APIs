@@ -80,5 +80,13 @@ namespace Project.APIs.Model.DTOs
         public required decimal BiitContribution { get; set; }
     }
 
+    public class ViewRequisitionDetailsForFinanceDto
+    {
+        public Guid RequisitionId { get; set; }
+        public required string SocietyName { get; set; }
+        public required string EventName { get; set; }
+        public DateTime EventDate { get; set; }
+        public Decimal AllotedBudget { get; set; }
+    }
     
 }
