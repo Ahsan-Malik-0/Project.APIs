@@ -24,12 +24,12 @@ namespace Project.APIs.Controllers
         }
 
         [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] string rejectionMessage)
+        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
                 Status = "D",
-                ReviewMessage = rejectionMessage
+                ReviewMessage = responseMessage.ResponseMessage
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();

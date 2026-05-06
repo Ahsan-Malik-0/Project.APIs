@@ -233,11 +233,26 @@ namespace Project.APIs.Services
             var chairpersonDetails = await _dB.Members.Where(m => m.Id == chairpersonId)
                 .Select(m => new ChairpersonDetailsForRequisitionDto()
                 {
-                    ChaipersonName = m.Name,
+                    ChairpersonName = m.Name,
                     SocietyName = m.Society!.Name
                 }).FirstOrDefaultAsync();
 
             if(chairpersonDetails == null)
+                throw new NotFoundException("Chairperson not found");
+
+            return chairpersonDetails;
+        }
+
+        public async Task<ChairpersonDetailsForRequisitionDto> GetChairpersonDetailsForFinance(string societyName)
+        {
+            var chairpersonDetails = await _dB.Members.Where(m => m.Role == "chairperson" && m.Society!.Name == societyName)
+                .Select(m => new ChairpersonDetailsForRequisitionDto()
+                {
+                    ChairpersonName = m.Name,
+                    SocietyName = m.Society!.Name
+                }).FirstOrDefaultAsync();
+
+            if (chairpersonDetails == null)
                 throw new NotFoundException("Chairperson not found");
 
             return chairpersonDetails;

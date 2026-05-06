@@ -8,7 +8,7 @@ namespace Project.APIs.Controllers.CRUD
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FinanceController(EventRequisitionService eventRequisitionService, AdministrationService administrationService) : ControllerBase
+    public class FinanceController(EventRequisitionService eventRequisitionService, AdministrationService administrationService, MemberService memberService) : ControllerBase
     {
         [HttpGet("ViewEventRequisitionDetails")]
         public async Task<IActionResult> ViewPendingRequisitions()
@@ -25,17 +25,38 @@ namespace Project.APIs.Controllers.CRUD
         //    return Ok(requisitionDetails);
         //}
 
-        [HttpPost("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
-        public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId, string reviewMessage)
+        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
                 Status = "F",
-                ReviewMessage = reviewMessage
+                ReviewMessage = responseMessage.ResponseMessage
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();
         }
+
+        [HttpGet("getChairpersonDetails/{societyName}")]
+        public async Task<IActionResult> GetChaipersonDetailsForRequisition(string societyName)
+        {
+            var chairpersonDetails = await memberService.GetChairpersonDetailsForFinance(societyName);
+            return Ok(chairpersonDetails);
+        }
+
+        [HttpPost("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
+        public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "G",
+                ReviewMessage = responseMessage.ResponseMessage
+            };
+            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
+
+
 
 
         // Handle Profile Endpoints --------------------------------------------------------

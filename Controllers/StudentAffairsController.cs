@@ -26,13 +26,20 @@ namespace Project.APIs.Controllers
             return Ok(requisitionDetails);
         }
 
+        [HttpGet("ViewApprovedRequisitionDetails")]
+        public async Task<IActionResult> ViewAcceptedEventDetails()
+        {
+            var requisitionDetails = await eventRequisitionService.ViewRequisitionDetailsForStudentAffairs();
+            return Ok(requisitionDetails);
+        }
+
         [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] string rejectionMessage)
+        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
                 Status = "B",
-                ReviewMessage = rejectionMessage
+                ReviewMessage = responseMessage.ResponseMessage
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();
@@ -50,7 +57,7 @@ namespace Project.APIs.Controllers
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
             {
-                Status = "G",
+                Status = "H",
                 ReviewMessage = "Event Completed"
             };
             await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);

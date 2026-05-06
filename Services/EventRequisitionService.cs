@@ -59,6 +59,7 @@ namespace Project.APIs.Services
 
                 if (requisition.Status == "B") requisition.Status = "A";
                 if (requisition.Status == "D") requisition.Status = "C";
+                if (requisition.Status == "F") requisition.Status = "E";
 
                 // Remove existing requirements
                 var existingRequirements = _dB.EventRequirements.Where(er => er.EventId == requisition.EventId);
@@ -169,8 +170,9 @@ namespace Project.APIs.Services
             ["C"] = "Approved By Student Affairs",
             ["D"] = "Reject By Admin",
             ["E"] = "Approved By Admin",
-            ["F"] = "Budget Released By Finance",
-            ["G"] = "Event completed"
+            ["F"] = "Reject By Finance",
+            ["G"] = "Budget Released By Finance",
+            ["H"] = "Event completed"
         };
 
         public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
@@ -392,6 +394,10 @@ namespace Project.APIs.Services
                     .Select(er => new ViewRequisitionDetailsForFinanceDto()
                     {
                         RequisitionId = er.Id,
+                        ChairpersonName = er._event!.Society!.Members
+                                .Where(m => m.Role == "chairperson")
+                                .Select(m => m.Name)
+                                .FirstOrDefault() ?? "N/A",
                         SocietyName = er._event!.Society!.Name,
                         EventName = er._event!.Name,
                         EventDate = er._event.Date,
@@ -399,6 +405,46 @@ namespace Project.APIs.Services
                     })
                     .AsNoTracking()
                     .ToListAsync();
+
+            return acceptedRequisition;
+        }
+
+        // Requisition list for Student Affairs
+        public async Task<List<ViewRequisitionDetailsForStudentAffairsDto>> ViewRequisitionDetailsForStudentAffairs()
+        {
+            var result = await _dB.EventRequisitions
+                    .Where(er => er.Status != "A")
+                    .Select(er => new
+                    {
+                        RequisitionId = er.Id,
+                        ChairpersonName = er._event!.Society!.Members
+                                .Where(m => m.Role == "chairperson")
+                                .Select(m => m.Name)
+                                .FirstOrDefault() ?? "N/A",
+                        SocietyName = er._event!.Society!.Name,
+                        EventName = er._event!.Name,
+                        EventDate = er._event.Date,
+                        Status = er.Status,
+                        ReviewMessage = er.ReviewMessage,
+                        AllotedBudget = er.AllocatedAmount // Add this property to match usage below
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+
+            var acceptedRequisition = result
+                .Select(er => new ViewRequisitionDetailsForStudentAffairsDto()
+                    {
+                        RequisitionId = er.RequisitionId,
+                        ChairpersonName = er.ChairpersonName,
+                        SocietyName = er.SocietyName,
+                        EventName = er.EventName,
+                        EventDate = er.EventDate,
+                        AllotedBudget = er.AllotedBudget,
+                        Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                        ReviewMessage = er.ReviewMessage
+                    })
+                    .ToList();
 
             return acceptedRequisition;
         }

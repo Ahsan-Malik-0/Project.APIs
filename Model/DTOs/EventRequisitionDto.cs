@@ -83,10 +83,23 @@ namespace Project.APIs.Model.DTOs
     public class ViewRequisitionDetailsForFinanceDto
     {
         public Guid RequisitionId { get; set; }
+        public string? ChairpersonName { get; set; }
         public required string SocietyName { get; set; }
         public required string EventName { get; set; }
         public DateTime EventDate { get; set; }
         public Decimal AllotedBudget { get; set; }
+    }
+
+    public class ViewRequisitionDetailsForAdminDto : ViewRequisitionDetailsForFinanceDto { }
+    public class ViewRequisitionDetailsForStudentAffairsDto : ViewRequisitionDetailsForFinanceDto 
+    {
+        public required string Status { get; set; }
+        public string? ReviewMessage { get; set; }
+    }
+
+    public class ResponseMessageDto
+    {
+        public required string ResponseMessage { get; set; }
     }
     
 }
