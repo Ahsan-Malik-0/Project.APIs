@@ -43,7 +43,7 @@ namespace Project.APIs.Services
             {
                 Name = admin.Name,
                 Username = admin.Username,
-                Picture = base64Image!
+                Picture = base64Image ?? admin.Picture,
             };
 
             return adminProfileDto;

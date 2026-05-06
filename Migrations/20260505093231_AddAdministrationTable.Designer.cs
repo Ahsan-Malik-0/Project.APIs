@@ -12,7 +12,7 @@ using Project.APIs.Database;
 namespace Project.APIs.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20260504043533_AddAdministrationTable")]
+    [Migration("20260505093231_AddAdministrationTable")]
     partial class AddAdministrationTable
     {
         /// <inheritdoc />
@@ -24,6 +24,36 @@ namespace Project.APIs.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Project.APIs.Model.Administration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HashPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administrations");
+                });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
                 {
@@ -52,36 +82,6 @@ namespace Project.APIs.Migrations
                     b.HasIndex("EventAuditId");
 
                     b.ToTable("AuditSpends");
-                });
-
-            modelBuilder.Entity("Project.APIs.Model.DTOs.Administration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("HashPassword")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Picture")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Administrations");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Event", b =>

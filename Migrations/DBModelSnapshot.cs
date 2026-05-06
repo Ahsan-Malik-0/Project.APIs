@@ -22,36 +22,7 @@ namespace Project.APIs.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("EventAuditId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ReceiptPiture")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Vender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventAuditId");
-
-                    b.ToTable("AuditSpends");
-                });
-
-            modelBuilder.Entity("Project.APIs.Model.DTOs.Administration", b =>
+            modelBuilder.Entity("Project.APIs.Model.Administration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,6 +50,35 @@ namespace Project.APIs.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Administrations");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("EventAuditId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiptPiture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Vender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventAuditId");
+
+                    b.ToTable("AuditSpends");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Event", b =>
