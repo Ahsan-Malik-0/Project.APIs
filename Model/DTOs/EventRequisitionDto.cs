@@ -65,6 +65,7 @@ namespace Project.APIs.Model.DTOs
         public DateTime RequestedDate { get; set; }
         public required string SocietyName { get; set; }
         public decimal RequestedAmount { get; set; }
+        public decimal AllotedAmount { get; set; }
     }
 
     public class ReviewEventRequisitionDto

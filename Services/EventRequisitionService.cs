@@ -345,6 +345,7 @@ namespace Project.APIs.Services
                     RequestedDate = er.RequestedDate,
                     SocietyName = er._event.Society!.Name,
                     RequestedAmount = er.RequestAmount,
+                    AllotedAmount = er.AllocatedAmount
                 })
                 .AsNoTracking()
                 .ToListAsync();
