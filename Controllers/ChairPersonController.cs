@@ -189,6 +189,16 @@ namespace Project.APIs.Controllers
             return NoContent();
         }
 
+        // Confirm receive amount
+        [HttpPut("verifyTakeAmount/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        {
+            string status = "clear";
+
+            await eventAuditService.UpdateAuditStatus(auditId, status);
+            return Ok();
+        }
+
         // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions
         [HttpPost("createYearlyBudgetRequisition/{chairpersonId:guid}")]

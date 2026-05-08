@@ -10,7 +10,7 @@ namespace Project.APIs.Model
         public required decimal Amount { get; set; }
         public string? ReceiptPicture { get; set; }
 
-        public Guid AuditId;
+        public Guid EventAuditId { get; set; }
 
         [JsonIgnore]
         public EventAudit? EventAudit { get; set; }

@@ -47,7 +47,7 @@ namespace Project.APIs.Services
                         Description = spend.ItemDescription,
                         Amount = spend.Amount,
                         ReceiptPicture = spend.ReceiptPicture,
-                        AuditId = eventAudit.Id,
+                        EventAuditId = eventAudit.Id,
                     };
 
                     await _dB.AuditSpends.AddAsync(auditSpend);
@@ -102,7 +102,7 @@ namespace Project.APIs.Services
                         Description = spend.ItemDescription,
                         Amount = spend.Amount,
                         ReceiptPicture = spend.ReceiptPicture,
-                        AuditId = existingEventAudit.Id,
+                        EventAuditId = existingEventAudit.Id,
                     };
 
                     await _dB.AuditSpends.AddAsync(auditSpend);
@@ -150,6 +150,24 @@ namespace Project.APIs.Services
             {
                 await transaction.RollbackAsync();
                 throw;
+            }
+        }
+
+        public async Task UpdateAuditStatus(Guid eventAuditId, string status)
+        {
+            var existingEventAudit = await _dB.EventAudits.FirstOrDefaultAsync(ea => ea.Id == eventAuditId);
+
+            if (existingEventAudit == null) throw new NotFoundException("Event audit not found");
+
+            existingEventAudit.Status = status;
+
+            try
+            {
+                await _dB.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new BusinessRuleException("Unable to update event audit status. Please try again.");
             }
         }
     }

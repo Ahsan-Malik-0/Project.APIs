@@ -20,4 +20,9 @@ namespace Project.APIs.Model.DTOs
         public required decimal RemainingAmount { get; set; }
         public required ICollection<UpdateAuditSpendDto> Spends { get; set; }
     }
+
+    public class UpdateAuditStatusDto
+    {
+        public required string Status { get; set; }
+    }
 }
