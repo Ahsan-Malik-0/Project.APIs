@@ -190,7 +190,7 @@ namespace Project.APIs.Controllers
         }
 
         // Confirm receive amount
-        [HttpPut("verifyTakeAmount/{auditId:guid}")]
+        [HttpGet("verifyTakeAmount/{auditId:guid}")]
         public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
         {
             string status = "clear";

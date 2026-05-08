@@ -32,8 +32,8 @@ namespace Project.APIs.Services
                     EventId = eventId,
                 };
 
-                if (newEventAudit.RemainingAmount > 0) eventAudit.Status = "take";
-                else if (newEventAudit.RemainingAmount < 0) eventAudit.Status = "give";
+                if (newEventAudit.RemainingAmount > 0) eventAudit.Status = "give";
+                else if (newEventAudit.RemainingAmount < 0) eventAudit.Status = "take";
                 if (newEventAudit.RemainingAmount == 0) eventAudit.Status = "clear";
 
                 await _dB.EventAudits.AddAsync(eventAudit);
@@ -73,7 +73,9 @@ namespace Project.APIs.Services
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
             {
-                var existingEventAudit = await _dB.EventAudits.FirstOrDefaultAsync(ea => ea.Id == eventAuditId);
+                var existingEventAudit = await _dB.EventAudits
+                    .Include(ea => ea.Spends)
+                    .FirstOrDefaultAsync(ea => ea.Id == eventAuditId);
 
                 if (existingEventAudit == null) throw new NotFoundException("Event audit not found");
 
@@ -83,8 +85,8 @@ namespace Project.APIs.Services
                 existingEventAudit.RevenueGenerated = updatedEventAudit.RevenueGenerated;
                 existingEventAudit.RemainingAmount = updatedEventAudit.RemainingAmount;
 
-                if (updatedEventAudit.RemainingAmount > 0) existingEventAudit.Status = "take";
-                else if (updatedEventAudit.RemainingAmount < 0) existingEventAudit.Status = "give";
+                if (updatedEventAudit.RemainingAmount > 0) existingEventAudit.Status = "give";
+                else if (updatedEventAudit.RemainingAmount < 0) existingEventAudit.Status = "take";
                 if (updatedEventAudit.RemainingAmount == 0) existingEventAudit.Status = "clear";
 
                 // Delete all past spends of event audit
