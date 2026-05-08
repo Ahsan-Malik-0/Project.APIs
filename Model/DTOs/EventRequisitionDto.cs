@@ -47,7 +47,8 @@ namespace Project.APIs.Model.DTOs
 
     public class EventRequisitionHistoryDto
     {
-        public Guid Id { get; set; }
+        public Guid RequisitionId { get; set; }
+        public Guid EventId { get; set; }
         public required string EventName { get; set; }
         public DateTime RequestedDate { get; set; }
         public DateTime AllocatedDate { get; set; }

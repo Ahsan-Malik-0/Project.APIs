@@ -9,7 +9,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService, YearlyBudgetService yearlyBudgetService) : ControllerBase
+    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService, YearlyBudgetService yearlyBudgetService, EventAuditService eventAuditService) : ControllerBase
     {
         // Handling Event Endpoints -------------------------------------------------------
         // Pending Events
@@ -138,8 +138,8 @@ namespace Project.APIs.Controllers
             return NoContent();
         }
 
-        //View Events Rquisitions History
-        [HttpGet("eventRequisitionHistory/{memberId:guid}")]
+        //View Events Requisitions History
+        [HttpGet("getEventRequisitionHistory/{memberId:guid}")]
         public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
         {
             var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
@@ -147,15 +147,47 @@ namespace Project.APIs.Controllers
         }
 
         // Handling Event Audits Endpoints ----------------------------------------------------
-        // Create Audit of events
-        //[HttpPost("createEventAudit")]
-        //public async Task<IActionResult> CreateEventAudit([FromBody] CreateEventAuditDto eventAuditDto)
-        //{
-
-        //}
         // View audits of events
+        [HttpGet("viewEventAudits/{eventId:guid}")]
+        public async Task<IActionResult> ViewEventAudits(Guid eventId)
+        {
+            var audits = await eventAuditService.GetEventAuditById(eventId);
+            return Ok(audits);
+        }
+
+        // Create Audit of events
+        [HttpPost("createEventAudit/{eventId:guid}")]
+        public async Task<IActionResult> CreateEventAudit(Guid eventId, [FromBody] CreateEventAuditDto eventAuditDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            await eventAuditService.CreateEventAudit(eventId, eventAuditDto);
+            return Ok();
+        }
+
         // Update audits of events
+        [HttpPut("updateEventAudit/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAudit(Guid auditId, [FromBody] UpdateEventAuditDto eventAuditDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            await eventAuditService.UpdateEventAudit(auditId, eventAuditDto);
+            return Ok();
+        }
+
         // Delete audits of events
+        [HttpDelete("deleteEventAudit/{auditId:guid}")]
+        public async Task<IActionResult> DeleteEventAudit(Guid auditId)
+        {
+            await eventAuditService.DeleteEventAuditById(auditId);
+            return NoContent();
+        }
 
         // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions

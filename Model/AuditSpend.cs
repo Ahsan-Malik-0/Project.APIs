@@ -8,7 +8,7 @@ namespace Project.APIs.Model
         public required string Vender { get; set; }
         public string? Description { get; set; }
         public required decimal Amount { get; set; }
-        public string? ReceiptPiture { get; set; }
+        public string? ReceiptPicture { get; set; }
 
         public Guid AuditId;
 

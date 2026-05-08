@@ -314,11 +314,12 @@ namespace Project.APIs.Services
                 throw new NotFoundException("Society not found");
 
             var acceptedRequisition = await _dB.EventRequisitions
-                    .Where(er => er.Status == "G"
+                    .Where(er => er.Status == "G" || er.Status == "H"
                     && er._event!.SocietyId == societyId)
                     .Select(er => new EventRequisitionHistoryDto()
                     {
-                        Id = er.Id,
+                        RequisitionId = er.Id,
+                        EventId = er.EventId,
                         EventName = er._event!.Name,
                         RequestedDate = er.RequestedDate,
                         AllocatedDate = er.AllocatedDate,

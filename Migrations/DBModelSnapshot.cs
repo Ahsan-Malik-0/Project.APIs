@@ -49,7 +49,7 @@ namespace Project.APIs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Administrations");
+                    b.ToTable("Administrations", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
@@ -78,7 +78,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventAuditId");
 
-                    b.ToTable("AuditSpends");
+                    b.ToTable("AuditSpends", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Event", b =>
@@ -108,7 +108,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventAudit", b =>
@@ -139,7 +139,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventAudits");
+                    b.ToTable("EventAudits", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventRequirement", b =>
@@ -171,7 +171,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventRequirements");
+                    b.ToTable("EventRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventRequisition", b =>
@@ -217,7 +217,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventRequisitions");
+                    b.ToTable("EventRequisitions", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Member", b =>
@@ -253,7 +253,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("Members");
+                    b.ToTable("Members", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Society", b =>
@@ -274,7 +274,7 @@ namespace Project.APIs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Societies");
+                    b.ToTable("Societies", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
@@ -312,7 +312,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("YearlyBudgets");
+                    b.ToTable("YearlyBudgets", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
@@ -339,7 +339,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("YearlyBudgetId");
 
-                    b.ToTable("YearlyEvents");
+                    b.ToTable("YearlyEvents", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEventRequirement", b =>
@@ -362,7 +362,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("YearlyEventId");
 
-                    b.ToTable("YearlyEventRequirements");
+                    b.ToTable("YearlyEventRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
