@@ -8,7 +8,6 @@ namespace Project.APIs.Model.DTOs
         public required decimal SpendAmount { get; set; }
         public required decimal RevenueGenerated { get; set; }
         public required decimal RemainingAmount { get; set; }
-        public required Guid EventId { get; set; }
         public required ICollection<CreateAuditSpendDto> Spends { get; set; }
     }
 
