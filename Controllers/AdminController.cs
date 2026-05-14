@@ -9,7 +9,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminController(EventRequisitionService eventRequisitionService, AdministrationService administrationService) : ControllerBase
+    public class AdminController(EventRequisitionService eventRequisitionService, AdministrationService administrationService, EventService eventService) : ControllerBase
     {
         [HttpGet("ApproveEventRequisition/{requisitionId:guid}")]
         public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId)
@@ -47,6 +47,13 @@ namespace Project.APIs.Controllers
         {
             var requisitionDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
             return Ok(requisitionDetails);
+        }
+
+        [HttpGet("ViewReservedNonFinancialRequirements")]
+        public async Task<IActionResult> ViewEventRequirements()
+        {
+            var requirements = await eventService.GetReservedNonFinancialRequirements();
+            return Ok(requirements);
         }
 
         // Handle Profile Endpoints --------------------------------------------------------

@@ -52,7 +52,7 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        [HttpGet("EventCompleted/{requisitionId:guid}")]
+        [HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
         public async Task<IActionResult> EventCompleted(Guid requisitionId)
         {
             ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto

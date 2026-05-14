@@ -83,7 +83,7 @@ namespace Project.APIs.Services
 
 
                 await _dB.SaveChangesAsync();
-                
+
 
                 await transaction.CommitAsync();
             }
@@ -225,7 +225,7 @@ namespace Project.APIs.Services
             if (_event == null)
                 throw new NotFoundException("Event not found");
 
-            if(!string.IsNullOrEmpty(updateEventStatus.Message))
+            if (!string.IsNullOrEmpty(updateEventStatus.Message))
                 _event.Message = updateEventStatus.Message;
 
             _event.Status = updateEventStatus.Status;
@@ -240,10 +240,36 @@ namespace Project.APIs.Services
                 .Include(e => e.Requirements)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
-            if(_event == null)
+            if (_event == null)
                 throw new NotFoundException("Event not found");
 
             return _event;
+        }
+
+        // Get all reserved non-financial requirements for admin
+        public async Task<List<EventRequirement>> GetReservedNonFinancialRequirements()
+        {
+            // First get all eligible EventIds
+            var eligibleEventIds = await _dB.EventRequisitions
+                .Where(erq => erq.Status == "C")
+                .Select(erq => erq.EventId)
+                .Distinct()
+                .ToListAsync();
+            
+            if (!eligibleEventIds.Any())
+                throw new NotFoundException("Requisitions not found");
+            
+            // Then get requirements for those events
+            var requirements = await _dB.EventRequirements
+                .Include(er => er._event)
+                .Where(er => er.Type == "non-financial" && 
+                            eligibleEventIds.Contains(er._event!.Id))
+                .ToListAsync();
+            
+            if (!requirements.Any())
+                throw new NotFoundException("Reserved non-financial requirements not found");
+
+            return requirements;
         }
     }
 }
