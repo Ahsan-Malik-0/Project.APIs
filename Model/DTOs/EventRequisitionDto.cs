@@ -50,6 +50,7 @@ namespace Project.APIs.Model.DTOs
         public Guid RequisitionId { get; set; }
         public Guid EventId { get; set; }
         public required string EventName { get; set; }
+        public required string RequisitionStatus { get; set; }
         public DateTime RequestedDate { get; set; }
         public DateTime AllocatedDate { get; set; }
         public decimal RequestedAmount { get; set; }
@@ -67,6 +68,7 @@ namespace Project.APIs.Model.DTOs
         public required string SocietyName { get; set; }
         public decimal RequestedAmount { get; set; }
         public decimal AllotedAmount { get; set; }
+        public decimal BiitContribution { get; set; }
     }
 
     public class ReviewEventRequisitionDto
@@ -89,7 +91,8 @@ namespace Project.APIs.Model.DTOs
         public required string SocietyName { get; set; }
         public required string EventName { get; set; }
         public DateTime EventDate { get; set; }
-        public Decimal AllotedBudget { get; set; }
+        public decimal AllotedBudget { get; set; }
+        public decimal BiitContribution { get; set; }
     }
 
     public class ViewRequisitionDetailsForFinanceHistoryDto : ViewRequisitionDetailsForFinanceDto
