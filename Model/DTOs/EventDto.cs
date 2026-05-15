@@ -52,4 +52,12 @@ namespace Project.APIs.Model.DTOs
         public required string Status { get; set; }
         public string? Message { get; set; }
     }
+
+
+    public class ViewReservedNonFinancialRequirements
+    {
+        public required string EventName { get; set; }
+        public DateTime EventDate { get; set; }
+        public required List<NonFinancialRequirement> NonFinancialRequirements { get; set; }
+    }
 }

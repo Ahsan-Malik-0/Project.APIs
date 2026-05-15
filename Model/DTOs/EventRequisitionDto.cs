@@ -92,7 +92,12 @@ namespace Project.APIs.Model.DTOs
         public Decimal AllotedBudget { get; set; }
     }
 
-    public class ViewRequisitionDetailsForAdminDto : ViewRequisitionDetailsForFinanceDto { }
+    public class ViewRequisitionDetailsForFinanceHistoryDto : ViewRequisitionDetailsForFinanceDto
+    {
+        public Guid EventId { get; set; }
+        public required string Status { get; set; }
+        
+    }
     public class ViewRequisitionDetailsForStudentAffairsDto : ViewRequisitionDetailsForFinanceDto 
     {
         public required string Status { get; set; }

@@ -247,29 +247,34 @@ namespace Project.APIs.Services
         }
 
         // Get all reserved non-financial requirements for admin
-        public async Task<List<EventRequirement>> GetReservedNonFinancialRequirements()
+        public async Task<List<ViewReservedNonFinancialRequirements>> GetReservedNonFinancialRequirements()
         {
-            // First get all eligible EventIds
-            var eligibleEventIds = await _dB.EventRequisitions
-                .Where(erq => erq.Status == "C")
-                .Select(erq => erq.EventId)
-                .Distinct()
+            var eligibleEvent = await _dB.Events
+                .Include(e => e.Requirements) // Make sure to include requirements
+                .Where(e => _dB.EventRequisitions
+                    .Any(er => er.EventId == e.Id && er.Status == "F" || er.Status == "G")) // Check requisition status for THIS event
                 .ToListAsync();
-            
-            if (!eligibleEventIds.Any())
-                throw new NotFoundException("Requisitions not found");
-            
-            // Then get requirements for those events
-            var requirements = await _dB.EventRequirements
-                .Include(er => er._event)
-                .Where(er => er.Type == "non-financial" && 
-                            eligibleEventIds.Contains(er._event!.Id))
-                .ToListAsync();
-            
-            if (!requirements.Any())
+
+            if (!eligibleEvent.Any())
+                throw new NotFoundException("Events not found");
+
+            var dto = eligibleEvent.Select(ee => new ViewReservedNonFinancialRequirements()
+            {
+                EventName = ee.Name,
+                EventDate = ee.Date,
+                NonFinancialRequirements = ee.Requirements
+                    .Where(r => r.Type == "non-financial") // Filter only non-financial requirements
+                    .Select(r => new NonFinancialRequirement()
+                    {
+                        ReqName = r.Name,
+                        ReqQty = r.Quantity
+                    }).ToList()
+            }).ToList();
+
+            if (!dto.Any() || dto.All(d => !d.NonFinancialRequirements.Any()))
                 throw new NotFoundException("Reserved non-financial requirements not found");
 
-            return requirements;
+            return dto;
         }
     }
 }

@@ -13,4 +13,10 @@ namespace Project.APIs.Model.DTOs
         public float Price { get; set; }
         public int Quantity { get; set; }
     }
+
+    public class NonFinancialRequirement
+    {
+        public required string ReqName { get; set; }
+        public int ReqQty { get; set; }
+    }
 }

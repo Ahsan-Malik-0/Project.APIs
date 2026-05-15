@@ -172,7 +172,9 @@ namespace Project.APIs.Services
             ["E"] = "Approved By Admin",
             ["F"] = "Reject By Finance",
             ["G"] = "Budget Released By Finance",
-            ["H"] = "Event completed"
+            ["H"] = "Event Completed",
+            ["I"] = "Request For Audit",
+            ["J"] = "Audit Cleared"
         };
 
         public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
@@ -409,6 +411,44 @@ namespace Project.APIs.Services
                     .ToListAsync();
 
             return acceptedRequisition;
+        }
+
+        public async Task<List<ViewRequisitionDetailsForFinanceHistoryDto>> ViewRequisitionDetailsForFinanceHistory()
+        {
+            var acceptedRequisition = await _dB.EventRequisitions
+                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I")
+                    .Select(er => new
+                    {
+                        EventId = er.EventId,
+                        RequisitionId = er.Id,
+                        ChairpersonName = er._event!.Society!.Members
+                                .Where(m => m.Role == "chairperson")
+                                .Select(m => m.Name)
+                                .FirstOrDefault() ?? "N/A",
+                        SocietyName = er._event!.Society!.Name,
+                        EventName = er._event!.Name,
+                        EventDate = er._event.Date,
+                        AllotedBudget = er.AllocatedAmount,
+                        Status = er.Status
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+            var dto = acceptedRequisition
+                    .Select(dto => new ViewRequisitionDetailsForFinanceHistoryDto()
+                    {
+                        EventId = dto.EventId,
+                        RequisitionId = dto.RequisitionId,
+                        ChairpersonName = dto.ChairpersonName,
+                        SocietyName = dto.SocietyName,
+                        EventName = dto.EventName,
+                        EventDate = dto.EventDate,
+                        AllotedBudget = dto.AllotedBudget,
+                        Status = StatusMap.GetValueOrDefault(dto.Status, "Unknown")
+                    })
+                    .ToList();
+
+            return dto;
         }
 
         // Requisition list for Student Affairs

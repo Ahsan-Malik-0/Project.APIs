@@ -8,7 +8,7 @@ namespace Project.APIs.Controllers.CRUD
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FinanceController(EventRequisitionService eventRequisitionService, AdministrationService administrationService, MemberService memberService) : ControllerBase
+    public class FinanceController(EventRequisitionService eventRequisitionService, AdministrationService administrationService, MemberService memberService, EventAuditService eventAuditService) : ControllerBase
     {
         [HttpGet("ViewEventRequisitionDetails")]
         public async Task<IActionResult> ViewPendingRequisitions()
@@ -56,7 +56,41 @@ namespace Project.APIs.Controllers.CRUD
             return Ok();
         }
 
+        [HttpGet("ViewEventRequisitionHistory")]
+        public async Task<IActionResult> ViewEventRequisitionHistory()
+        {
+            var eventRequisitionHistory = await eventRequisitionService.ViewRequisitionDetailsForFinanceHistory();
+            return Ok(eventRequisitionHistory);
+        }
 
+
+        // Handle audit endpoints --------------------------------------------------------
+        [HttpGet("RequestForEventAudit/{requisitionId:guid}")]
+        public async Task<IActionResult> RequestForEventAudit(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "I",
+            };
+            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
+
+        [HttpGet("ViewEventAuditDetails/{eventId:guid}")]
+        public async Task<IActionResult> ViewEventAuditDetails(Guid eventId)
+        {
+            var eventAuditDetails = await eventAuditService.GetEventAuditById(eventId);
+            return Ok(eventAuditDetails);
+        }
+
+        [HttpGet("verifyTakeAmount/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        {
+            string status = "clear";
+
+            await eventAuditService.UpdateAuditStatus(auditId, status);
+            return Ok();
+        }
 
 
         // Handle Profile Endpoints --------------------------------------------------------
