@@ -17,7 +17,7 @@ namespace Project.APIs.Database
         public DbSet<YearlyEventRequirement> YearlyEventRequirements { get; set; }
         public DbSet<Administration> Administrations { get; set; }
         public DbSet<EventAudit> EventAudits { get; set; }
-        public DbSet<YearlrBudgetScrutiny> yearlrBudgetScrutinies { get; set; }
+        public DbSet<YearlyBudgetScrutiny> YearlyBudgetScrutinies { get; set; }
         
     }
 }

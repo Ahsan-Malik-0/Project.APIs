@@ -1,6 +1,6 @@
 ﻿namespace Project.APIs.Model
 {
-    public class YearlrBudgetScrutiny
+    public class YearlyBudgetScrutiny
     {
         public Guid Id { get; set; }
         public required string Comment { get; set; }

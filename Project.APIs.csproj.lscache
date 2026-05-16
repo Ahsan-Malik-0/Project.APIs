@@ -102,8 +102,6 @@ Migrations/
  20260416080429_AuditSpendTable.Designer.cs
  20260505093231_AddAdministrationTable.cs
  20260505093231_AddAdministrationTable.Designer.cs
- 20260516073047_AddYearlyBudgetScrutiny.cs
- 20260516073047_AddYearlyBudgetScrutiny.Designer.cs
  DBModelSnapshot.cs
 Model/
  Administration.cs
@@ -119,6 +117,7 @@ Model/
   MemberDto.cs
   SocietyDto.cs
   YearlyBudgetDto.cs
+  YearlyBudgetScrutinyDto.cs
   YearlyEventDto.cs
   YearlyEventRequirementDto.cs
  Event.cs
@@ -127,8 +126,8 @@ Model/
  EventRequisition.cs
  Member.cs
  Society.cs
- YearlrBudgetScrutiny.cs
  YearlyBudget.cs
+ YearlyBudgetScrutiny.cs
  YearlyEvent.cs
  YearlyEventRequirement.cs
 obj/Debug/net8.0/
@@ -146,6 +145,7 @@ Services/
  MemberService.cs
  SocietyService.cs
  SwaggerExtensionService.cs
+ YearlyBudgetScrutinyService.cs
  YearlyBudgetService.cs
 
 [metadataReferences]
