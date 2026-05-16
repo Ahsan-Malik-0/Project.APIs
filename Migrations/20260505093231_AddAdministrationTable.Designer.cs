@@ -70,7 +70,7 @@ namespace Project.APIs.Migrations
                     b.Property<Guid?>("EventAuditId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReceiptPiture")
+                    b.Property<string>("ReceiptPicture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vender")

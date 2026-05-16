@@ -41,7 +41,7 @@ namespace Project.APIs.Migrations
                     b.Property<Guid?>("EventAuditId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReceiptPiture")
+                    b.Property<string>("ReceiptPicture")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -42,7 +42,7 @@ namespace Project.APIs.Migrations
                     Vender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ReceiptPiture = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceiptPicture = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EventAuditId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>

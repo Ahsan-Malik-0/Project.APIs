@@ -49,7 +49,7 @@ namespace Project.APIs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Administrations", (string)null);
+                    b.ToTable("Administrations");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
@@ -64,10 +64,10 @@ namespace Project.APIs.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("EventAuditId")
+                    b.Property<Guid>("EventAuditId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReceiptPiture")
+                    b.Property<string>("ReceiptPicture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vender")
@@ -78,7 +78,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventAuditId");
 
-                    b.ToTable("AuditSpends", (string)null);
+                    b.ToTable("AuditSpends");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Event", b =>
@@ -108,7 +108,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventAudit", b =>
@@ -139,7 +139,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventAudits", (string)null);
+                    b.ToTable("EventAudits");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventRequirement", b =>
@@ -171,7 +171,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventRequirements", (string)null);
+                    b.ToTable("EventRequirements");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.EventRequisition", b =>
@@ -217,7 +217,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventRequisitions", (string)null);
+                    b.ToTable("EventRequisitions");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Member", b =>
@@ -253,7 +253,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("Members", (string)null);
+                    b.ToTable("Members");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.Society", b =>
@@ -274,7 +274,41 @@ namespace Project.APIs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Societies", (string)null);
+                    b.ToTable("Societies");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlrBudgetScrutiny", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdministrationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("YearlyBudgetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("YearlyBydgetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdministrationId");
+
+                    b.HasIndex("YearlyBudgetId");
+
+                    b.ToTable("yearlrBudgetScrutinies");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
@@ -312,7 +346,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("SocietyId");
 
-                    b.ToTable("YearlyBudgets", (string)null);
+                    b.ToTable("YearlyBudgets");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
@@ -339,7 +373,7 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("YearlyBudgetId");
 
-                    b.ToTable("YearlyEvents", (string)null);
+                    b.ToTable("YearlyEvents");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyEventRequirement", b =>
@@ -362,14 +396,16 @@ namespace Project.APIs.Migrations
 
                     b.HasIndex("YearlyEventId");
 
-                    b.ToTable("YearlyEventRequirements", (string)null);
+                    b.ToTable("YearlyEventRequirements");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
                 {
                     b.HasOne("Project.APIs.Model.EventAudit", "EventAudit")
                         .WithMany("Spends")
-                        .HasForeignKey("EventAuditId");
+                        .HasForeignKey("EventAuditId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("EventAudit");
                 });
@@ -427,6 +463,23 @@ namespace Project.APIs.Migrations
                         .IsRequired();
 
                     b.Navigation("Society");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlrBudgetScrutiny", b =>
+                {
+                    b.HasOne("Project.APIs.Model.Administration", "Administration")
+                        .WithMany()
+                        .HasForeignKey("AdministrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project.APIs.Model.YearlyBudget", "YearlyBudget")
+                        .WithMany()
+                        .HasForeignKey("YearlyBudgetId");
+
+                    b.Navigation("Administration");
+
+                    b.Navigation("YearlyBudget");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>

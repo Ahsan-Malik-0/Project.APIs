@@ -12,8 +12,8 @@ using Project.APIs.Database;
 namespace Project.APIs.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20260416080429_AuditSpendTable")]
-    partial class AuditSpendTable
+    [Migration("20260516073047_AddYearlyBudgetScrutiny")]
+    partial class AddYearlyBudgetScrutiny
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace Project.APIs.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Project.APIs.Model.Administration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HashPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administrations");
+                });
 
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
                 {
@@ -37,7 +67,7 @@ namespace Project.APIs.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("EventAuditId")
+                    b.Property<Guid>("EventAuditId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ReceiptPicture")
@@ -250,11 +280,135 @@ namespace Project.APIs.Migrations
                     b.ToTable("Societies");
                 });
 
+            modelBuilder.Entity("Project.APIs.Model.YearlrBudgetScrutiny", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdministrationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("YearlyBudgetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("YearlyBydgetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdministrationId");
+
+                    b.HasIndex("YearlyBudgetId");
+
+                    b.ToTable("yearlrBudgetScrutinies");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AllotedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("AllotedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Credits")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RequestedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("RequestedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Session")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("SocietyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Session")
+                        .IsUnique();
+
+                    b.HasIndex("SocietyId");
+
+                    b.ToTable("YearlyBudgets");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("EstimateAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("EstimateMonth")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("YearlyBudgetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("YearlyBudgetId");
+
+                    b.ToTable("YearlyEvents");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyEventRequirement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("EstimatePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("YearlyEventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("YearlyEventId");
+
+                    b.ToTable("YearlyEventRequirements");
+                });
+
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
                 {
                     b.HasOne("Project.APIs.Model.EventAudit", "EventAudit")
                         .WithMany("Spends")
-                        .HasForeignKey("EventAuditId");
+                        .HasForeignKey("EventAuditId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("EventAudit");
                 });
@@ -314,6 +468,56 @@ namespace Project.APIs.Migrations
                     b.Navigation("Society");
                 });
 
+            modelBuilder.Entity("Project.APIs.Model.YearlrBudgetScrutiny", b =>
+                {
+                    b.HasOne("Project.APIs.Model.Administration", "Administration")
+                        .WithMany()
+                        .HasForeignKey("AdministrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project.APIs.Model.YearlyBudget", "YearlyBudget")
+                        .WithMany()
+                        .HasForeignKey("YearlyBudgetId");
+
+                    b.Navigation("Administration");
+
+                    b.Navigation("YearlyBudget");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
+                {
+                    b.HasOne("Project.APIs.Model.Society", "Society")
+                        .WithMany()
+                        .HasForeignKey("SocietyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Society");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
+                {
+                    b.HasOne("Project.APIs.Model.YearlyBudget", "YearlyBudget")
+                        .WithMany("YearlyEvents")
+                        .HasForeignKey("YearlyBudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("YearlyBudget");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyEventRequirement", b =>
+                {
+                    b.HasOne("Project.APIs.Model.YearlyEvent", "YearlyEvent")
+                        .WithMany("YearlyEventRequirements")
+                        .HasForeignKey("YearlyEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("YearlyEvent");
+                });
+
             modelBuilder.Entity("Project.APIs.Model.Event", b =>
                 {
                     b.Navigation("Requirements");
@@ -327,6 +531,16 @@ namespace Project.APIs.Migrations
             modelBuilder.Entity("Project.APIs.Model.Society", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
+                {
+                    b.Navigation("YearlyEvents");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.YearlyEvent", b =>
+                {
+                    b.Navigation("YearlyEventRequirements");
                 });
 #pragma warning restore 612, 618
         }

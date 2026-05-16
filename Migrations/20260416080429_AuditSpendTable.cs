@@ -11,7 +11,7 @@ namespace Project.APIs.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "ReceiptPiture",
+                name: "ReceiptPicture",
                 table: "AuditSpends",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -31,7 +31,7 @@ namespace Project.APIs.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "ReceiptPiture",
+                name: "ReceiptPicture",
                 table: "AuditSpends",
                 type: "nvarchar(max)",
                 nullable: false,
