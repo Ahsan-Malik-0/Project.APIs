@@ -1,4 +1,6 @@
-﻿namespace Project.APIs.Model.DTOs
+﻿using System.Diagnostics.Contracts;
+
+namespace Project.APIs.Model.DTOs
 {
     public class YearlyBudgetScrutinyDto
     {
@@ -10,6 +12,10 @@
         public required string AdministrationStatus { get; set; }
         public required string AdministrationComment { get; set; }
         public DateTime CommentDate { get; set; }
+    }
 
+    public class AddCommentDto : ViewScrutinyDetailsDto 
+    {
+        public Guid YearlyBudgetId { get; set; } 
     }
 }

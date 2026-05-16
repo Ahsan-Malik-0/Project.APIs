@@ -102,6 +102,8 @@ Migrations/
  20260416080429_AuditSpendTable.Designer.cs
  20260505093231_AddAdministrationTable.cs
  20260505093231_AddAdministrationTable.Designer.cs
+ 20260516100231_AddYearlyBudgetScrutiny.cs
+ 20260516100231_AddYearlyBudgetScrutiny.Designer.cs
  DBModelSnapshot.cs
 Model/
  Administration.cs
