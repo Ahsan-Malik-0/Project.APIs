@@ -132,6 +132,12 @@ namespace Project.APIs.Services
                 .Select(m => m.SocietyId)
                 .FirstOrDefaultAsync();
 
+            var alreadyExistingBudget = await _dB.YearlyBudgets
+                .Where(yb => yb.SocietyId == societyId && yb.Session == newYearlyBudget.Session)
+                .FirstOrDefaultAsync();                                         
+            if (alreadyExistingBudget != null)
+                throw new BusinessRuleException("A yearly budget for the specified session already exists for this society.");
+
             if (societyId == Guid.Empty)
                 throw new NotFoundException("Chairperson not found or does not belong to any society.");
 

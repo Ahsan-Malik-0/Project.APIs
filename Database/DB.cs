@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
 
@@ -18,6 +19,7 @@ namespace Project.APIs.Database
         public DbSet<Administration> Administrations { get; set; }
         public DbSet<EventAudit> EventAudits { get; set; }
         public DbSet<YearlyBudgetScrutiny> YearlyBudgetScrutinies { get; set; }
+        public DbSet<VirtualSociety> VirtualSocieties { get; set; }
         
     }
 }

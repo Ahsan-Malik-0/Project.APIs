@@ -12,8 +12,8 @@ using Project.APIs.Database;
 namespace Project.APIs.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20260516100231_AddYearlyBudgetScrutiny")]
-    partial class AddYearlyBudgetScrutiny
+    [Migration("20260517220348_AddTechfestTable")]
+    partial class AddTechfestTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace Project.APIs.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("EventVirtualSociety", b =>
+                {
+                    b.Property<Guid>("EventsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("virtualSocietiesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("EventsId", "virtualSocietiesId");
+
+                    b.HasIndex("virtualSocietiesId");
+
+                    b.ToTable("EventVirtualSociety");
+                });
 
             modelBuilder.Entity("Project.APIs.Model.Administration", b =>
                 {
@@ -216,6 +231,9 @@ namespace Project.APIs.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
@@ -280,6 +298,36 @@ namespace Project.APIs.Migrations
                     b.ToTable("Societies");
                 });
 
+            modelBuilder.Entity("Project.APIs.Model.VirtualSociety", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChairpersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("MemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Session")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId");
+
+                    b.ToTable("VirtualSocieties");
+                });
+
             modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>
                 {
                     b.Property<Guid>("Id")
@@ -303,7 +351,7 @@ namespace Project.APIs.Migrations
 
                     b.Property<string>("Session")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("SocietyId")
                         .HasColumnType("uniqueidentifier");
@@ -400,6 +448,21 @@ namespace Project.APIs.Migrations
                     b.ToTable("YearlyEventRequirements");
                 });
 
+            modelBuilder.Entity("EventVirtualSociety", b =>
+                {
+                    b.HasOne("Project.APIs.Model.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project.APIs.Model.VirtualSociety", null)
+                        .WithMany()
+                        .HasForeignKey("virtualSocietiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Project.APIs.Model.AuditSpend", b =>
                 {
                     b.HasOne("Project.APIs.Model.EventAudit", "EventAudit")
@@ -464,6 +527,15 @@ namespace Project.APIs.Migrations
                         .IsRequired();
 
                     b.Navigation("Society");
+                });
+
+            modelBuilder.Entity("Project.APIs.Model.VirtualSociety", b =>
+                {
+                    b.HasOne("Project.APIs.Model.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId");
+
+                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("Project.APIs.Model.YearlyBudget", b =>

@@ -9,15 +9,6 @@ namespace Project.APIs.Services
     public class EventRequisitionService(DB _dB)
     {
 
-        // Event Requisition Status List
-        // A -> Pending
-        // B -> Rejected by Admin (Message)
-        // C -> Accepted By Admin
-        // D -> Rejected By SA (Message)
-        // E -> Accepted By SA
-        // F -> Budget Released By Finance
-        // G -> Chairperson received the budget
-
         public async Task CreateEventRequisition(CreateEventRequisitionDto newRequisition)
         {
             var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);

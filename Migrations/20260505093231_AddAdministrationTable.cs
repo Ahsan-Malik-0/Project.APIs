@@ -93,12 +93,6 @@ namespace Project.APIs.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_YearlyBudgets_Session",
-                table: "YearlyBudgets",
-                column: "Session",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_YearlyBudgets_SocietyId",
                 table: "YearlyBudgets",
                 column: "SocietyId");

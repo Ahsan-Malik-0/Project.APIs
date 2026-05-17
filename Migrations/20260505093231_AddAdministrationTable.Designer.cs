@@ -310,9 +310,6 @@ namespace Project.APIs.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Session")
-                        .IsUnique();
-
                     b.HasIndex("SocietyId");
 
                     b.ToTable("YearlyBudgets");

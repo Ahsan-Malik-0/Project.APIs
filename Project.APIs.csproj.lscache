@@ -105,6 +105,8 @@ Migrations/
  20260505093231_AddAdministrationTable.Designer.cs
  20260516100231_AddYearlyBudgetScrutiny.cs
  20260516100231_AddYearlyBudgetScrutiny.Designer.cs
+ 20260517220348_AddTechfestTable.cs
+ 20260517220348_AddTechfestTable.Designer.cs
  DBModelSnapshot.cs
 Model/
  Administration.cs
@@ -129,6 +131,7 @@ Model/
  EventRequisition.cs
  Member.cs
  Society.cs
+ VirtualSociety.cs
  YearlyBudget.cs
  YearlyBudgetScrutiny.cs
  YearlyEvent.cs

@@ -13,5 +13,7 @@ namespace Project.APIs.Model
         public Society? Society { get; set; }
 
         public virtual ICollection<EventRequirement> Requirements { get; set; } = new List<EventRequirement>();
+
+        public ICollection<VirtualSociety>? virtualSocieties { get; set; }
     }
 }
