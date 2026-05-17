@@ -263,7 +263,7 @@ namespace Project.APIs.Services
                 EventName = ee.Name,
                 EventDate = ee.Date,
                 NonFinancialRequirements = ee.Requirements
-                    .Where(r => r.Type == "non-financial") // Filter only non-financial requirements
+                    .Where(r => r.Type.Contains("non", StringComparison.OrdinalIgnoreCase)) // Filter only non-financial requirements
                     .Select(r => new NonFinancialRequirement()
                     {
                         ReqName = r.Name,
