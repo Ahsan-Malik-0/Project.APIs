@@ -194,5 +194,17 @@ namespace Project.APIs.Services
                 throw;
             }
         }
+
+        public async Task ApproveYearlyBudget(Guid yearlyBudgetId, ApproveYearlyBudgetDto approvalDetails)
+        {
+            var yearlyBudget = await _dB.YearlyBudgets.FindAsync(yearlyBudgetId);
+            if (yearlyBudget == null)
+                throw new NotFoundException("Yearly budget not found.");
+
+            yearlyBudget.AllotedAmount = approvalDetails.AllotedAmount;
+            yearlyBudget.AllotedDate = approvalDetails.AllotedDate;
+            
+            await _dB.SaveChangesAsync();
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Project.APIs.Services
                 .Where(ybs => ybs.YearlyBudgetId == yearlyBudgetId)
                 .Select(ybs => new ViewScrutinyDetailsDto()
                 {
+                    Id = ybs.Id,
                     AdministrationName = ybs.Name,
                     AdministrationComment = ybs.Comment,
                     AdministrationRole = ybs.Administration!.Role,
@@ -64,5 +65,7 @@ namespace Project.APIs.Services
             _dB.YearlyBudgetScrutinies.Remove(commentsToDelete);
             await _dB.SaveChangesAsync();
         }
+
+
     }
 }

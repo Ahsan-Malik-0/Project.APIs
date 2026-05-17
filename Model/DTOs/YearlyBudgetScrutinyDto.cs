@@ -8,6 +8,7 @@ namespace Project.APIs.Model.DTOs
 
     public class ViewScrutinyDetailsDto
     {
+        public Guid Id { get; set; }
         public required string AdministrationName { get; set; }
         // public required string AdministrationStatus { get; set; }
         public required string AdministrationComment { get; set; }

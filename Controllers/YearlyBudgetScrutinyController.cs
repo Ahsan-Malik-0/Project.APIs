@@ -63,12 +63,31 @@ namespace Project.APIs.Controllers
             await scrutinyService.AddComment(administrationId, addComment);
             return Ok();
         }
-        
+
         [HttpDelete("deleteComment/{commentId}")]
         public async Task<IActionResult> DeleteComments(Guid commentId)
         {
             await scrutinyService.DeleteComments(commentId);
             return Ok();
         }
+
+        [HttpPost("approveYearlyBudget/{yearlyBudgetId}")]
+        public async Task<IActionResult> ApproveYearlyBudget(Guid yearlyBudgetId, [FromBody] ApproveYearlyBudgetDto approvalDetails)
+        {
+            try
+            {
+                await yearlyBudgetService.ApproveYearlyBudget(yearlyBudgetId, approvalDetails);
+                return Ok();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Something went wrong. Please try again later {ex}." });
+            }
+        }
+
     }
 }

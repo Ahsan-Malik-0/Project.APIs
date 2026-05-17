@@ -20,4 +20,12 @@ namespace Project.APIs.Model.DTOs
         public required DateTime RequestedDate { get; set; }
         public ICollection<CreateYearlyEventDto>? YearlyEvents { get; set; }
     }
+
+    public class ApproveYearlyBudgetDto
+    {
+        public Guid Id { get; set; }
+        public required decimal AllotedAmount { get; set; }
+        public required DateTime AllotedDate { get; set; }
+    }
+
 }
