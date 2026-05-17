@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Project.APIs.Database;
 using Project.APIs.Model;
+using Project.APIs.Model.DTOs;
 
 namespace Project.APIs.Controllers.CRUD
 {
