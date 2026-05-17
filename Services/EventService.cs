@@ -252,7 +252,7 @@ namespace Project.APIs.Services
             var eligibleEvent = await _dB.Events
                 .Include(e => e.Requirements) // Make sure to include requirements
                 .Where(e => _dB.EventRequisitions
-                    .Any(er => er.EventId == e.Id && er.Status == "F" || er.Status == "G")) // Check requisition status for THIS event
+                    .Any(er => er.EventId == e.Id && (er.Status == "E" || er.Status == "F" || er.Status == "G"))) // Check requisition status for THIS event
                 .ToListAsync();
 
             if (!eligibleEvent.Any())
