@@ -26,6 +26,7 @@ namespace Project.APIs.Model.DTOs
         public Guid Id { get; set; }
         public required decimal AllotedAmount { get; set; }
         public required DateTime AllotedDate { get; set; }
+        public decimal Credits { get; set; }
     }
 
 }

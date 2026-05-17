@@ -39,6 +39,7 @@ namespace Project.APIs.Services
                     Name = addComment.AdministrationName,
                     Comment = addComment.AdministrationComment,
                     // Status = addComment.AdministrationStatus,
+                    Date = addComment.CommentDate,
                     AdministrationId = administrationId,
                     YearlyBudgetId = addComment.YearlyBudgetId
                 };

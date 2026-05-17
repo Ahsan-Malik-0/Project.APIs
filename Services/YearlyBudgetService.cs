@@ -203,7 +203,8 @@ namespace Project.APIs.Services
 
             yearlyBudget.AllotedAmount = approvalDetails.AllotedAmount;
             yearlyBudget.AllotedDate = approvalDetails.AllotedDate;
-            
+            yearlyBudget.Credits = approvalDetails.Credits;
+
             await _dB.SaveChangesAsync();
         }
     }
