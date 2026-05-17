@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Project.APIs.Model
+namespace Project.APIs.Model.DTOs
 {
     public class SocietyDto
     {

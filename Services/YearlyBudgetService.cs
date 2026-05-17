@@ -8,6 +8,38 @@ namespace Project.APIs.Services
 {
     public class YearlyBudgetService(DB _dB)
     {
+        // Get All yearly budgets of a society
+        public async Task<List<YearlyBudget>> GetAllYearlyBudgets()
+        {
+            var details = await _dB.YearlyBudgets
+                .Include(yb => yb.Society)
+                .Include(yb => yb.YearlyEvents)!
+                .ThenInclude(ye => ye.YearlyEventRequirements)
+                .OrderByDescending(yb => yb.RequestedDate)
+                .ToListAsync();
+
+            if (details == null || details.Count == 0)
+            {
+                throw new NotFoundException("No yearly budgets found.");
+            }
+            return details;
+        }
+
+        // Get yearly budget by ID
+        public async Task<YearlyBudget> GetYearlyBudgetById(Guid yearlyBudgetId)
+        {
+            var details = await _dB.YearlyBudgets
+                .Include(yb => yb.YearlyEvents)!
+                .ThenInclude(ye => ye.YearlyEventRequirements)
+                .FirstOrDefaultAsync(yb => yb.Id == yearlyBudgetId);
+
+            if (details == null)
+            {
+                throw new NotFoundException("Yearly budget not found for the given ID.");
+            }
+            return details;
+        }
+
         // Get recent added yearly budget
         public async Task<YearlyBudget> GetRecentYearlyBudget(Guid memberId)
         {

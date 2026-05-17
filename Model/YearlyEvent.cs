@@ -1,4 +1,6 @@
-﻿namespace Project.APIs.Model
+﻿using System.Text.Json.Serialization;
+
+namespace Project.APIs.Model
 {
     public class YearlyEvent
     {
@@ -8,6 +10,7 @@
         public required string EstimateMonth { get; set; }
 
         public Guid YearlyBudgetId { get; set; }
+        [JsonIgnore]
         public YearlyBudget? YearlyBudget { get; set; }
 
         public ICollection<YearlyEventRequirement>? YearlyEventRequirements { get; set; }

@@ -64,6 +64,7 @@ Controllers/
  FinanceController.cs
  PresidentController.cs
  StudentAffairsController.cs
+ YearlyBudgetScrutinyController.cs
 Database/DB.cs
 Exceptions/
  BusinessRuleException.cs

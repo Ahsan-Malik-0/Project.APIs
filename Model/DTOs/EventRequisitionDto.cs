@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Server.HttpSys;
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Project.APIs.Model.DTOs
 {
     public class CreateEventRequisitionDto
