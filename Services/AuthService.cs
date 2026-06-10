@@ -47,18 +47,48 @@ namespace Project.APIs.Services
         public async Task<Member?> RegisterAsync(MemberDto memberDto)
         {
             // Check for duplicate username FIRST
-            var usernameExists = await _dB.Members
-                .AnyAsync(m => m.Username == memberDto.Username && m.Username == memberDto.Username);
+            //var usernameExists = await _dB.Members
+            //    .AnyAsync(m => m.Username == memberDto.Username && m.Username == memberDto.Username);
 
             //var cpExists = await _dB.Members
             //    .AnyAsync(m => m.Role == memberDto.Role && m.SocietyId == memberDto.SocietyId);
 
 
 
-            if (usernameExists)
+            //if (usernameExists)
+            if (memberDto.SocietyId != Guid.Empty)
+
             {
-                throw new BusinessRuleException("Username already exist");
+                var usernameExists = await _dB.Members
+                    .AnyAsync(m => m.Role == memberDto.Role && m.Society!.Id == memberDto.SocietyId);
+
+                if (usernameExists)
+                {
+                    if (memberDto.Role == "president")
+                    {
+                        throw new BusinessRuleException("President already exist");
+                    }
+                    else
+                    {
+                        throw new BusinessRuleException("Chairperson already exist");
+                    }
+                }
             }
+            else
+            {
+                var usernameExists = await _dB.Members
+                   .AnyAsync(m => m.Role == memberDto.Role);
+
+                if (usernameExists)
+                {
+
+                    throw new BusinessRuleException($"{memberDto.Role} already exist");
+                    
+                }
+            }
+
+            //var chairpersonExists1 = await _dB.Members
+            //    .AnyAsync(m => m.Username == memberDto.Username);
 
             if (string.IsNullOrEmpty(memberDto.HashPassword))
             {
@@ -81,7 +111,7 @@ namespace Project.APIs.Services
 
             Member member = new Member
             {
-                Id = Guid.NewGuid(),  // Explicitly create new GUID
+                //Id = Guid.NewGuid(),  // Explicitly create new GUID
                 Name = memberDto.Name,
                 Username = memberDto.Username,
                 HashPassword = _passwordHasher.HashPassword(null!, memberDto.HashPassword!),
