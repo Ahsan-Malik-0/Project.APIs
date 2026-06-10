@@ -8,7 +8,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService, AdministrationService administrationService) : ControllerBase
+    public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
     {
         //// Handle Event Requisition Endpoints --------------------------------------------------------
         //[HttpGet("ViewPendingRequisitions")]
@@ -70,18 +70,18 @@ namespace Project.APIs.Controllers
         [HttpGet("viewProfile/{memberId:guid}")]
         public async Task<IActionResult> GetProfile(Guid memberId)
         {
-            var member = await administrationService.ViewProfile(memberId);
+            var member = await memberService.ViewProfile(memberId);
             return Ok(member);
         }
 
         //Edit Profile
         [HttpPut("updateProfile/{memberId:guid}")]
-        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateAdminProfileDto updateAdminProfileDto)
+        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateMemberProfileDto updateMemberProfile)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Fill the credentials");
 
-            await administrationService.EditProfile(memberId, updateAdminProfileDto);
+            await memberService.EditProfile(memberId, updateMemberProfile);
             return Ok();
         }
 
