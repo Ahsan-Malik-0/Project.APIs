@@ -48,7 +48,12 @@ namespace Project.APIs.Services
         {
             // Check for duplicate username FIRST
             var usernameExists = await _dB.Members
-                .AnyAsync(m => m.Username == memberDto.Username);
+                .AnyAsync(m => m.Username == memberDto.Username && m.Username == memberDto.Username);
+
+            //var cpExists = await _dB.Members
+            //    .AnyAsync(m => m.Role == memberDto.Role && m.SocietyId == memberDto.SocietyId);
+
+
 
             if (usernameExists)
             {
