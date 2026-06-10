@@ -50,6 +50,22 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
+        // View Member Profile
+        [HttpGet("viewMemberProfile/{chairpersonId:guid}")]
+        public async Task<IActionResult> GetPresidentProfile(Guid chairpersonId)
+        {
+            var president = await memberService.GetMemberProfile(chairpersonId);
+            return Ok(president);
+        }
+
+        // Edit Member Profile
+        [HttpPut("updateMemberProfile/{presidentId:guid}")]
+        public async Task<IActionResult> UpdatePresidentProfile(Guid presidentId, EditMemberProfileDto editMemberProfile)
+        {
+            await memberService.UpdateMemberProfile(presidentId, editMemberProfile);
+            return Ok();
+        }
+
 
         [Authorize]
         [HttpGet]
