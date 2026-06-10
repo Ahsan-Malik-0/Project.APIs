@@ -47,13 +47,38 @@ namespace Project.APIs.Services
         public async Task<Member?> RegisterAsync(MemberDto memberDto)
         {
             // Check for duplicate username FIRST
-            var usernameExists = await _dB.Members
-                .AnyAsync(m => m.Username == memberDto.Username);
-
-            if (usernameExists)
+            if (memberDto.SocietyId != Guid.Empty)
             {
-                throw new BusinessRuleException("Username already exist");
+                var usernameExists = await _dB.Members
+                    .AnyAsync(m => m.Role == memberDto.Role && m.Society!.Id == memberDto.SocietyId);
+
+                if (usernameExists)
+                {
+                    if (memberDto.Role == "presiden")
+                    {
+                        throw new BusinessRuleException("President already exist");
+                    }
+                    else
+                    {
+                        throw new BusinessRuleException("Chairperson already exist");
+                    }
+                }
             }
+            else
+            {
+                var usernameExists = await _dB.Members
+                   .AnyAsync(m => m.Role == memberDto.Role);
+
+                if (usernameExists)
+                {
+
+                    throw new BusinessRuleException($"{memberDto.Role} already exist");
+                    
+                }
+            }
+
+            //var chairpersonExists1 = await _dB.Members
+            //    .AnyAsync(m => m.Username == memberDto.Username);
 
             if (string.IsNullOrEmpty(memberDto.HashPassword))
             {
