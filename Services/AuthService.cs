@@ -20,12 +20,19 @@ namespace Project.APIs.Services
 
             if (member == null)
             {
-                return null;
+                //return null;
+                throw new BusinessRuleException("Username does not Exists");
+            }
+
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new BusinessRuleException("Username is required");
             }
 
             if (string.IsNullOrEmpty(hashPassword))
             {
-                throw new BusinessRuleException("Password must required");
+                throw new BusinessRuleException("Password is required");
             }
 
             var result = _passwordHasher.VerifyHashedPassword(
@@ -64,14 +71,14 @@ namespace Project.APIs.Services
 
                 if (usernameExists)
                 {
-                    if (memberDto.Role == "president")
-                    {
-                        throw new BusinessRuleException("President already exist");
-                    }
-                    else
-                    {
-                        throw new BusinessRuleException("Chairperson already exist");
-                    }
+                    //if (memberDto.Role.Contains("president", StringComparison.OrdinalIgnoreCase))
+                    //{
+                    throw new BusinessRuleException($"{memberDto.Role} already exist");
+                    //}
+                    //else
+                    //{
+                    //    throw new BusinessRuleException("Chairperson already exist");
+                    //}
                 }
             }
             else
