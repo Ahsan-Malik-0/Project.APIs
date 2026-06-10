@@ -54,7 +54,7 @@ namespace Project.APIs.Services
 
                 if (usernameExists)
                 {
-                    if (memberDto.Role == "presiden")
+                    if (memberDto.Role == "president")
                     {
                         throw new BusinessRuleException("President already exist");
                     }
@@ -101,7 +101,7 @@ namespace Project.APIs.Services
 
             Member member = new Member
             {
-                Id = Guid.NewGuid(),  // Explicitly create new GUID
+                //Id = Guid.NewGuid(),  // Explicitly create new GUID
                 Name = memberDto.Name,
                 Username = memberDto.Username,
                 HashPassword = _passwordHasher.HashPassword(null!, memberDto.HashPassword!),
