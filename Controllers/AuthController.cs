@@ -8,7 +8,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService, MemberService memberService) : ControllerBase
     {
         //Registration
         [HttpPost("Register")]
@@ -30,6 +30,26 @@ namespace Project.APIs.Controllers
             var token = await authService.LoginAsync(request.Username, request.HashPassword);
             return Ok(token);
         }
+
+        //View Profile
+        [HttpGet("viewProfile/{memberId:guid}")]
+        public async Task<IActionResult> GetProfile(Guid memberId)
+        {
+            var member = await memberService.ViewProfile(memberId);
+            return Ok(member);
+        }
+
+        //Edit Profile
+        [HttpPut("updateProfile/{memberId:guid}")]
+        public async Task<IActionResult> UpdateProfile(Guid memberId, [FromBody] UpdateMemberProfileDto updateMemberProfileDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Fill the credentials");
+
+            await memberService.EditProfile(memberId, updateMemberProfileDto);
+            return Ok();
+        }
+
 
         [Authorize]
         [HttpGet]
