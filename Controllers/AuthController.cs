@@ -51,18 +51,18 @@ namespace Project.APIs.Controllers
         }
 
         // View Member Profile
-        [HttpGet("viewMemberProfile/{chairpersonId:guid}")]
-        public async Task<IActionResult> GetPresidentProfile(Guid chairpersonId)
+        [HttpGet("viewMemberProfile/{upperLevelId:guid}")]
+        public async Task<IActionResult> GetPresidentProfile(Guid upperLevelId)
         {
-            var president = await memberService.GetMemberProfile(chairpersonId);
-            return Ok(president);
+            var lowerMember = await memberService.GetMemberProfile(upperLevelId);
+            return Ok(lowerMember);
         }
 
         // Edit Member Profile
-        [HttpPut("updateMemberProfile/{presidentId:guid}")]
-        public async Task<IActionResult> UpdatePresidentProfile(Guid presidentId, EditMemberProfileDto editMemberProfile)
+        [HttpPut("updateMemberProfile/{lowerLevelId:guid}")]
+        public async Task<IActionResult> UpdatePresidentProfile(Guid lowerLevelId, EditMemberProfileDto editMemberProfile)
         {
-            await memberService.UpdateMemberProfile(presidentId, editMemberProfile);
+            await memberService.UpdateMemberProfile(lowerLevelId, editMemberProfile);
             return Ok();
         }
 
