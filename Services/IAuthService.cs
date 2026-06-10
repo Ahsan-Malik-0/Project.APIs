@@ -8,7 +8,7 @@ namespace Project.APIs.Services
     {
         Task<Member?> RegisterAsync(MemberDto request);
         Task<string?> LoginAsync(string username, string hashPassword); 
-        Task<string?> LoginAdminAsync(string username, string hashPassword);
-        Task<Administration?> RegisterAdminAsync(CreateAdministrationDto request);
+        //Task<string?> LoginAdminAsync(string username, string hashPassword);
+        //Task<Administration?> RegisterAdminAsync(CreateAdministrationDto request);
     }
 }

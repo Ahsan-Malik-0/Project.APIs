@@ -21,10 +21,10 @@ namespace Project.APIs.Services
 
             string? base64Image = null;
 
-            if (!string.IsNullOrEmpty(admin.Picture))
+            if (!string.IsNullOrEmpty(admin.ProfileImage))
             {
                 // Remove starting '/'
-                var relativePath = admin.Picture.TrimStart('/');
+                var relativePath = admin.ProfileImage.TrimStart('/');
 
                 // Get full physical path
                 var fullPath = Path.Combine(_env.WebRootPath, relativePath);
@@ -43,7 +43,7 @@ namespace Project.APIs.Services
             {
                 Name = admin.Name,
                 Username = admin.Username,
-                Picture = base64Image ?? admin.Picture,
+                Picture = base64Image ?? admin.ProfileImage,
             };
 
             return adminProfileDto;
@@ -83,9 +83,9 @@ namespace Project.APIs.Services
             if (!string.IsNullOrEmpty(updatedAdmin.Picture))
             {
                 // Delete old image (if exists)
-                if (!string.IsNullOrEmpty(oldAdmin!.Picture))
+                if (!string.IsNullOrEmpty(oldAdmin!.ProfileImage))
                 {
-                    var oldImagePath = Path.Combine(_env.WebRootPath, oldAdmin.Picture.TrimStart('/'));
+                    var oldImagePath = Path.Combine(_env.WebRootPath, oldAdmin.ProfileImage.TrimStart('/'));
 
                     if (File.Exists(oldImagePath))
                         File.Delete(oldImagePath);
@@ -106,7 +106,7 @@ namespace Project.APIs.Services
                 await File.WriteAllBytesAsync(fullPath, imageBytes);
 
                 // Save relative path in DB
-                oldAdmin.Picture = $"/profiles/{fileName}";
+                oldAdmin.ProfileImage = $"/profiles/{fileName}";
             }
 
                 

@@ -143,7 +143,7 @@ namespace Project.APIs.Services
                     Session = newYearlyBudget.Session,
                     RequestedAmount = newYearlyBudget.RequestedAmount,
                     RequestedDate = newYearlyBudget.RequestedDate,
-                    SocietyId = societyId
+                    SocietyId = (Guid)societyId
                 };
 
                 await _dB.YearlyBudgets.AddAsync(yearlyBudget);

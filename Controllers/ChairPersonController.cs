@@ -82,20 +82,20 @@ namespace Project.APIs.Controllers
 
         // Handling Events Requisition Endpoints -----------------------------------------------------
         // Pending Envents Requisitions
-        [HttpGet("getPendingEventRequisitions/{memberId:guid}")]
-        public async Task<IActionResult> PendingRequisitions(Guid memberId)
-        {
-            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
-            return Ok(pendingRequisitions);
-        }
+        //[HttpGet("getPendingEventRequisitions/{memberId:guid}")]
+        //public async Task<IActionResult> PendingRequisitions(Guid memberId)
+        //{
+        //    var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
+        //    return Ok(pendingRequisitions);
+        //}
 
-        // Events Requisitions Detail
-        [HttpGet("getEventRequisitionDetails/{requisitionId:guid}")]
-        public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
-        {
-            var requisitionsDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
-            return Ok(requisitionsDetails);
-        }
+        //// Events Requisitions Detail
+        //[HttpGet("getEventRequisitionDetails/{requisitionId:guid}")]
+        //public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
+        //{
+        //    var requisitionsDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
+        //    return Ok(requisitionsDetails);
+        //}
 
         [HttpGet("getChairpersonDetailsForRequisition/{chairpersonId:guid}")]
         public async Task<IActionResult> GetChaipersonDetailsForRequisition(Guid chairpersonId)
@@ -131,20 +131,20 @@ namespace Project.APIs.Controllers
         }
 
         // Delete Events Requisitions
-        [HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)
-        {
-            await eventRequisitionService.DeleteEventRequisition(requisitionId);
-            return NoContent();
-        }
+        //[HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
+        //public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)
+        //{
+        //    await eventRequisitionService.DeleteEventRequisition(requisitionId);
+        //    return NoContent();
+        //}
 
-        //View Events Requisitions History
-        [HttpGet("getEventRequisitionHistory/{memberId:guid}")]
-        public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
-        {
-            var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
-            return Ok(RequisitionList);
-        }
+        ////View Events Requisitions History
+        //[HttpGet("getEventRequisitionHistory/{memberId:guid}")]
+        //public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
+        //{
+        //    var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
+        //    return Ok(RequisitionList);
+        //}
 
         // Handling Event Audits Endpoints ----------------------------------------------------
         // View audits of events
@@ -190,14 +190,14 @@ namespace Project.APIs.Controllers
         }
 
         // Confirm receive amount
-        [HttpGet("verifyTakeAmount/{auditId:guid}")]
-        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
-        {
-            string status = "clear";
+        //[HttpGet("verifyTakeAmount/{auditId:guid}")]
+        //public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        //{
+        //    string status = "clear";
 
-            await eventAuditService.UpdateAuditStatus(auditId, status);
-            return Ok();
-        }
+        //    await eventAuditService.UpdateAuditStatus(auditId, status);
+        //    return Ok();
+        //}
 
         // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions

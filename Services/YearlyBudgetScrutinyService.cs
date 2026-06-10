@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
@@ -21,7 +22,7 @@ namespace Project.APIs.Services
                     // AdministrationStatus = ybs.Status!,
                     CommentDate = ybs.Date,
                 }).ToListAsync();
-                
+
             if (details == null || details.Count == 0)
             {
                 throw new NotFoundException("No scrutiny details found for the given yearly budget ID.");
@@ -67,6 +68,45 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
+        // Get all events happens after top early budget of that society approval
+        //public async Task<List<GetYearlyBudgetDetailsWithEventsDto>> GetYearlyBudgetWithEvents()
+        //{
+        //    var details = await _dB.YearlyBudgets
+        //        .Where(yb => yb.AllotedAmount > 0)
+        //        .ToListAsync();
 
+        //    if (details == null)
+        //        throw new NotFoundException("No approved yearly budget found for the given society ID.");
+
+        //    var earlyBudgetDetailsWithEvents = new List<GetYearlyBudgetDetailsWithEventsDto>();
+
+        //    foreach (var detail in details)
+        //    {
+        //        var yearlyBudgetDetails = new GetYearlyBudgetDetailsWithEventsDto()
+        //        {
+        //            Session = detail.Session,
+        //            AllotedAmount = detail.AllotedAmount,
+        //            AllotedDate = detail.AllotedDate,
+        //            Credits = detail.Credits,
+        //            RequisitionDetails = await _dB.EventRequisitions
+        //                .Where(er => er._event!.SocietyId == detail.SocietyId && er.AllocatedDate >= detail.AllotedDate)
+        //                .Select(er => new ViewRequisitionRequestDetailsDto()
+        //                {
+        //                    Id = er.Id,
+        //                    EventName = er._event!.Name,
+        //                    SocietyName = er._event!.Society!.Name,
+        //                    RequestedAmount = er.RequestAmount,
+        //                    AllotedAmount = er.AllocatedAmount,
+        //                    BiitContribution = er.BiitContribution,
+        //                    EventDate = er._event!.Date,
+        //                    RequestedDate = er.RequestedDate
+        //                }).ToListAsync()
+        //        };
+
+        //        earlyBudgetDetailsWithEvents.Add(yearlyBudgetDetails);
+        //    }
+
+        //    return earlyBudgetDetailsWithEvents;
+        //}
     }
 }

@@ -20,10 +20,10 @@ namespace Project.APIs.Services
 
             string? base64Image = null;
 
-            if (!string.IsNullOrEmpty(member.Picture))
+            if (!string.IsNullOrEmpty(member.ProfileImage))
             {
                 // Remove starting '/'
-                var relativePath = member.Picture.TrimStart('/');
+                var relativePath = member.ProfileImage.TrimStart('/');
 
                 // Get full physical path
                 var fullPath = Path.Combine(_env.WebRootPath, relativePath);
@@ -42,8 +42,8 @@ namespace Project.APIs.Services
             {
                 Name = member.Name,
                 Username = member.Username,
-                Picture = base64Image!,
-                SocietyId = member.SocietyId
+                ProfileImage = base64Image!,
+                SocietyId = (Guid)member.SocietyId!
             };
 
             return memberProfileDto;
@@ -144,12 +144,12 @@ namespace Project.APIs.Services
 
             // image handling
 
-            if (!string.IsNullOrEmpty(updatedMember.Picture))
+            if (!string.IsNullOrEmpty(updatedMember.ProfileImage))
             {
                 // Delete old image (if exists)
-                if (!string.IsNullOrEmpty(oldMember!.Picture))
+                if (!string.IsNullOrEmpty(oldMember!.ProfileImage))
                 {
-                    var oldImagePath = Path.Combine(_env.WebRootPath, oldMember.Picture.TrimStart('/'));
+                    var oldImagePath = Path.Combine(_env.WebRootPath, oldMember.ProfileImage.TrimStart('/'));
 
                     if (File.Exists(oldImagePath))
                         File.Delete(oldImagePath);
@@ -164,13 +164,13 @@ namespace Project.APIs.Services
                 var fullPath = Path.Combine(folderPath, fileName);
 
                 // Convert Base64 → byte[]
-                byte[] imageBytes = Convert.FromBase64String(updatedMember.Picture);
+                byte[] imageBytes = Convert.FromBase64String(updatedMember.ProfileImage);
 
                 // Save file
                 await File.WriteAllBytesAsync(fullPath, imageBytes);
 
                 // Save relative path in DB
-                oldMember.Picture = $"/profiles/{fileName}";
+                oldMember.ProfileImage = $"/profiles/{fileName}";
             }
 
 

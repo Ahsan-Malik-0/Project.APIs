@@ -7,7 +7,7 @@ namespace Project.APIs.Model.DTOs
         public required string Body { get; set; } = string.Empty;
         public required DateTime RequestedDate { get; set; }
         public required decimal RequestedAmount { get; set; }
-        public required Guid EventId { get; set; }
+        public required ICollection<Guid> EventIds{ get; set; }
     }
 
     public class UpdateEventRequisitionDto
@@ -108,6 +108,12 @@ namespace Project.APIs.Model.DTOs
     public class ResponseMessageDto
     {
         public required string ResponseMessage { get; set; }
+    }
+
+
+    public class RequisitionDetailsForYearlyBudgetDto
+    {
+        public decimal AllotedAmount { get; set; }
     }
     
 }

@@ -10,6 +10,6 @@ namespace Project.APIs.Model
         public required string Username { get; set; }
         public required string HashPassword { get; set; }
         public required string Role { get; set; }
-        public string? Picture { get; set; }
+        public string? ProfileImage { get; set; }
     }
 }

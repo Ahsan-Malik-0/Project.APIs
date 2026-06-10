@@ -11,50 +11,50 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class AdminController(EventRequisitionService eventRequisitionService, AdministrationService administrationService, EventService eventService) : ControllerBase
     {
-        [HttpGet("ApproveEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId)
-        {
-            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-            {   
-                Status = "E",
-                ReviewMessage = null
-            };
-            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-            return Ok();
-        }
+        //[HttpGet("ApproveEventRequisition/{requisitionId:guid}")]
+        //public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId)
+        //{
+        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+        //    {   
+        //        Status = "E",
+        //        ReviewMessage = null
+        //    };
+        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+        //    return Ok();
+        //}
 
-        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
-        {
-            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-            {
-                Status = "D",
-                ReviewMessage = responseMessage.ResponseMessage
-            };
-            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-            return Ok();
-        }
+        //[HttpPost("RejectEventRequisition/{requisitionId:guid}")]
+        //public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        //{
+        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+        //    {
+        //        Status = "D",
+        //        ReviewMessage = responseMessage.ResponseMessage
+        //    };
+        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+        //    return Ok();
+        //}
 
-        [HttpGet("ViewPendingRequisitions")]
-        public async Task<IActionResult> ViewPendingRequisitions()
-        {
-            var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('C');
-            return Ok(pendingRequisitions);
-        }
+        //[HttpGet("ViewPendingRequisitions")]
+        //public async Task<IActionResult> ViewPendingRequisitions()
+        //{
+        //    var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('C');
+        //    return Ok(pendingRequisitions);
+        //}
 
-        [HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
-        public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
-        {
-            var requisitionDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
-            return Ok(requisitionDetails);
-        }
+        //[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
+        //public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
+        //{
+        //    var requisitionDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
+        //    return Ok(requisitionDetails);
+        //}
 
-        [HttpGet("ViewReservedNonFinancialRequirements")]
-        public async Task<IActionResult> ViewEventRequirements()
-        {
-            var requirements = await eventService.GetReservedNonFinancialRequirements();
-            return Ok(requirements);
-        }
+        //[HttpGet("ViewReservedNonFinancialRequirements")]
+        //public async Task<IActionResult> ViewEventRequirements()
+        //{
+        //    var requirements = await eventService.GetReservedNonFinancialRequirements();
+        //    return Ok(requirements);
+        //}
 
         // Handle Profile Endpoints --------------------------------------------------------
         //View Profile

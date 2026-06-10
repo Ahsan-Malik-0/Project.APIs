@@ -12,4 +12,10 @@ namespace Project.APIs.Model.DTOs
         [StringLength(2000)]
         public required string Description { get; set; }
     }
+
+    public class ListOfSocietiesDto
+    {
+        public Guid SocietyId { get; set; }
+        public required string SocietyName { get; set; }
+    }
 }

@@ -155,32 +155,32 @@ namespace Project.APIs.Services
             }
         }
 
-        public async Task UpdateAuditStatus(Guid eventAuditId, string status)
-        {
-            var transaction = await _dB.Database.BeginTransactionAsync();
-            try
-            {
-                if (status == "clear")
-                {
-                    var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.EventId == _dB.EventAudits.FirstOrDefault(ea => ea.Id == eventAuditId)!.EventId);
+        //public async Task UpdateAuditStatus(Guid eventAuditId, string status)
+        //{
+        //    var transaction = await _dB.Database.BeginTransactionAsync();
+        //    try
+        //    {
+        //        if (status == "clear")
+        //        {
+        //            var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.EventId == _dB.EventAudits.FirstOrDefault(ea => ea.Id == eventAuditId)!.EventId);
 
-                    await eventRequisitionService.UpdateRequisitionStatus(requisition!.Id);
-                }
+        //            await eventRequisitionService.UpdateRequisitionStatus(requisition!.Id);
+        //        }
                 
-                var existingEventAudit = await _dB.EventAudits.FirstOrDefaultAsync(ea => ea.Id == eventAuditId);
+        //        var existingEventAudit = await _dB.EventAudits.FirstOrDefaultAsync(ea => ea.Id == eventAuditId);
 
-                if (existingEventAudit == null) throw new NotFoundException("Event audit not found");
+        //        if (existingEventAudit == null) throw new NotFoundException("Event audit not found");
 
-                existingEventAudit.Status = status;
-                await _dB.SaveChangesAsync();
+        //        existingEventAudit.Status = status;
+        //        await _dB.SaveChangesAsync();
 
-                await transaction.CommitAsync();
-            }
-            catch (DbUpdateException)
-            {
-                await transaction.RollbackAsync();
-                throw new BusinessRuleException("Unable to update event audit status. Please try again.");
-            }
-        }
+        //        await transaction.CommitAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        await transaction.RollbackAsync();
+        //        throw new BusinessRuleException("Unable to update event audit status. Please try again.");
+        //    }
+        //}
     }
 }

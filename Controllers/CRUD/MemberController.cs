@@ -48,7 +48,7 @@ namespace Project.APIs.Controllers.CRUD
                 member.Name,
                 member.Username,
                 member.Role,
-                member.Picture,
+                member.ProfileImage,
                 member.SocietyId,
                 SocietyName = member.Society?.Name
             });
@@ -82,7 +82,7 @@ namespace Project.APIs.Controllers.CRUD
             member.Username = memberDto.Username;
             member.HashPassword = memberDto.HashPassword;
             member.Role = memberDto.Role;
-            member.Picture = memberDto.Picture;
+            member.ProfileImage = memberDto.ProfileImage;
 
             _dB.Members.Update(member);
             await _dB.SaveChangesAsync();

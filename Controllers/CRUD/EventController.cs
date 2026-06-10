@@ -34,9 +34,11 @@ namespace Project.APIs.Controllers.CRUD
             Event _event = new Event()
             {
                 Name = eventDto.Name,
-                Date = eventDto.Date,
+                StartTime = eventDto.StartTime,
+                EndTime = eventDto.EndTime,
+                EventDate = eventDto.Date,
                 Status = eventDto.Status!,
-                Message = eventDto.Message,
+                ReviewMessage = eventDto.Message,
                 SocietyId = eventDto.SocietyId
             };
 
@@ -69,9 +71,9 @@ namespace Project.APIs.Controllers.CRUD
                 return BadRequest("Event Not Found");
 
             _event.Name = eventDto.Name;
-            _event.Date = eventDto.Date;
+            _event.EventDate = eventDto.Date;
             _event.Status = eventDto.Status!;
-            _event.Message = eventDto.Message;
+            _event.ReviewMessage = eventDto.Message;
 
             _dB.Events.Update(_event);
             await _dB.SaveChangesAsync();

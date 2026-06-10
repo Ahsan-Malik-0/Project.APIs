@@ -29,4 +29,13 @@ namespace Project.APIs.Model.DTOs
         public decimal Credits { get; set; }
     }
 
+    public class GetYearlyBudgetDetailsWithEventsDto
+    {
+        public string Session { get; set; } = string.Empty;
+        public decimal AllotedAmount { get; set; }
+        public DateTime AllotedDate { get; set; }
+        public decimal Credits { get; set; }
+        public ICollection<ViewRequisitionRequestDetailsDto>? RequisitionDetails { get; set; }
+    }
+
 }

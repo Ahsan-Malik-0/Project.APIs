@@ -6,6 +6,11 @@ namespace Project.APIs.Model.DTOs
     {
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
+        [Required(ErrorMessage = "Start Time is required")]
+        public TimeSpan StartTime { get; set; }
+
+        [Required(ErrorMessage = "End Time is required")]
+        public TimeSpan EndTime { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
         public DateTime Date { get; set; }
@@ -23,8 +28,14 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
 
+        [Required(ErrorMessage = "Start Time is required")]
+        public TimeSpan StartTime { get; set; }
+
+        [Required(ErrorMessage = "End Time is required")]
+        public TimeSpan EndTime { get; set; }
+
         [Required(ErrorMessage = "Date is required")]
-        public DateTime Date { get; set; }
+        public DateTime EventDate { get; set; }
 
         [Required(ErrorMessage = "SocietyId is required")]
         public Guid SocietyId { get; set; }
@@ -38,8 +49,14 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
 
-        [Required(ErrorMessage = "Name is required")]
-        public DateTime Date { get; set; }
+        [Required(ErrorMessage = "Start Time is required")]
+        public TimeSpan StartTime { get; set; }
+
+        [Required(ErrorMessage = "End Time is required")]
+        public TimeSpan EndTime { get; set; }
+
+        [Required(ErrorMessage = "Date is required")]
+        public DateTime EventDate { get; set; }
 
         [Required(ErrorMessage = "Requirements are required")]
         public required ICollection<EventRequirementDto> Requirements { get; set; }

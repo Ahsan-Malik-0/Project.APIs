@@ -28,33 +28,33 @@ namespace Project.APIs.Controllers
         public async Task<ActionResult<string>> GetMemberByPass(LoginDto request)
         {
 
-            var token1 = await authService.LoginAsync(request.Username, request.HashPassword);
+            var token = await authService.LoginAsync(request.Username, request.HashPassword);
 
-            if (token1 == null)
-            {
-                var token2 = await authService.LoginAdminAsync(request.Username, request.HashPassword);
-                if (token2 == null)
-                {
-                    return BadRequest("Invalid Username or password");
-                }
-                return Ok(token2);
-            }
+            //if (token1 == null)
+            //{
+            //    var token2 = await authService.LoginAdminAsync(request.Username, request.HashPassword);
+            //    if (token2 == null)
+            //    {
+            //        return BadRequest("Invalid Username or password");
+            //    }
+            //    return Ok(token2);
+            //}
 
-            return Ok(token1);
+            return Ok(token);
         }
 
-        [HttpPost("AdminRegister")]
-        public async Task<ActionResult<Administration>> AddAdmin([FromBody] CreateAdministrationDto administrationDto)
-        {
-            var admin = await authService.RegisterAdminAsync(administrationDto);
+        //[HttpPost("AdminRegister")]
+        //public async Task<ActionResult<Administration>> AddAdmin([FromBody] CreateAdministrationDto administrationDto)
+        //{
+        //    var admin = await authService.RegisterAdminAsync(administrationDto);
 
-            if (admin == null)
-            {
-                return BadRequest("User Already Exist");
-            }
+        //    if (admin == null)
+        //    {
+        //        return BadRequest("User Already Exist");
+        //    }
 
-            return Ok(admin);
-        }
+        //    return Ok(admin);
+        //}
 
         [Authorize]
         [HttpGet]

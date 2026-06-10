@@ -47,15 +47,41 @@ namespace Project.APIs.Services
         public async Task AddEvent(AddEventDto newEvent, string status)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
-
             try
             {
+                // Check if conflicting event exists
+                var conflictingEvent = await _dB.Events
+                    .Where(e => e.Status == "pending"
+                        && e.EventDate.Date == newEvent.EventDate.Date
+                        && e.StartTime == newEvent.StartTime)
+                    .Select(e => new
+                     {
+                         Event = e,
+                         ConflictingRequirements = e.Requirements
+                            .Where(r => r.Type == "non-financial"
+                                && newEvent.Requirements.Select(nr => nr.Name).Contains(r.Name))
+                            .ToList()
+                     })
+                    .FirstOrDefaultAsync(x => x.ConflictingRequirements.Any());
+
+                if (conflictingEvent != null)
+                {
+                    var conflictingNames = string.Join(", ",
+                        conflictingEvent.ConflictingRequirements.Select(r => r.Name));
+                    throw new BusinessRuleException(
+                        $"Non-financial requirements '{conflictingNames}' already exist in event '{conflictingEvent.Event.Name}'");
+                    //throw new BusinessRuleException("Same even exist");
+                }
+
+
                 var _event = new Event
                 {
                     Name = newEvent.Name,
-                    Date = newEvent.Date,
+                    StartTime = newEvent.StartTime,
+                    EndTime = newEvent.EndTime,
+                    EventDate = newEvent.EventDate,
                     Status = status,
-                    Message = null,
+                    ReviewMessage = null,
                     SocietyId = newEvent.SocietyId
                 };
 
@@ -105,6 +131,30 @@ namespace Project.APIs.Services
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
+            // Check if conflicting event exists
+            var conflictingEvent = await _dB.Events
+                .Where(e => e.Status == "pending"
+                    && e.EventDate.Date == dto.EventDate.Date
+                    && e.StartTime == dto.StartTime)
+                .Select(e => new
+                {
+                    Event = e,
+                    ConflictingRequirements = e.Requirements
+                        .Where(r => r.Type == "non-financial"
+                            && dto.Requirements.Select(nr => nr.Name).Contains(r.Name))
+                        .ToList()
+                })
+                .FirstOrDefaultAsync(x => x.ConflictingRequirements.Any());
+
+            if (conflictingEvent != null)
+            {
+                var conflictingNames = string.Join(", ",
+                    conflictingEvent.ConflictingRequirements.Select(r => r.Name));
+                throw new BusinessRuleException(
+                    $"Non-financial requirements '{conflictingNames}' already exist in event '{conflictingEvent.Event.Name}'");
+                //throw new BusinessRuleException("Same even exist");
+            }
+
             try
             {
                 var existingEvent = await _dB.Events
@@ -116,8 +166,10 @@ namespace Project.APIs.Services
 
                 // 1️ Update event fields
                 existingEvent.Name = dto.Name;
-                existingEvent.Date = dto.Date;
-                existingEvent.Message = "";
+                existingEvent.StartTime = dto.StartTime;
+                existingEvent.EndTime = dto.EndTime;
+                existingEvent.EventDate = dto.EventDate;
+                existingEvent.ReviewMessage = "";
 
                 if (existingEvent.Status == "rejected" || existingEvent.Status == "postponed")
                     existingEvent.Status = "pending";
@@ -208,7 +260,7 @@ namespace Project.APIs.Services
                 .Where(e => e.Status == "accepted" || e.Status == "postponed")
                 .Where(e => _dB.Members
                     .Any(m => m.Id == memberId && m.SocietyId == e.SocietyId))
-                .OrderByDescending(e => e.Date) // Order by date
+                .OrderByDescending(e => e.EventDate) // Order by date
                 .ToListAsync();
 
             if (!events.Any())
@@ -226,7 +278,7 @@ namespace Project.APIs.Services
                 throw new NotFoundException("Event not found");
 
             if (!string.IsNullOrEmpty(updateEventStatus.Message))
-                _event.Message = updateEventStatus.Message;
+                _event.ReviewMessage = updateEventStatus.Message;
 
             _event.Status = updateEventStatus.Status;
 
@@ -247,34 +299,34 @@ namespace Project.APIs.Services
         }
 
         // Get all reserved non-financial requirements for admin
-        public async Task<List<ViewReservedNonFinancialRequirements>> GetReservedNonFinancialRequirements()
-        {
-            var eligibleEvent = await _dB.Events
-                .Include(e => e.Requirements) // Make sure to include requirements
-                .Where(e => _dB.EventRequisitions
-                    .Any(er => er.EventId == e.Id && (er.Status == "E" || er.Status == "F" || er.Status == "G"))) // Check requisition status for THIS event
-                .ToListAsync();
+        //public async Task<List<ViewReservedNonFinancialRequirements>> GetReservedNonFinancialRequirements()
+        //{
+        //    var eligibleEvent = await _dB.Events
+        //        .Include(e => e.Requirements) // Make sure to include requirements
+        //        .Where(e => _dB.EventRequisitions
+        //            .Any(er => er.EventId == e.Id && (er.Status == "E" || er.Status == "F" || er.Status == "G"))) // Check requisition status for THIS event
+        //        .ToListAsync();
 
-            if (!eligibleEvent.Any())
-                throw new NotFoundException("Events not found");
+        //    if (!eligibleEvent.Any())
+        //        throw new NotFoundException("Events not found");
 
-            var dto = eligibleEvent.Select(ee => new ViewReservedNonFinancialRequirements()
-            {
-                EventName = ee.Name,
-                EventDate = ee.Date,
-                NonFinancialRequirements = ee.Requirements
-                    .Where(r => r.Type.Contains("non", StringComparison.OrdinalIgnoreCase)) // Filter only non-financial requirements
-                    .Select(r => new NonFinancialRequirement()
-                    {
-                        ReqName = r.Name,
-                        ReqQty = r.Quantity
-                    }).ToList()
-            }).ToList();
+        //    var dto = eligibleEvent.Select(ee => new ViewReservedNonFinancialRequirements()
+        //    {
+        //        EventName = ee.Name,
+        //        EventDate = ee.Date,
+        //        NonFinancialRequirements = ee.Requirements
+        //            .Where(r => r.Type.Contains("non", StringComparison.OrdinalIgnoreCase)) // Filter only non-financial requirements
+        //            .Select(r => new NonFinancialRequirement()
+        //            {
+        //                ReqName = r.Name,
+        //                ReqQty = r.Quantity
+        //            }).ToList()
+        //    }).ToList();
 
-            if (!dto.Any() || dto.All(d => !d.NonFinancialRequirements.Any()))
-                throw new NotFoundException("Reserved non-financial requirements not found");
+        //    if (!dto.Any() || dto.All(d => !d.NonFinancialRequirements.Any()))
+        //        throw new NotFoundException("Reserved non-financial requirements not found");
 
-            return dto;
-        }
+        //    return dto;
+        //}
     }
 }
