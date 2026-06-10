@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Project.APIs.Database;
@@ -9,7 +8,6 @@ using Project.APIs.Model.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static Project.APIs.Model.DTOs.AdministrationDto;
 
 namespace Project.APIs.Services
 {
@@ -114,8 +112,5 @@ namespace Project.APIs.Services
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
-
-       
-
     }
 }
