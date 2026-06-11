@@ -47,9 +47,6 @@ namespace Project.APIs.Model.DTOs
 
     public class UpdateMemberProfileDto
     {
-        [Required(ErrorMessage = "Id is required")]
-        public Guid Id { get; set; }
-
         [Required(ErrorMessage = "Name is required")]
         public required string Name { get; set; }
         [StringLength(20)]
