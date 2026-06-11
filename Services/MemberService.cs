@@ -43,7 +43,7 @@ namespace Project.APIs.Services
                 Name = member.Name,
                 Username = member.Username,
                 ProfileImage = base64Image!,
-                SocietyId = (Guid)member.SocietyId!
+                SocietyId = member.SocietyId ?? Guid.Empty
             };
 
             return memberProfileDto;
