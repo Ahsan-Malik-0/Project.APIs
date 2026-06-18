@@ -18,6 +18,6 @@ namespace Project.APIs.Model
         [JsonIgnore]
         [ForeignKey(nameof(RequisitionId))] // Add this line
         public EventRequisition? EventRequisition { get; set; }
-        public virtual ICollection<EventRequirement> Requirements { get; set; } = new List<EventRequirement>();
+        public required IList<EventRequirement> Requirements { get; set; }
     }
 }

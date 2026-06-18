@@ -13,6 +13,6 @@ namespace Project.APIs.Model
         public string? Description { get; set; }
 
         [JsonIgnore]
-        public ICollection<Member>? Members { get; set; }
+        public List<Member>? Members { get; set; }
     }
 }

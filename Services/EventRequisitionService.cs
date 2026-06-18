@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
@@ -20,18 +21,10 @@ namespace Project.APIs.Services
 
         public async Task CreateEventRequisition(CreateEventRequisitionDto newRequisition)
         {
-            //var @event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
-
-            //if (@event == null)
-            //    throw new NotFoundException("Event Not Found");
-
-            //@event.Status = "accepted";
-
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
             try
             {
-
                 EventRequisition eventRequisition = new EventRequisition()
                 {
                     RequestedDate = newRequisition.RequestedDate,
@@ -40,25 +33,20 @@ namespace Project.APIs.Services
                     //EventId = newRequisition.EventId,
                     RequestAmount = newRequisition.RequestedAmount,
                     Status = "A",
+                    Events = null
                 };
 
                 await _dB.EventRequisitions.AddAsync(eventRequisition);
                 await _dB.SaveChangesAsync();
 
-                foreach (Guid eventId in newRequisition.EventIds)
+                var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == newRequisition.EventId);
+                if (_event == null)
                 {
-                    var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-                    if (_event == null)
-                    {
-                        throw new NotFoundException("Event Not Found");
-                    }
-
-                    _event.Status = "accepted";
-                    _event.RequisitionId = eventRequisition.Id;
-
-                    //await _dB.Events.AddAsync(_event);
-
+                    throw new NotFoundException("Event Not Found");
                 }
+
+                _event.Status = "accepted";
+                _event.RequisitionId = eventRequisition.Id;
 
                 await _dB.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -75,7 +63,7 @@ namespace Project.APIs.Services
             }
         }
 
-        public async Task UpdateEventRequisition(Guid requisitionId, UpdateEventRequisitionDto updateEventRequisitionDto)
+        public async Task UpdateEventRequisition(Guid requisitionId, UpdateEventRequisitionDto updateEventRequisition)
         {
             var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -86,30 +74,34 @@ namespace Project.APIs.Services
                 if (requisition == null)
                     throw new NotFoundException("Requisition Not Found");
 
-                requisition.Subject = updateEventRequisitionDto.Subject;
-                requisition.Body = updateEventRequisitionDto.Body;
-                requisition.RequestedDate = updateEventRequisitionDto.RequestedDate;
-                requisition.RequestAmount = updateEventRequisitionDto.RequestedAmount;
+                requisition.Subject = updateEventRequisition.Subject;
+                requisition.Body = updateEventRequisition.Body;
+                requisition.RequestedDate = updateEventRequisition.RequestedDate;
+                requisition.RequestAmount = updateEventRequisition.RequestedAmount;
 
                 if (requisition.Status == "B") requisition.Status = "A";
                 if (requisition.Status == "D") requisition.Status = "C";
                 if (requisition.Status == "F") requisition.Status = "E";
 
-                // Remove existing requirements
-                //var existingRequirements = _dB.EventRequirements.Where(er => er.EventId == requisition.EventId);
+                // Remove requisition id from old event
+                var oldEvent = await _dB.Events.Where(e => e.RequisitionId == requisitionId).FirstOrDefaultAsync();
 
-                //_dB.EventRequirements.RemoveRange(existingRequirements);
+                if (oldEvent == null)
+                    throw new NotFoundException("Previous Event Not Found");
 
-                // Add new requirements
-                var newRequirements = updateEventRequisitionDto.EventRequirements.Select(er => new EventRequirement
+                oldEvent.RequisitionId = null;
+                oldEvent.Status = "pending";
+
+                // Add requisition id in new event
+                var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == updateEventRequisition.EventId);
+                if (_event == null)
                 {
-                    Type = er.Type,
-                    Name = er.Name,
-                    Price = er.Price,
-                    Quantity = er.Quantity,
-                    //EventId = requisition.EventId
-                }).ToList();
-                await _dB.EventRequirements.AddRangeAsync(newRequirements);
+                    throw new NotFoundException("Event Not Found");
+                }
+
+                _event.Status = "accepted";
+                _event.RequisitionId = requisitionId;
+
 
                 _dB.EventRequisitions.Update(requisition);
                 await _dB.SaveChangesAsync();
@@ -128,89 +120,97 @@ namespace Project.APIs.Services
             }
         }
 
+        public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForChairperson(Guid memberId)
+        {
+            //var member1 = await _dB.Members.FirstOrDefaultAsync(e => e.Id == memberId);
 
-        //public async Task<List<PendingEventRequisitionsDto>> GetPendingRequisitions(Guid memberId)
-        // Member Id In
-        // Event name
-        // event date
-        // Status
-        // Review Message (if any)
+            //var societyId = member1!.SocietyId;
 
-        // For chairperosn
-        //    public async Task<List<PendingEventRequisitionDto>> GetPendingEventRequisitions(Guid memberId)
-        //    {
-        //        // By joining method
-        //        //var result = await (
-        //        //    from er in _dB.EventRequisitions
-        //        //    join e in _dB.Events on er.EventId equals e.Id
-        //        //    join m in _dB.Members on e.SocietyId equals m.SocietyId
-        //        //    where er.Status == "pending"
-        //        //          && m.Id == memberId
-        //        //    select new PendingEventRequisitionDetailsDto
-        //        //    {
-        //        //        Id = er.EventId,
-        //        //        EventName = e.Name,
-        //        //        EventDate = e.Date,
-        //        //        Status = er.Status
-        //        //    }
-        //        //)
-        //        //.AsNoTracking()
-        //        //.ToListAsync();
+            //var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.Events!.FirstOrDefault()!.Id == societyId);
 
-        //        // By sub query method
-        //        //var result = await _dB.EventRequisitions
-        //        //    .Where(er => er.Status == "pending" &&
-        //        //        _dB.Events.Any(e => e.Id == er.EventId &&
-        //        //                _dB.Members.Any(m => m.Id == memberId &&
-        //        //                                    m.SocietyId == e.SocietyId)))
-        //        //    .Select(er => new PendingEventRequisitionDetailsDto()
-        //        //    {
-        //        //      Id = er.Id, /// changed by jason  on 6 march 11:30
-        //        //      EventName = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Name).FirstOrDefault()!,
-        //        //      EventDate = _dB.Events.Where(e => e.Id == er.EventId).Select(e => e.Date).FirstOrDefault(),
-        //        //      Status = er.Status,
-        //        //      ReviewMessage = er.ReviewMessage /// changed by jason  on 6 march 11:32
-        //        //    })
-        //        //    .AsNoTracking()
-        //        //    .ToListAsync();
+            var result = await _dB.EventRequisitions
+                .Where(er => er.Status != "H" && er.Status != "I" && er.Status != "J")
+                .Where(er => er.Events!.FirstOrDefault()!.Society!.Members!.Any(m => m.Id == memberId))
+                .Select(er => new
+                {
+                    er.Id,
+                    er.RequestedDate,
+                    er.RequestAmount,
+                    er.Status,
+                    er.ReviewMessage,
+                    er.Subject,
+                    er.Body,
+                    Event = er.Events!.Select(e => new
+                    {
+                        e.Id,
+                        e.Name,
+                        e.EventDate,
+                        e.StartTime,
+                        e.EndTime,
+                        Requirements = e.Requirements.ToList(),
+                        Society = new
+                        {
+                            e.Society!.Id,
+                            e.Society.Name,
+                            Member = e.Society.Members!.FirstOrDefault(m => m.Id == memberId)!.Name
+                        }
+                    }).FirstOrDefault()
+                })
+                .AsNoTracking().ToListAsync();
 
-        //        var result = await _dB.EventRequisitions
-        //                .Where(er => er.Status != "H" && er.Status != "I" && er.Status != "J")
-        //                //.Where(er => er._event!.Society!.Members.Any(m => m.Id == memberId))
-        //                .Select(er => new
-        //                {
-        //                    er.Id,
-        //                    //er._event!.Name,
-        //                    //er._event.Date,
-        //                    er.Status,
-        //                    er.ReviewMessage
-        //                })
-        //                .AsNoTracking()
-        //                .ToListAsync();
+            if (!result.Any())
+            {
+                throw new NotFoundException("Requisition not found.");
+            }
 
-        //        return result.Select(er => new PendingEventRequisitionDto()
-        //        {
-        //            Id = er.Id,
-        //            //EventName = er.Name,
-        //            //EventDate = er.Date,
-        //            Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
-        //            ReviewMessage = er.ReviewMessage
-        //        }).ToList();
-        //    }
+            string member = result.FirstOrDefault()!.Event!.Society.Member;
 
-        //    private static readonly Dictionary<string, string> StatusMap = new()
-        //    {
-        //        ["A"] = "Pending",
-        //        ["B"] = "Reject By Student Affairs",
-        //        ["C"] = "Approved By Student Affairs",
-        //        ["D"] = "Reject By Admin",
-        //        ["E"] = "Approved By Admin",
-        //        ["F"] = "Reject By Finance",
-        //        ["G"] = "Budget Released By Finance",
-        //        ["H"] = "Event Completed",
-        //        ["I"] = "Request For Audit",
-        //        ["J"] = "Audit Cleared"
-        //    };
+            return result.Select(er => new RequisitionDetailsForChairperson()
+            {
+                Id = er.Id,
+                RequestedDate = er.RequestedDate,
+                RequestedAmount = er.RequestAmount,
+                Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                ReviewMessage = er.ReviewMessage,
+                Subject = er.Subject,
+                Body = er.Body,
+                ChairpersonName = member,
+                //Event = er.Event.
+                Event = new Event
+                {
+                    Id = er!.Event!.Id,
+                    Name = er.Event.Name,
+                    EventDate = er.Event.EventDate,
+                    StartTime = er.Event.StartTime,
+                    EndTime = er.Event.EndTime,
+                    Status = null!,
+                    Requirements = er.Event.Requirements,
+                    Society = new Society
+                    {
+                        Id = er.Event.Society.Id,
+                        Name = er.Event.Society.Name,
+                        Members = new List<Member>
+                        {
+                            new Member { Name = er.Event.Society.Member, Username = null!, Role = null! }
+                        }
+                    }
+                }
+            }).ToList();
+        }
+
+        private static readonly Dictionary<string, string> StatusMap = new()
+        {
+            ["A"] = "Pending",
+            ["B"] = "Reject By Student Affairs",
+            ["C"] = "Approved By Student Affairs",
+            ["D"] = "Reject By Admin",
+            ["E"] = "Approved By Admin",
+            ["F"] = "Reject By Finance",
+            ["G"] = "Budget Released By Finance",
+            ["H"] = "Event Completed",
+            ["I"] = "Request For Audit",
+            ["J"] = "Audit Cleared"
+        };
 
         //    public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         //    {
@@ -329,16 +329,42 @@ namespace Project.APIs.Services
         //        return result;
         //    }
 
-        //    public async Task DeleteEventRequisition(Guid requisitionId)
-        //    {
-        //        var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+        public async Task DeleteEventRequisition(Guid requisitionId)
+        {
+            var transaction = await _dB.Database.BeginTransactionAsync();
 
-        //        if (requisition == null)
-        //            throw new NotFoundException("Requisition Not Found");
+            try
+            {
+                var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
 
-        //        _dB.EventRequisitions.Remove(requisition);
-        //        await _dB.SaveChangesAsync();
-        //    }
+                if (requisition == null)
+                    throw new NotFoundException("Requisition Not Found");
+
+                // Remove requisition id from old events
+                var oldEventList = await _dB.Events.Where(e => e.RequisitionId == requisitionId).ToListAsync();
+
+                foreach (var _event in oldEventList)
+                {
+                    _event.RequisitionId = null;
+                    _event.Status = "pending";
+                }
+
+                _dB.EventRequisitions.Remove(requisition);
+                await _dB.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                throw new BusinessRuleException("Unable to save event. Please try again.");
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw; // goes to 500 handler
+            }
+        }
 
 
         //    // Chairperson History

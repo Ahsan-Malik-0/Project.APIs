@@ -39,7 +39,8 @@ namespace Project.APIs.Controllers.CRUD
                 EventDate = eventDto.Date,
                 Status = eventDto.Status!,
                 ReviewMessage = eventDto.Message,
-                SocietyId = eventDto.SocietyId
+                SocietyId = eventDto.SocietyId,
+                Requirements = null!,
             };
 
             await _dB.Events.AddAsync(_event);

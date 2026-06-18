@@ -18,6 +18,6 @@ namespace Project.APIs.Model
         //[JsonIgnore]
         //public Event? _event { get; set; }
 
-        public ICollection<Event>? Events { get; set; }
+        public required List<Event> Events { get; set; }
     }
 }

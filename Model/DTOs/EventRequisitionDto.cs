@@ -7,7 +7,16 @@ namespace Project.APIs.Model.DTOs
         public required string Body { get; set; } = string.Empty;
         public required DateTime RequestedDate { get; set; }
         public required decimal RequestedAmount { get; set; }
-        public required ICollection<Guid> EventIds{ get; set; }
+        public required Guid EventId { get; set; }
+    }
+
+    public class CreateVirtualEventRequisitionDto
+    {
+        public required string Subject { get; set; } = string.Empty;
+        public required string Body { get; set; } = string.Empty;
+        public required DateTime RequestedDate { get; set; }
+        public required decimal RequestedAmount { get; set; }
+        public required ICollection<Guid> EventIds { get; set; }
     }
 
     public class UpdateEventRequisitionDto
@@ -16,30 +25,52 @@ namespace Project.APIs.Model.DTOs
         public required string Body { get; set; } = string.Empty;
         public required DateTime RequestedDate { get; set; }
         public required decimal RequestedAmount { get; set; }
-        public required ICollection<EventRequirementDto> EventRequirements { get; set; } 
+        public required Guid EventId{ get; set; }
+    }
+
+    public class UpdateVirtualEventRequisitionDto
+    {
+        public required string Subject { get; set; } = string.Empty;
+        public required string Body { get; set; } = string.Empty;
+        public required DateTime RequestedDate { get; set; }
+        public required decimal RequestedAmount { get; set; }
+        public required ICollection<Guid> EventIds { get; set; }
     }
 
 
     // For pending requisition list
-    public class PendingEventRequisitionDto
+    public class RequisitionDetailsForChairperson
     {
         public Guid Id { get; set; }
-        public required string EventName { get; set; }
-        public DateTime EventDate { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public decimal RequestedAmount { get; set; }
         public required string Status { get; set; }
         public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
+        public required string Subject { get; set; }
+        public required string Body { get; set; }
+        public required string ChairpersonName { get; set; }
+        public required Event Event { get; set; }
+    }
+
+    public class VirtualRequisitionDetailsForChairperson
+    {
+        public Guid Id { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public decimal RequestedAmount { get; set; }
+        public required string Status { get; set; }
+        public string? ReviewMessage { get; set; } // changed by jaosn on 6 march 11:31
+        public required string Subject { get; set; }
+        public required string Body { get; set; }
+        public required string ChairpersonName { get; set; }
+        public required List<Event> Events { get; set; }
     }
 
     // For more details after selecting a specific requisition
     public class EventRequisitionDetailsDto
     {
         public Guid Id { get; set; }
-        public required string Subject { get; set; }
         public DateTime EventDate { get; set; }
-        public DateTime RequestedDate { get; set; }
-        public required string Body { get; set; }
         public required ICollection<EventRequirementDto> EventRequirements { get; set; }
-        public required string ChairpersonName { get; set; }
         public required string SocietyName { get; set; }
     }
 

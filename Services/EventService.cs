@@ -82,7 +82,8 @@ namespace Project.APIs.Services
                     EventDate = newEvent.EventDate,
                     Status = status,
                     ReviewMessage = null,
-                    SocietyId = newEvent.SocietyId
+                    SocietyId = newEvent.SocietyId,
+                    Requirements = null!
                 };
 
                 // Add event first

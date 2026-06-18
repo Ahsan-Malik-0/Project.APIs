@@ -82,12 +82,12 @@ namespace Project.APIs.Controllers
 
         // Handling Events Requisition Endpoints -----------------------------------------------------
         // Pending Envents Requisitions
-        //[HttpGet("getPendingEventRequisitions/{memberId:guid}")]
-        //public async Task<IActionResult> PendingRequisitions(Guid memberId)
-        //{
-        //    var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions(memberId);
-        //    return Ok(pendingRequisitions);
-        //}
+        [HttpGet("getPendingEventRequisitions/{memberId:guid}")]
+        public async Task<IActionResult> PendingRequisitions(Guid memberId)
+        {
+            var pendingRequisitions = await eventRequisitionService.GetRequisitionDetailsForChairperson(memberId);
+            return Ok(pendingRequisitions);
+        }
 
         //// Events Requisitions Detail
         //[HttpGet("getEventRequisitionDetails/{requisitionId:guid}")]
@@ -131,12 +131,12 @@ namespace Project.APIs.Controllers
         }
 
         // Delete Events Requisitions
-        //[HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
-        //public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)
-        //{
-        //    await eventRequisitionService.DeleteEventRequisition(requisitionId);
-        //    return NoContent();
-        //}
+        [HttpDelete("deleteEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> DeleteEventRequisition(Guid requisitionId)
+        {
+            await eventRequisitionService.DeleteEventRequisition(requisitionId);
+            return NoContent();
+        }
 
         ////View Events Requisitions History
         //[HttpGet("getEventRequisitionHistory/{memberId:guid}")]
