@@ -90,3 +90,61 @@ DROP TABLE EventRequirements -- DELETE TABLE
 
 SELECT * FROM EventRequisitions where Id = (SELECT RequisitionId FROM Events where SocietyId = 'CFA9EA19-11D3-4834-07E7-08DEB7EC3EC8' )
 SELECT * FROM EventRequisitions WHERE Id IN (SELECT RequisitionId FROM Events WHERE SocietyId = 'CFA9EA19-11D3-4834-07E7-08DEB7EC3EC8')
+
+
+
+
+
+
+
+
+CREATE TABLE YearlyBudgets (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Session VARCHAR(50) NOT NULL,
+    RequestedAmount DECIMAL NOT NULL,
+    AllotedAmount DECIMAL NULL,
+
+    RequestedDate DATE NOT NULL,
+    AllotedDate	 DATE NULL,
+
+    Credits DECIMAL NULL,
+
+	SocietyId UNIQUEIDENTIFIER,
+	FOREIGN KEY (SocietyId) REFERENCES Societies(Id)
+
+);
+
+SELECT * FROM YearlyBudget
+DELETE YearlyBudget -- DELETE DATA
+DROP TABLE YearlyBudget -- DELETE TABLE
+
+
+CREATE TABLE YearlyEvents (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Name VARCHAR(150) NOT NULL,
+    EstimateAmount DECIMAL NOT NULL,
+    EstimateMonth VARCHAR(30) NOT NULL,
+
+    YearlyBudgetId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (YearlyBudgetId) REFERENCES YearlyBudgets(Id)
+
+);
+
+SELECT * FROM YearlyEvents
+DELETE YearlyEvents -- DELETE DATA
+DROP TABLE YearlyEvents -- DELETE TABLE
+
+
+CREATE TABLE YearlyEventRequirements (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Name VARCHAR(20) NOT NULL,
+    EstimatePrice DECIMAL NOT NULL,
+
+    YearlyEventId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (YearlyEventId) REFERENCES YearlyEvents(Id)
+
+);
+
+SELECT * FROM YearlyEventRequirement
+DELETE YearlyEventRequirement -- DELETE DATA
+DROP TABLE YearlyEventRequirement -- DELETE TABLE
