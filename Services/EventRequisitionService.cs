@@ -250,6 +250,7 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
+
             return result.Select(er => new RequisitionDetailsForChairperson()
             {
                 Id = er.Id,

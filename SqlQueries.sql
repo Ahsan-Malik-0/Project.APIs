@@ -145,6 +145,6 @@ CREATE TABLE YearlyEventRequirements (
 
 );
 
-SELECT * FROM YearlyEventRequirement
-DELETE YearlyEventRequirement -- DELETE DATA
-DROP TABLE YearlyEventRequirement -- DELETE TABLE
+SELECT * FROM YearlyEventRequirements
+DELETE YearlyEventRequirements -- DELETE DATA
+DROP TABLE YearlyEventRequirements -- DELETE TABLE
