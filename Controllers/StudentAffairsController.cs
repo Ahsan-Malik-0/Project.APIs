@@ -41,16 +41,16 @@ namespace Project.APIs.Controllers
                 Status = "B",
                 ReviewMessage = responseMessage.ResponseMessage
             };
-            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+            await eventRequisitionService.RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
             return Ok();
         }
 
-        //[HttpPost("ApproveEventRequisition/{requisitionId:guid}")]
-        //public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId, [FromBody] ApproveEventRequisitionDto acceptEventRequisitionDto)
-        //{
-        //    await eventRequisitionService.ApproveEventRequisition(requisitionId, acceptEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpPost("ApproveEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId, [FromBody] ApproveEventRequisitionDto acceptEventRequisitionDto)
+        {
+            await eventRequisitionService.ApproveEventRequisitionBySA(requisitionId, acceptEventRequisitionDto);
+            return Ok();
+        }
 
         //[HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
         //public async Task<IActionResult> EventCompleted(Guid requisitionId)

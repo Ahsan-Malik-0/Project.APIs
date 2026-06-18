@@ -511,7 +511,7 @@ namespace Project.APIs.Services
         //    // Accept by Admin
         //    // Reject by SA
         //    // Budget released by finance
-        public async Task ReviewEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        public async Task RejectEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
         {
             var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -556,45 +556,44 @@ namespace Project.APIs.Services
             }
         }
 
-        //    // Accept by SA
-        //    public async Task ApproveEventRequisition(Guid requisitionId, ApproveEventRequisitionDto approveEventRequisitionDto)
-        //    {
-        //        var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+        public async Task ApproveEventRequisitionBySA(Guid requisitionId, ApproveEventRequisitionDto approveEventRequisitionDto)
+        {
+            var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
 
-        //        if (requisition == null)
-        //            throw new NotFoundException("Requisition Not Found");
+            if (requisition == null)
+                throw new NotFoundException("Requisition Not Found");
 
-        //        requisition.Status = "C";
-        //        requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
-        //        requisition.AllocatedAmount = approveEventRequisitionDto.AllocatedAmount;
-        //        requisition.BiitContribution = approveEventRequisitionDto.BiitContribution;
+            requisition.Status = "C";
+            requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
+            requisition.AllocatedAmount = approveEventRequisitionDto.AllocatedAmount;
+            requisition.BiitContribution = approveEventRequisitionDto.BiitContribution;
 
-        //        _dB.EventRequisitions.Update(requisition);
-        //        await _dB.SaveChangesAsync();
-        //    }
+            _dB.EventRequisitions.Update(requisition);
+            await _dB.SaveChangesAsync();
+        }
 
-        //    public async Task<List<ViewRequisitionDetailsForFinanceDto>> ViewRequisitionDetailsForFinance()
-        //    {
-        //        var acceptedRequisition = await _dB.EventRequisitions
-        //                .Where(er => er.Status == "E")
-        //                .Select(er => new ViewRequisitionDetailsForFinanceDto()
-        //                {
-        //                    RequisitionId = er.Id,
-        //                    ChairpersonName = er._event!.Society!.Members
-        //                            .Where(m => m.Role == "chairperson")
-        //                            .Select(m => m.Name)
-        //                            .FirstOrDefault() ?? "N/A",
-        //                    SocietyName = er._event!.Society!.Name,
-        //                    EventName = er._event!.Name,
-        //                    EventDate = er._event.Date,
-        //                    AllotedBudget = er.AllocatedAmount,
-        //                    BiitContribution = er.BiitContribution
-        //                })
-        //                .AsNoTracking()
-        //                .ToListAsync();
+        //public async Task<List<ViewRequisitionDetailsForFinanceDto>> ViewRequisitionDetailsForFinance()
+        //{
+        //    var acceptedRequisition = await _dB.EventRequisitions
+        //            .Where(er => er.Status == "E")
+        //            .Select(er => new ViewRequisitionDetailsForFinanceDto()
+        //            {
+        //                RequisitionId = er.Id,
+        //                ChairpersonName = er._event!.Society!.Members
+        //                        .Where(m => m.Role == "chairperson")
+        //                        .Select(m => m.Name)
+        //                        .FirstOrDefault() ?? "N/A",
+        //                SocietyName = er._event!.Society!.Name,
+        //                EventName = er._event!.Name,
+        //                EventDate = er._event.Date,
+        //                AllotedBudget = er.AllocatedAmount,
+        //                BiitContribution = er.BiitContribution
+        //            })
+        //            .AsNoTracking()
+        //            .ToListAsync();
 
-        //        return acceptedRequisition;
-        //    }
+        //    return acceptedRequisition;
+        //}
 
         //    public async Task<List<ViewRequisitionDetailsForFinanceHistoryDto>> ViewRequisitionDetailsForFinanceHistory()
         //    {
