@@ -511,50 +511,50 @@ namespace Project.APIs.Services
         //    // Accept by Admin
         //    // Reject by SA
         //    // Budget released by finance
-        //    public async Task ReviewEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
-        //    {
-        //        var transaction = await _dB.Database.BeginTransactionAsync();
-        //        try
-        //        {
-        //            var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
+        public async Task ReviewEventRequisition(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        {
+            var transaction = await _dB.Database.BeginTransactionAsync();
+            try
+            {
+                var requisition = await _dB.EventRequisitions.FindAsync(requisitionId);
 
-        //            if (requisition == null)
-        //                throw new NotFoundException("Requisition Not Found");
+                if (requisition == null)
+                    throw new NotFoundException("Requisition Not Found");
 
-        //            // Minus credits from yearly if budget release by finance
-        //            // if (reviewEventRequisitionDto.Status == "G")
-        //            // {
-        //            //     // Get the latest yearly budget for the society
-        //            //     var yearlyBudget = await _dB.YearlyBudgets
-        //            //         .Where(yb => yb.SocietyId == requisition._event!.SocietyId)
-        //            //         .OrderByDescending(yb => yb.RequestedDate)
-        //            //         .FirstOrDefaultAsync();
+                // Minus credits from yearly if budget release by finance
+                // if (reviewEventRequisitionDto.Status == "G")
+                // {
+                //     // Get the latest yearly budget for the society
+                //     var yearlyBudget = await _dB.YearlyBudgets
+                //         .Where(yb => yb.SocietyId == requisition._event!.SocietyId)
+                //         .OrderByDescending(yb => yb.RequestedDate)
+                //         .FirstOrDefaultAsync();
 
-        //            //     if (yearlyBudget == null)
-        //            //         throw new NotFoundException("Yearly Budget Not Found");
+                //     if (yearlyBudget == null)
+                //         throw new NotFoundException("Yearly Budget Not Found");
 
-        //            //     yearlyBudget.Credits -= requisition.RequestAmount;
-        //            //     _dB.YearlyBudgets.Update(yearlyBudget);
-        //            // }
+                //     yearlyBudget.Credits -= requisition.RequestAmount;
+                //     _dB.YearlyBudgets.Update(yearlyBudget);
+                // }
 
-        //            requisition.Status = reviewEventRequisitionDto.Status;
-        //            requisition.ReviewMessage = reviewEventRequisitionDto.ReviewMessage;
+                requisition.Status = reviewEventRequisitionDto.Status;
+                requisition.ReviewMessage = reviewEventRequisitionDto.ReviewMessage;
 
-        //            _dB.EventRequisitions.Update(requisition);
-        //            await _dB.SaveChangesAsync();
-        //            await transaction.CommitAsync();
-        //        }
-        //        catch (DbUpdateException)
-        //        {
-        //            await transaction.RollbackAsync();
-        //            throw new BusinessRuleException("Unable to review event requisition. Please try again.");
-        //        }
-        //        catch (Exception)
-        //        {
-        //            await transaction.RollbackAsync();
-        //            throw; // goes to 500 handler
-        //        }
-        //    }
+                _dB.EventRequisitions.Update(requisition);
+                await _dB.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                throw new BusinessRuleException("Unable to review event requisition. Please try again.");
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw; // goes to 500 handler
+            }
+        }
 
         //    // Accept by SA
         //    public async Task ApproveEventRequisition(Guid requisitionId, ApproveEventRequisitionDto approveEventRequisitionDto)

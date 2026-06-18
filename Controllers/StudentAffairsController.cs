@@ -33,17 +33,17 @@ namespace Project.APIs.Controllers
         //    return Ok(requisitionDetails);
         //}
 
-        //[HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        //public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "B",
-        //        ReviewMessage = responseMessage.ResponseMessage
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "B",
+                ReviewMessage = responseMessage.ResponseMessage
+            };
+            await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
         //[HttpPost("ApproveEventRequisition/{requisitionId:guid}")]
         //public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId, [FromBody] ApproveEventRequisitionDto acceptEventRequisitionDto)
