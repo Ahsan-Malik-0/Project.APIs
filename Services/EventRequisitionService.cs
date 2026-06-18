@@ -212,6 +212,77 @@ namespace Project.APIs.Services
             ["J"] = "Audit Cleared"
         };
 
+        public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForAdministration(char status)
+        {
+            var result = await _dB.EventRequisitions
+               .Where(er => er.Status == status.ToString())
+               .Select(er => new
+               {
+                   er.Id,
+                   er.RequestedDate,
+                   er.RequestAmount,
+                   er.Status,
+                   er.ReviewMessage,
+                   er.Subject,
+                   er.Body,
+                   Event = er.Events!.Select(e => new
+                   {
+                       e.Id,
+                       e.Name,
+                       e.EventDate,
+                       e.StartTime,
+                       e.EndTime,
+                       Requirements = e.Requirements.ToList(),
+                       Society = new
+                       {
+                           e.Society!.Id,
+                           e.Society.Name,
+                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "chairperson")!.Name
+                       }
+                   }).FirstOrDefault()
+               })
+               .AsNoTracking().ToListAsync();
+
+            if (!result.Any())
+            {
+                throw new NotFoundException("Requisition not found.");
+            }
+
+            string member = result.FirstOrDefault()!.Event!.Society.Member;
+
+            return result.Select(er => new RequisitionDetailsForChairperson()
+            {
+                Id = er.Id,
+                RequestedDate = er.RequestedDate,
+                RequestedAmount = er.RequestAmount,
+                Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                ReviewMessage = er.ReviewMessage,
+                Subject = er.Subject,
+                Body = er.Body,
+                ChairpersonName = member,
+                //Event = er.Event.
+                Event = new Event
+                {
+                    Id = er!.Event!.Id,
+                    Name = er.Event.Name,
+                    EventDate = er.Event.EventDate,
+                    StartTime = er.Event.StartTime,
+                    EndTime = er.Event.EndTime,
+                    Status = null!,
+                    Requirements = er.Event.Requirements,
+                    Society = new Society
+                    {
+                        Id = er.Event.Society.Id,
+                        Name = er.Event.Society.Name,
+                        Members = new List<Member>
+                        {
+                            new Member { Name = er.Event.Society.Member, Username = null!, Role = null! }
+                        }
+                    }
+                }
+            }).ToList();
+        }
+
         //    public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         //    {
         //        // var eventsIds = await _dB.Events

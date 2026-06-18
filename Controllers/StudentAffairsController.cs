@@ -10,14 +10,14 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
     {
-        //// Handle Event Requisition Endpoints --------------------------------------------------------
-        //[HttpGet("ViewPendingRequisitions")]
-        //public async Task<IActionResult> ViewPendingRequisitions()
-        //{
-        //    var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('A');
-        //    // Implementation for viewing pending requisitions
-        //    return Ok(pendingRequisitions);
-        //}
+        // Handle Event Requisition Endpoints --------------------------------------------------------
+        [HttpGet("ViewPendingRequisitions")]
+        public async Task<IActionResult> ViewPendingRequisitions()
+        {
+            var pendingRequisitions = await eventRequisitionService.GetRequisitionDetailsForAdministration('A');
+            // Implementation for viewing pending requisitions
+            return Ok(pendingRequisitions);
+        }
 
         //[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
         //public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
