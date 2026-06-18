@@ -122,41 +122,36 @@ namespace Project.APIs.Services
 
         public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForChairperson(Guid memberId)
         {
-            //var member1 = await _dB.Members.FirstOrDefaultAsync(e => e.Id == memberId);
-
-            //var societyId = member1!.SocietyId;
-
-            //var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.Events!.FirstOrDefault()!.Id == societyId);
-
             var result = await _dB.EventRequisitions
                 .Where(er => er.Status != "H" && er.Status != "I" && er.Status != "J")
                 .Where(er => er.Events!.FirstOrDefault()!.Society!.Members!.Any(m => m.Id == memberId))
                 .Select(er => new
-                {
-                    er.Id,
-                    er.RequestedDate,
-                    er.RequestAmount,
-                    er.Status,
-                    er.ReviewMessage,
-                    er.Subject,
-                    er.Body,
-                    Event = er.Events!.Select(e => new
-                    {
-                        e.Id,
-                        e.Name,
-                        e.EventDate,
-                        e.StartTime,
-                        e.EndTime,
-                        Requirements = e.Requirements.ToList(),
-                        Society = new
-                        {
-                            e.Society!.Id,
-                            e.Society.Name,
-                            Member = e.Society.Members!.FirstOrDefault(m => m.Id == memberId)!.Name
-                        }
-                    }).FirstOrDefault()
-                })
+                 {
+                     er.Id,
+                     er.RequestedDate,
+                     er.RequestAmount,
+                     er.Status,
+                     er.ReviewMessage,
+                     er.Subject,
+                     er.Body,
+                     Event = er.Events!.Select(e => new
+                     {
+                         e.Id,
+                         e.Name,
+                         e.EventDate,
+                         e.StartTime,
+                         e.EndTime,
+                         Requirements = e.Requirements.ToList(),
+                         Society = new
+                         {
+                             e.Society!.Id,
+                             e.Society.Name,
+                             Member = e.Society.Members!.FirstOrDefault(m => m.Id == memberId)!.Name
+                         }
+                     }).FirstOrDefault()
+                 })
                 .AsNoTracking().ToListAsync();
+
 
             if (!result.Any())
             {
@@ -214,6 +209,8 @@ namespace Project.APIs.Services
 
         public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForAdministration(char status)
         {
+
+            // This is comment
             var result = await _dB.EventRequisitions
                .Where(er => er.Status == status.ToString())
                .Select(er => new

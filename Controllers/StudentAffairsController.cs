@@ -10,14 +10,14 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService) : ControllerBase
     {
-        // Handle Event Requisition Endpoints --------------------------------------------------------
-        [HttpGet("ViewPendingRequisitions")]
-        public async Task<IActionResult> ViewPendingRequisitions()
-        {
-            var pendingRequisitions = await eventRequisitionService.GetRequisitionDetailsForAdministration('A');
-            // Implementation for viewing pending requisitions
-            return Ok(pendingRequisitions);
-        }
+        //// Handle Event Requisition Endpoints --------------------------------------------------------
+        //[HttpGet("ViewPendingRequisitions")]
+        //public async Task<IActionResult> ViewPendingRequisitions()
+        //{
+        //    var pendingRequisitions = await eventRequisitionService.GetPendingEventRequisitions('A');
+        //    // Implementation for viewing pending requisitions
+        //    return Ok(pendingRequisitions);
+        //}
 
         //[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
         //public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
@@ -33,24 +33,24 @@ namespace Project.APIs.Controllers
         //    return Ok(requisitionDetails);
         //}
 
-        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
-        {
-            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-            {
-                Status = "B",
-                ReviewMessage = responseMessage.ResponseMessage
-            };
-            await eventRequisitionService.RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
-            return Ok();
-        }
+        //[HttpPost("RejectEventRequisition/{requisitionId:guid}")]
+        //public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        //{
+        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+        //    {
+        //        Status = "B",
+        //        ReviewMessage = responseMessage.ResponseMessage
+        //    };
+        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
+        //    return Ok();
+        //}
 
-        [HttpPost("ApproveEventRequisition/{requisitionId:guid}")]
-        public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId, [FromBody] ApproveEventRequisitionDto acceptEventRequisitionDto)
-        {
-            await eventRequisitionService.ApproveEventRequisitionBySA(requisitionId, acceptEventRequisitionDto);
-            return Ok();
-        }
+        //[HttpPost("ApproveEventRequisition/{requisitionId:guid}")]
+        //public async Task<IActionResult> ApproveEventRequisition(Guid requisitionId, [FromBody] ApproveEventRequisitionDto acceptEventRequisitionDto)
+        //{
+        //    await eventRequisitionService.ApproveEventRequisition(requisitionId, acceptEventRequisitionDto);
+        //    return Ok();
+        //}
 
         //[HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
         //public async Task<IActionResult> EventCompleted(Guid requisitionId)
