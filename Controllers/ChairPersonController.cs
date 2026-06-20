@@ -138,13 +138,13 @@ namespace Project.APIs.Controllers
             return NoContent();
         }
 
-        ////View Events Requisitions History
-        //[HttpGet("getEventRequisitionHistory/{memberId:guid}")]
-        //public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
-        //{
-        //    var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
-        //    return Ok(RequisitionList);
-        //}
+        //View Events Requisitions History
+        [HttpGet("getEventRequisitionHistory/{memberId:guid}")]
+        public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
+        {
+            var RequisitionList = await eventRequisitionService.GetEventRequisitionHistoryForCP(memberId);
+            return Ok(RequisitionList);
+        }
 
         // Handling Event Audits Endpoints ----------------------------------------------------
         // View audits of events

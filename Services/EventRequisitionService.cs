@@ -237,7 +237,7 @@ namespace Project.APIs.Services
                     };
                     await _dB.EventRequirements.AddAsync(eventRequirement);
                 }
-                
+
                 _dB.EventRequisitions.Update(requisition);
                 await _dB.SaveChangesAsync();
 
@@ -261,30 +261,30 @@ namespace Project.APIs.Services
                 .Where(er => er.Status != "H" && er.Status != "I" && er.Status != "J")
                 .Where(er => er.Events!.FirstOrDefault()!.Society!.Members!.Any(m => m.Id == memberId))
                 .Select(er => new
-                 {
-                     er.Id,
-                     er.RequestedDate,
-                     er.RequestAmount,
-                     er.Status,
-                     er.ReviewMessage,
-                     er.Subject,
-                     er.Body,
-                     Event = er.Events!.Select(e => new
-                     {
-                         e.Id,
-                         e.Name,
-                         e.EventDate,
-                         e.StartTime,
-                         e.EndTime,
-                         Requirements = e.Requirements.ToList(),
-                         Society = new
-                         {
-                             e.Society!.Id,
-                             e.Society.Name,
-                             Member = e.Society.Members!.FirstOrDefault(m => m.Id == memberId)!.Name
-                         }
-                     }).FirstOrDefault()
-                 })
+                {
+                    er.Id,
+                    er.RequestedDate,
+                    er.RequestAmount,
+                    er.Status,
+                    er.ReviewMessage,
+                    er.Subject,
+                    er.Body,
+                    Event = er.Events!.Select(e => new
+                    {
+                        e.Id,
+                        e.Name,
+                        e.EventDate,
+                        e.StartTime,
+                        e.EndTime,
+                        Requirements = e.Requirements.ToList(),
+                        Society = new
+                        {
+                            e.Society!.Id,
+                            e.Society.Name,
+                            Member = e.Society.Members!.FirstOrDefault(m => m.Id == memberId)!.Name
+                        }
+                    }).FirstOrDefault()
+                })
                 .AsNoTracking().ToListAsync();
 
 
@@ -342,7 +342,7 @@ namespace Project.APIs.Services
             ["J"] = "Audit Cleared"
         };
 
-        public async Task<List<RequisitionDetailsForSA>> GetRequisitionDetailsForAdministration(char status)
+        public async Task<List<RequisitionDetailsForSA>> GetRequisitionDetailsForSA(char status)
         {
             // This is comment
             var result = await _dB.EventRequisitions
@@ -413,6 +413,49 @@ namespace Project.APIs.Services
                 }
             }).ToList();
         }
+
+        public async Task<List<RequisitionDetailsForFinance>> GetRequisitionDetailsForFinance(char status)
+        {
+            // This is comment
+            var result = await _dB.EventRequisitions
+               .Where(er => er.Status == status.ToString())
+               .Select(er => new
+               {
+                   er.Id,
+                   SocietyName = er.Events.FirstOrDefault()!.Society!.Name,
+                   EventName = er.Events.FirstOrDefault()!.Name,
+                   EventDate = er.Events.FirstOrDefault()!.EventDate,
+                   er.AllocatedAmount,
+                   er.BiitContribution,
+                   Event = er.Events!.Select(e => new
+                   {
+                       Society = new
+                       {
+                           Member = e.Society!.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
+                       }
+                   }).FirstOrDefault()
+               })
+               .AsNoTracking().ToListAsync();
+
+            if (!result.Any())
+            {
+                throw new NotFoundException("Requisition not found.");
+            }
+
+            string member = result.FirstOrDefault()!.Event!.Society.Member;
+
+            return result.Select(er => new RequisitionDetailsForFinance()
+            {
+                RequisitionId = er.Id,
+                SocietyName = er.SocietyName,
+                EventName = er.EventName,
+                EventDate = er.EventDate,
+                AllocatedAmount = er.AllocatedAmount,
+                BiitContribution = er.BiitContribution,
+                ChairpersonName = member
+            }).ToList();
+        }
+
 
         //    public async Task<EventRequisitionDetailsDto> GetEventRequisitionDetails(Guid requisitionId)
         //    {
@@ -569,52 +612,154 @@ namespace Project.APIs.Services
         }
 
 
-        //    // Chairperson History
-        //    public async Task<List<EventRequisitionHistoryDto>> GetEventRequisitionHistory(Guid memberId)
-        //    {
-        //        var societyId = await _dB.Members
-        //                .Where(m => memberId == m.Id)
-        //                .Select(m => m.SocietyId)
-        //                .FirstOrDefaultAsync();
+        // Chairperson History
+        public async Task<List<EventRequisitionHistoryForCP>> GetEventRequisitionHistoryForCP(Guid memberId)
+        {
+            var societyId = await _dB.Members
+                    .Where(m => memberId == m.Id)
+                    .Select(m => m.SocietyId)
+                    .FirstOrDefaultAsync();
 
-        //        if (societyId == Guid.Empty)
-        //            throw new NotFoundException("Society not found");
+            if (societyId == Guid.Empty)
+                throw new NotFoundException("Society not found");
 
-        //        var acceptedRequisition = await _dB.EventRequisitions
-        //                .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J"
-        //                && er._event!.SocietyId == societyId)
-        //                .Select(er => new EventRequisitionHistoryDto()
-        //                {
-        //                    RequisitionId = er.Id,
-        //                    EventId = er.EventId,
-        //                    EventName = er._event!.Name,
-        //                    RequisitionStatus = er.Status,
-        //                    RequestedDate = er.RequestedDate,
-        //                    AllocatedDate = er.AllocatedDate,
-        //                    RequestedAmount = er.RequestAmount,
-        //                    AllocatedAmount = er.RequestAmount,
-        //                    BiitContribution = er.BiitContribution
-        //                })
-        //                .AsNoTracking()
-        //                .ToListAsync();
+            var acceptedRequisition = await _dB.EventRequisitions
+                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J"
+                    && er.Events.FirstOrDefault()!.SocietyId == societyId)
+                    .Select(er => new
+                    {
+                        er.Id,
+                        EventId = er.Events.FirstOrDefault()!.Id,
+                        EventName = er.Events.FirstOrDefault()!.Name,
+                        EventDate = er.Events.FirstOrDefault()!.EventDate,
+                        StartTime = er.Events.FirstOrDefault()!.StartTime,
+                        EndTime = er.Events.FirstOrDefault()!.EndTime,
+                        Requirements = er.Events.FirstOrDefault()!.Requirements.ToList(),
+                        er.Status,
+                        er.RequestedDate,
+                        er.AllocatedDate,
+                        er.RequestAmount,
+                        er.AllocatedAmount,
+                        er.BiitContribution
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
 
-        //        var dto = acceptedRequisition
-        //                .Select(er => new EventRequisitionHistoryDto()
-        //                {
-        //                    RequisitionId = er.RequisitionId,
-        //                    EventId = er.EventId,
-        //                    EventName = er.EventName,
-        //                    RequisitionStatus = StatusMap.GetValueOrDefault(er.RequisitionStatus, "Unknown"),
-        //                    RequestedDate = er.RequestedDate,
-        //                    AllocatedDate = er.AllocatedDate,
-        //                    RequestedAmount = er.RequestedAmount,
-        //                    AllocatedAmount = er.AllocatedAmount,
-        //                    BiitContribution = er.BiitContribution
-        //                })
-        //                .ToList();
+            var dto = acceptedRequisition
+                    .Select(er => new EventRequisitionHistoryForCP()
+                    {
+                        RequisitionId = er.Id,
+                        EventId = er.EventId,
+                        EventName = er.EventName,
+                        EventDate = er.EventDate,
+                        StartTime = er.StartTime,
+                        EndTime = er.EndTime,
+                        RequisitionStatus = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                        RequestedDate = er.RequestedDate,
+                        AllocatedDate = er.AllocatedDate,
+                        RequestedAmount = er.RequestAmount,
+                        AllocatedAmount = er.AllocatedAmount,
+                        BiitContribution = er.BiitContribution,
+                        Requirements = er.Requirements
+                    })
+                    .ToList();
 
-        //        return dto;
-        //    }
+            return dto;
+        }
+
+        // SA History
+        public async Task<List<EventRequisitionHistoryForSA>> GetEventRequisitionHistoryForSA()
+        {
+            var result = await _dB.EventRequisitions
+                    .Where(er => er.Status != "A")
+                    .Select(er => new
+                    {
+                        er.Id,
+                        //ChairpersonName = er.Events.FirstOrDefault()!.Society!.Members!
+                        //        .Where(m => m.Role == "chairperson")
+                        //        .Select(m => m.Name)
+                        //        .FirstOrDefault() ?? "N/A",
+                        SocietyName = er.Events.FirstOrDefault()!.Society!.Name,
+                        EventName = er.Events.FirstOrDefault()!.Name,
+                        EventDate = er.Events.FirstOrDefault()!.EventDate,
+                        StartTime = er.Events.FirstOrDefault()!.StartTime,
+                        EndTime = er.Events.FirstOrDefault()!.EndTime,
+                        Requirements = er.Events.FirstOrDefault()!.Requirements.ToList(),
+                        er.Status,
+                        er.RequestedDate,
+                        er.AllocatedDate,
+                        er.RequestAmount,
+                        er.AllocatedAmount,
+                        er.BiitContribution,
+                        er.ReviewMessage
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+
+            var acceptedRequisition = result
+                .Select(er => new EventRequisitionHistoryForSA()
+                {
+                    RequisitionId = er.Id,
+                    SocietyName = er.SocietyName,
+                    EventName = er.EventName,
+                    EventDate = er.EventDate,
+                    StartTime = er.StartTime,
+                    EndTime = er.EndTime,
+                    RequisitionStatus = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                    RequestedDate = er.RequestedDate,
+                    AllocatedDate = er.AllocatedDate,
+                    RequestedAmount = er.RequestAmount,
+                    AllocatedAmount = er.AllocatedAmount,
+                    BiitContribution = er.BiitContribution,
+                    ReviewMessage = er.ReviewMessage,
+                    Requirements = er.Requirements
+                })
+                .ToList();
+
+            return acceptedRequisition;
+        }
+
+        // Finance History
+        public async Task<List<EventRequisitionHistoryForFinance>> GetEventRequisitionHistoryForFinance()
+        {
+            var result = await _dB.EventRequisitions
+                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")
+                    .Select(er => new
+                    {
+                        er.Id,
+                        ChairpersonName = er.Events.FirstOrDefault()!.Society!.Members!
+                                .Where(m => m.Role == "chairperson")
+                                .Select(m => m.Name)
+                                .FirstOrDefault() ?? "N/A",
+                        SocietyName = er.Events.FirstOrDefault()!.Society!.Name,
+                        EventName = er.Events.FirstOrDefault()!.Name,
+                        EventDate = er.Events.FirstOrDefault()!.EventDate,
+                        er.Status,
+                        er.AllocatedAmount,
+                        er.BiitContribution,
+                        er.ReviewMessage
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+
+            var acceptedRequisition = result
+                .Select(er => new EventRequisitionHistoryForFinance()
+                {
+                    RequisitionId = er.Id,
+                    SocietyName = er.SocietyName,
+                    ChairpersonName = er.ChairpersonName,
+                    EventName = er.EventName,
+                    EventDate = er.EventDate,
+                    RequisitionStatus = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+                    AllocatedAmount = er.AllocatedAmount,
+                    BiitContribution = er.BiitContribution
+                })
+                .ToList();
+
+            return acceptedRequisition;
+        }
 
         //    // For student affairs and administration to view pending requisitions list
         //    public async Task<List<ViewRequisitionRequestDetailsDto>> GetPendingEventRequisitions(char status)
@@ -694,7 +839,7 @@ namespace Project.APIs.Services
             if (requisition == null)
                 throw new NotFoundException("Requisition Not Found");
 
-            requisition.Status = "C";
+            requisition.Status = "E";
             requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
             requisition.AllocatedAmount = approveEventRequisitionDto.AllocatedAmount;
             requisition.BiitContribution = approveEventRequisitionDto.BiitContribution;
@@ -703,6 +848,10 @@ namespace Project.APIs.Services
             await _dB.SaveChangesAsync();
         }
 
+        public async Task ReleaseEventRequisitionBudget(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        {
+            await RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
+        }
         //public async Task<List<ViewRequisitionDetailsForFinanceDto>> ViewRequisitionDetailsForFinance()
         //{
         //    var acceptedRequisition = await _dB.EventRequisitions
@@ -766,47 +915,47 @@ namespace Project.APIs.Services
         //        return dto;
         //    }
 
-        //    // Requisition list for Student Affairs
-        //    public async Task<List<ViewRequisitionDetailsForStudentAffairsDto>> ViewRequisitionDetailsForStudentAffairs()
-        //    {
-        //        var result = await _dB.EventRequisitions
-        //                .Where(er => er.Status != "A")
-        //                .Select(er => new
-        //                {
-        //                    RequisitionId = er.Id,
-        //                    ChairpersonName = er._event!.Society!.Members
-        //                            .Where(m => m.Role == "chairperson")
-        //                            .Select(m => m.Name)
-        //                            .FirstOrDefault() ?? "N/A",
-        //                    SocietyName = er._event!.Society!.Name,
-        //                    EventName = er._event!.Name,
-        //                    EventDate = er._event.Date,
-        //                    Status = er.Status,
-        //                    ReviewMessage = er.ReviewMessage,
-        //                    AllotedBudget = er.AllocatedAmount,// Add this property to match usage below
-        //                    BiitContribution = er.BiitContribution // Add this property to match usage below
-        //                })
-        //                .AsNoTracking()
-        //                .ToListAsync();
-
-
-        //        var acceptedRequisition = result
-        //            .Select(er => new ViewRequisitionDetailsForStudentAffairsDto()
+        // Requisition list for Student Affairs
+        //public async Task<List<ViewRequisitionDetailsForStudentAffairsDto>> ViewRequisitionDetailsForStudentAffairs()
+        //{
+        //    var result = await _dB.EventRequisitions
+        //            .Where(er => er.Status != "A")
+        //            .Select(er => new
         //            {
-        //                RequisitionId = er.RequisitionId,
-        //                ChairpersonName = er.ChairpersonName,
-        //                SocietyName = er.SocietyName,
-        //                EventName = er.EventName,
-        //                EventDate = er.EventDate,
-        //                AllotedBudget = er.AllotedBudget,
-        //                BiitContribution = er.BiitContribution,
-        //                Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
-        //                ReviewMessage = er.ReviewMessage
+        //                er.Id,
+        //                ChairpersonName = er.Events.FirstOrDefault()!.Society!.Members!
+        //                        .Where(m => m.Role == "chairperson")
+        //                        .Select(m => m.Name)
+        //                        .FirstOrDefault() ?? "N/A",
+        //                SocietyName = er.Events.FirstOrDefault()!.Society!.Name,
+        //                EventName = er.Events.FirstOrDefault()!.Name,
+        //                EventDate = er.Events.FirstOrDefault()!.EventDate,
+        //                er.Status,
+        //                er.ReviewMessage,
+        //                er.AllocatedAmount,
+        //                er.BiitContribution 
         //            })
-        //                .ToList();
+        //            .AsNoTracking()
+        //            .ToListAsync();
 
-        //        return acceptedRequisition;
-        //    }
+
+        //    var acceptedRequisition = result
+        //        .Select(er => new ViewRequisitionDetailsForStudentAffairsDto()
+        //        {
+        //            RequisitionId = er.Id,
+        //            ChairpersonName = er.ChairpersonName,
+        //            SocietyName = er.SocietyName,
+        //            EventName = er.EventName,
+        //            EventDate = er.EventDate,
+        //            AllotedBudget = er.AllocatedAmount,
+        //            BiitContribution = er.BiitContribution,
+        //            Status = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+        //            ReviewMessage = er.ReviewMessage
+        //        })
+        //            .ToList();
+
+        //    return acceptedRequisition;
+        //}
 
         //    public async Task UpdateRequisitionStatus(Guid requisitionId)
         //    {
@@ -820,5 +969,6 @@ namespace Project.APIs.Services
         //        _dB.EventRequisitions.Update(requisition);
         //        await _dB.SaveChangesAsync();
         //    }
+
     }
 }

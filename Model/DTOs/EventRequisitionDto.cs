@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.APIs.Model.DTOs
@@ -58,6 +59,16 @@ namespace Project.APIs.Model.DTOs
     }
 
     public class RequisitionDetailsForSA : RequisitionDetailsForChairperson { }
+    public class RequisitionDetailsForFinance
+    {
+        public Guid RequisitionId { get; set; }
+        public string? SocietyName { get; set; }
+        public string? EventName { get; set; }
+        public DateTime EventDate { get; set; }
+        public decimal AllocatedAmount { get; set; }
+        public decimal BiitContribution { get; set; }
+        public string? ChairpersonName { get; set; }
+    }
 
 
     public class VirtualRequisitionDetailsForChairperson
@@ -82,18 +93,36 @@ namespace Project.APIs.Model.DTOs
         public required string SocietyName { get; set; }
     }
 
-    public class EventRequisitionHistoryDto
+    public class EventRequisitionHistoryForCP
     {
         public Guid RequisitionId { get; set; }
         public Guid EventId { get; set; }
         public required string EventName { get; set; }
+        public DateTime EventDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
         public required string RequisitionStatus { get; set; }
         public DateTime RequestedDate { get; set; }
         public DateTime AllocatedDate { get; set; }
         public decimal RequestedAmount { get; set; }
         public decimal AllocatedAmount { get; set; }
         public decimal BiitContribution { get; set; }
+        public List<EventRequirement>? Requirements { get; set; }
     }
+
+    public class EventRequisitionHistoryForSA : EventRequisitionHistoryForCP
+    {
+        public string? SocietyName { get; set; }
+        public string? ReviewMessage { get; set; }
+    }
+
+    public class EventRequisitionHistoryForFinance : EventRequisitionHistoryForCP
+    {
+        public string? SocietyName { get; set; }
+        public string? ChairpersonName { get; set; }
+    }
+
+
 
     // For student affairs and administration to view details of a pending requisition
     public class ViewRequisitionRequestDetailsDto
