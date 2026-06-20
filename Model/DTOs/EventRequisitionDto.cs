@@ -57,7 +57,7 @@ namespace Project.APIs.Model.DTOs
         public required Event Event { get; set; }
     }
 
-    public class RequisitionDetailsForAdministration : RequisitionDetailsForChairperson { }
+    public class RequisitionDetailsForSA : RequisitionDetailsForChairperson { }
 
 
     public class VirtualRequisitionDetailsForChairperson

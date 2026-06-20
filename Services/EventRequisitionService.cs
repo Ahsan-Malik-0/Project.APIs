@@ -342,7 +342,7 @@ namespace Project.APIs.Services
             ["J"] = "Audit Cleared"
         };
 
-        public async Task<List<RequisitionDetailsForAdministration>> GetRequisitionDetailsForAdministration(char status)
+        public async Task<List<RequisitionDetailsForSA>> GetRequisitionDetailsForAdministration(char status)
         {
             // This is comment
             var result = await _dB.EventRequisitions
@@ -368,7 +368,7 @@ namespace Project.APIs.Services
                        {
                            e.Society!.Id,
                            e.Society.Name,
-                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "chairperson")!.Name
+                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
                        }
                    }).FirstOrDefault()
                })
@@ -381,7 +381,7 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
-            return result.Select(er => new RequisitionDetailsForAdministration()
+            return result.Select(er => new RequisitionDetailsForSA()
             {
                 Id = er.Id,
                 RequestedDate = er.RequestedDate,
