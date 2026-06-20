@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace Project.APIs.Model.DTOs
 {
     public class CreateEventRequisitionDto
@@ -25,7 +27,10 @@ namespace Project.APIs.Model.DTOs
         public required string Body { get; set; } = string.Empty;
         public required DateTime RequestedDate { get; set; }
         public required decimal RequestedAmount { get; set; }
-        public required Guid EventId{ get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public DateTime EventDate { get; set; }
+        public required ICollection<EventRequirementDto> EventRequirements { get; set; }
     }
 
     public class UpdateVirtualEventRequisitionDto

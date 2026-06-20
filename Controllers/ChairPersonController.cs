@@ -89,13 +89,13 @@ namespace Project.APIs.Controllers
             return Ok(pendingRequisitions);
         }
 
-        //// Events Requisitions Detail
-        //[HttpGet("getEventRequisitionDetails/{requisitionId:guid}")]
-        //public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
-        //{
-        //    var requisitionsDetails = await eventRequisitionService.GetEventRequisitionDetails(requisitionId);
-        //    return Ok(requisitionsDetails);
-        //}
+        // Events Requisitions Detail
+        [HttpGet("getEventRequisitionById/{requisitionId:guid}")]
+        public async Task<IActionResult> GetEventRequisitionDetails(Guid requisitionId)
+        {
+            var requisitionsDetails = await eventRequisitionService.GetEventRequisitionById(requisitionId);
+            return Ok(requisitionsDetails);
+        }
 
         [HttpGet("getChairpersonDetailsForRequisition/{chairpersonId:guid}")]
         public async Task<IActionResult> GetChaipersonDetailsForRequisition(Guid chairpersonId)
