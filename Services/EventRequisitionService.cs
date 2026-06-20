@@ -63,9 +63,124 @@ namespace Project.APIs.Services
             }
         }
 
+        public async Task<RequisitionDetailsForChairperson> GetEventRequisitionById(Guid requisitionId)
+        {
+            var result = await _dB.EventRequisitions
+                .Where(er => er.Id == requisitionId)
+                .Select(er => new
+                {
+                    er.Id,
+                    er.RequestedDate,
+                    er.RequestAmount,
+                    er.Status,
+                    er.ReviewMessage,
+                    er.Subject,
+                    er.Body,
+                    Event = er.Events!.Select(e => new
+                    {
+                        e.Id,
+                        e.Name,
+                        e.EventDate,
+                        e.StartTime,
+                        e.EndTime,
+                        Requirements = e.Requirements.ToList(),
+                        Society = new
+                        {
+                            e.Society!.Id,
+                            e.Society.Name,
+                            Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
+                        }
+                    }).FirstOrDefault()
+                }).FirstOrDefaultAsync();
+
+
+            if (result == null)
+            {
+                throw new NotFoundException("Requisition not found.");
+            }
+
+            string member = result.Event!.Society.Member;
+
+            return new RequisitionDetailsForChairperson()
+            {
+                Id = result.Id,
+                RequestedDate = result.RequestedDate,
+                RequestedAmount = result.RequestAmount,
+                Status = StatusMap.GetValueOrDefault(result.Status, "Unknown"),
+                ReviewMessage = result.ReviewMessage,
+                Subject = result.Subject,
+                Body = result.Body,
+                ChairpersonName = member,
+                //Event = er.Event.
+                Event = new Event
+                {
+                    Id = result!.Event!.Id,
+                    Name = result.Event.Name,
+                    EventDate = result.Event.EventDate,
+                    StartTime = result.Event.StartTime,
+                    EndTime = result.Event.EndTime,
+                    Status = null!,
+                    Requirements = result.Event.Requirements,
+                    Society = new Society
+                    {
+                        Id = result.Event.Society.Id,
+                        Name = result.Event.Society.Name,
+                        Members = new List<Member>
+                        {
+                            new Member { Name = result.Event.Society.Member, Username = null!, Role = null! }
+                        }
+                    }
+                }
+            };
+        }
+
         public async Task UpdateEventRequisition(Guid requisitionId, UpdateEventRequisitionDto updateEventRequisition)
         {
             var transaction = await _dB.Database.BeginTransactionAsync();
+
+            // Step 1: get non-financial requirement names from new event
+            var newNonFinancialReqNames = updateEventRequisition.EventRequirements
+                .Where(r => r.Type == "non-financial")
+                .Select(r => r.Name)
+                .ToList();
+
+            // Step 2: check overlapping events + matching requirements
+            var conflictingEvent = await _dB.Events
+                .Include(e => e.Requirements)
+                .FirstOrDefaultAsync(e =>
+                    e.Status == "pending" &&
+                    e.EventDate.Date == updateEventRequisition.EventDate.Date &&
+
+                    // exclude self (important if updating)
+                    e.RequisitionId != requisitionId &&
+
+                    // TIME OVERLAP CHECK
+                    updateEventRequisition.StartTime < e.EndTime &&
+                    updateEventRequisition.EndTime > e.StartTime &&
+
+                    // REQUIREMENT CONFLICT CHECK
+                    e.Requirements.Any(r =>
+                        r.Type == "non-financial" &&
+                        newNonFinancialReqNames.Contains(r.Name)
+                    )
+                );
+
+            // Step 3: throw exception if conflict found
+            if (conflictingEvent != null)
+            {
+                var conflictingNames = conflictingEvent.Requirements
+                    .Where(r =>
+                        r.Type == "non-financial" &&
+                        newNonFinancialReqNames.Contains(r.Name))
+                    .Select(r => r.Name)
+                    .Distinct();
+
+                throw new BusinessRuleException(
+                    $"Non-financial requirements '{string.Join(", ", conflictingNames)}' " +
+                    $"already exist in event '{conflictingEvent.Name}'"
+                );
+            }
+
             try
             {
 
@@ -79,30 +194,50 @@ namespace Project.APIs.Services
                 requisition.RequestedDate = updateEventRequisition.RequestedDate;
                 requisition.RequestAmount = updateEventRequisition.RequestedAmount;
 
-                if (requisition.Status == "B") requisition.Status = "A";
-                if (requisition.Status == "D") requisition.Status = "C";
-                if (requisition.Status == "F") requisition.Status = "E";
-
-                // Remove requisition id from old event
-                var oldEvent = await _dB.Events.Where(e => e.RequisitionId == requisitionId).FirstOrDefaultAsync();
-
-                if (oldEvent == null)
-                    throw new NotFoundException("Previous Event Not Found");
-
-                oldEvent.RequisitionId = null;
-                oldEvent.Status = "pending";
-
-                // Add requisition id in new event
-                var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == updateEventRequisition.EventId);
-                if (_event == null)
+                requisition.Status = requisition.Status switch
                 {
-                    throw new NotFoundException("Event Not Found");
+                    "B" => "A",
+                    "D" => "C",
+                    "F" => "E",
+                    _ => requisition.Status
+                };
+
+                // Get Event
+                var _event = await _dB.Events
+                        .Include(e => e.Requirements)
+                        .FirstOrDefaultAsync(e => e.RequisitionId == requisitionId);
+
+                if (_event == null) throw new NotFoundException("Event not found");
+
+                // Remove requirements
+                if (_event != null)
+                {
+                    _dB.EventRequirements.RemoveRange(_event.Requirements);
+                }
+                else
+                {
+                    throw new NotFoundException("Event not found");
                 }
 
-                _event.Status = "accepted";
-                _event.RequisitionId = requisitionId;
+                _event.EventDate = updateEventRequisition.EventDate;
+                _event.StartTime = updateEventRequisition.StartTime;
+                _event.EndTime = updateEventRequisition.EndTime;
 
+                _dB.Events.Update(_event);
 
+                foreach (var req in updateEventRequisition.EventRequirements)
+                {
+                    EventRequirement eventRequirement = new EventRequirement()
+                    {
+                        Name = req.Name,
+                        Type = req.Type,
+                        Quantity = req.Quantity,
+                        Price = req.Price,
+                        EventId = _event.Id
+                    };
+                    await _dB.EventRequirements.AddAsync(eventRequirement);
+                }
+                
                 _dB.EventRequisitions.Update(requisition);
                 await _dB.SaveChangesAsync();
 
@@ -111,7 +246,7 @@ namespace Project.APIs.Services
             catch (DbUpdateException)
             {
                 await transaction.RollbackAsync();
-                throw new BusinessRuleException("Unable to save event. Please try again.");
+                throw new BusinessRuleException("Unable to update requisitoin. Please try again.");
             }
             catch (Exception)
             {

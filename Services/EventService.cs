@@ -50,27 +50,47 @@ namespace Project.APIs.Services
             try
             {
                 // Check if conflicting event exists
-                var conflictingEvent = await _dB.Events
-                    .Where(e => e.Status == "pending"
-                        && e.EventDate.Date == newEvent.EventDate.Date
-                        && e.StartTime == newEvent.StartTime)
-                    .Select(e => new
-                     {
-                         Event = e,
-                         ConflictingRequirements = e.Requirements
-                            .Where(r => r.Type == "non-financial"
-                                && newEvent.Requirements.Select(nr => nr.Name).Contains(r.Name))
-                            .ToList()
-                     })
-                    .FirstOrDefaultAsync(x => x.ConflictingRequirements.Any());
+                // Step 1: get non-financial requirement names from new event
+                var newNonFinancialReqNames = newEvent.Requirements
+                    .Where(r => r.Type == "non-financial")
+                    .Select(r => r.Name)
+                    .ToList();
 
+                // Step 2: check overlapping events + matching requirements
+                var conflictingEvent = await _dB.Events
+                    .Include(e => e.Requirements)
+                    .FirstOrDefaultAsync(e =>
+                        e.Status == "pending" &&
+                        e.EventDate.Date == newEvent.EventDate.Date &&
+
+                        // exclude self (important if updating)
+                        //e.Id != newEvent.Id &&
+
+                        // TIME OVERLAP CHECK
+                        newEvent.StartTime < e.EndTime &&
+                        newEvent.EndTime > e.StartTime &&
+
+                        // REQUIREMENT CONFLICT CHECK
+                        e.Requirements.Any(r =>
+                            r.Type == "non-financial" &&
+                            newNonFinancialReqNames.Contains(r.Name)
+                        )
+                    );
+
+                // Step 3: throw exception if conflict found
                 if (conflictingEvent != null)
                 {
-                    var conflictingNames = string.Join(", ",
-                        conflictingEvent.ConflictingRequirements.Select(r => r.Name));
+                    var conflictingNames = conflictingEvent.Requirements
+                        .Where(r =>
+                            r.Type == "non-financial" &&
+                            newNonFinancialReqNames.Contains(r.Name))
+                        .Select(r => r.Name)
+                        .Distinct();
+
                     throw new BusinessRuleException(
-                        $"Non-financial requirements '{conflictingNames}' already exist in event '{conflictingEvent.Event.Name}'");
-                    //throw new BusinessRuleException("Same even exist");
+                        $"Non-financial requirements '{string.Join(", ", conflictingNames)}' " +
+                        $"already exist in event '{conflictingEvent.Name}'"
+                    );
                 }
 
 
@@ -132,28 +152,47 @@ namespace Project.APIs.Services
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
 
-            // Check if conflicting event exists
-            var conflictingEvent = await _dB.Events
-                .Where(e => e.Status == "pending"
-                    && e.EventDate.Date == dto.EventDate.Date
-                    && e.StartTime == dto.StartTime)
-                .Select(e => new
-                {
-                    Event = e,
-                    ConflictingRequirements = e.Requirements
-                        .Where(r => r.Type == "non-financial"
-                            && dto.Requirements.Select(nr => nr.Name).Contains(r.Name))
-                        .ToList()
-                })
-                .FirstOrDefaultAsync(x => x.ConflictingRequirements.Any());
+            // Step 1: get non-financial requirement names from new event
+            var newNonFinancialReqNames = dto.Requirements
+                .Where(r => r.Type == "non-financial")
+                .Select(r => r.Name)
+                .ToList();
 
+            // Step 2: check overlapping events + matching requirements
+            var conflictingEvent = await _dB.Events
+                .Include(e => e.Requirements)
+                .FirstOrDefaultAsync(e =>
+                    e.Status == "pending" &&
+                    e.EventDate.Date == dto.EventDate.Date &&
+
+                    // exclude self (important if updating)
+                    e.Id != id &&
+
+                    // TIME OVERLAP CHECK
+                    dto.StartTime < e.EndTime &&
+                    dto.EndTime > e.StartTime &&
+
+                    // REQUIREMENT CONFLICT CHECK
+                    e.Requirements.Any(r =>
+                        r.Type == "non-financial" &&
+                        newNonFinancialReqNames.Contains(r.Name)
+                    )
+                );
+
+            // Step 3: throw exception if conflict found
             if (conflictingEvent != null)
             {
-                var conflictingNames = string.Join(", ",
-                    conflictingEvent.ConflictingRequirements.Select(r => r.Name));
+                var conflictingNames = conflictingEvent.Requirements
+                    .Where(r =>
+                        r.Type == "non-financial" &&
+                        newNonFinancialReqNames.Contains(r.Name))
+                    .Select(r => r.Name)
+                    .Distinct();
+
                 throw new BusinessRuleException(
-                    $"Non-financial requirements '{conflictingNames}' already exist in event '{conflictingEvent.Event.Name}'");
-                //throw new BusinessRuleException("Same even exist");
+                    $"Non-financial requirements '{string.Join(", ", conflictingNames)}' " +
+                    $"already exist in event '{conflictingEvent.Name}'"
+                );
             }
 
             try
