@@ -342,9 +342,8 @@ namespace Project.APIs.Services
             ["J"] = "Audit Cleared"
         };
 
-        public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForAdministration(char status)
+        public async Task<List<RequisitionDetailsForAdministration>> GetRequisitionDetailsForAdministration(char status)
         {
-
             // This is comment
             var result = await _dB.EventRequisitions
                .Where(er => er.Status == status.ToString())
@@ -382,7 +381,7 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
-            return result.Select(er => new RequisitionDetailsForChairperson()
+            return result.Select(er => new RequisitionDetailsForAdministration()
             {
                 Id = er.Id,
                 RequestedDate = er.RequestedDate,
