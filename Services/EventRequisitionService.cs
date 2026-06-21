@@ -342,9 +342,8 @@ namespace Project.APIs.Services
             ["J"] = "Audit Cleared"
         };
 
-        public async Task<List<RequisitionDetailsForChairperson>> GetRequisitionDetailsForAdministration(char status)
+        public async Task<List<RequisitionDetailsForAdministration>> GetRequisitionDetailsForAdministration(char status)
         {
-
             // This is comment
             var result = await _dB.EventRequisitions
                .Where(er => er.Status == status.ToString())
@@ -369,7 +368,7 @@ namespace Project.APIs.Services
                        {
                            e.Society!.Id,
                            e.Society.Name,
-                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "chairperson")!.Name
+                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "Chairperson")!.Name
                        }
                    }).FirstOrDefault()
                })
@@ -383,9 +382,15 @@ namespace Project.APIs.Services
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
 
+
+            //return result
+            //    .Where(er => er.Event != null) // Added by jason
+            //    .Select(er => new RequisitionDetailsForChairperson()
+
             return result
-                .Where(er => er.Event != null) // Added by jason
-                .Select(er => new RequisitionDetailsForChairperson()
+                //.Where(er => er.Event != null) // Added by jason
+                .Select(er => new RequisitionDetailsForAdministration()
+
             {
                 Id = er.Id,
                 RequestedDate = er.RequestedDate,
