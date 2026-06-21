@@ -2,7 +2,7 @@
 
 namespace Project.APIs.Model
 {
-    [Index(nameof(Session), IsUnique = true)]
+    //[Index(nameof(Session), IsUnique = true)]
     public class YearlyBudget
     {
         public Guid Id { get; set; }

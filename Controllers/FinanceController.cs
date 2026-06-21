@@ -9,13 +9,13 @@ namespace Project.APIs.Controllers.CRUD
     [ApiController]
     public class FinanceController(EventRequisitionService eventRequisitionService, MemberService memberService, EventAuditService eventAuditService) : ControllerBase
     {
-        //[HttpGet("ViewEventRequisitionDetails")]
-        //public async Task<IActionResult> ViewPendingRequisitions()
-        //{
-        //    var eventRequisitions = await eventRequisitionService.ViewRequisitionDetailsForFinance();
-        //    // Implementation for viewing pending requisitions
-        //    return Ok(eventRequisitions);
-        //}
+        [HttpGet("ViewEventRequisitionDetails")]
+        public async Task<IActionResult> ViewPendingRequisitions()
+        {
+            var eventRequisitions = await eventRequisitionService.GetRequisitionDetailsForFinance('E');
+            // Implementation for viewing pending requisitions
+            return Ok(eventRequisitions);
+        }
 
         ////[HttpGet("ViewRequisitionDetails/{requisitionId:guid}")]
         ////public async Task<IActionResult> ViewRequisitionDetails(Guid requisitionId)
@@ -24,17 +24,17 @@ namespace Project.APIs.Controllers.CRUD
         ////    return Ok(requisitionDetails);
         ////}
 
-        //[HttpPost("RejectEventRequisition/{requisitionId:guid}")]
-        //public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "F",
-        //        ReviewMessage = responseMessage.ResponseMessage
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
+        public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "F",
+                ReviewMessage = responseMessage.ResponseMessage
+            };
+            await eventRequisitionService.RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
         //[HttpGet("getChairpersonDetails/{societyName}")]
         //public async Task<IActionResult> GetChaipersonDetailsForRequisition(string societyName)
@@ -43,37 +43,37 @@ namespace Project.APIs.Controllers.CRUD
         //    return Ok(chairpersonDetails);
         //}
 
-        //[HttpPost("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
-        //public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "G",
-        //        ReviewMessage = responseMessage.ResponseMessage
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpPost("ReleasedEventRequisitionBudget/{requisitionId:guid}")]
+        public async Task<IActionResult> ReleasedEventRequisitionBudget(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "G",
+                ReviewMessage = responseMessage.ResponseMessage
+            };
+            await eventRequisitionService.ReleaseEventRequisitionBudget(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
-        //[HttpGet("ViewEventRequisitionHistory")]
-        //public async Task<IActionResult> ViewEventRequisitionHistory()
-        //{
-        //    var eventRequisitionHistory = await eventRequisitionService.ViewRequisitionDetailsForFinanceHistory();
-        //    return Ok(eventRequisitionHistory);
-        //}
+        [HttpGet("ViewEventRequisitionHistory")]
+        public async Task<IActionResult> ViewEventRequisitionHistory()
+        {
+            var eventRequisitionHistory = await eventRequisitionService.GetEventRequisitionHistoryForFinance();
+            return Ok(eventRequisitionHistory);
+        }
 
 
         //// Handle audit endpoints --------------------------------------------------------
-        //[HttpGet("RequestForEventAudit/{requisitionId:guid}")]
-        //public async Task<IActionResult> RequestForEventAudit(Guid requisitionId)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "I",
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpGet("RequestForEventAudit/{requisitionId:guid}")]
+        public async Task<IActionResult> RequestForEventAudit(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "I",
+            };
+            await eventRequisitionService.UpdateRequisitionStatusToRequestForAudit(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
         [HttpGet("ViewEventAuditDetails/{eventId:guid}")]
         public async Task<IActionResult> ViewEventAuditDetails(Guid eventId)
@@ -82,14 +82,14 @@ namespace Project.APIs.Controllers.CRUD
             return Ok(eventAuditDetails);
         }
 
-        //[HttpGet("verifyTakeAmount/{auditId:guid}")]
-        //public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
-        //{
-        //    string status = "clear";
+        [HttpGet("verifyTakeAmount/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        {
+            string status = "clear";
 
-        //    await eventAuditService.UpdateAuditStatus(auditId, status);
-        //    return Ok();
-        //}
+            await eventAuditService.UpdateAuditStatus(auditId, status);
+            return Ok();
+        }
 
 
         // Handle Profile Endpoints --------------------------------------------------------

@@ -14,7 +14,7 @@ namespace Project.APIs.Controllers
         [HttpGet("ViewPendingRequisitions")]
         public async Task<IActionResult> ViewPendingRequisitions()
         {
-            var pendingRequisitions = await eventRequisitionService.GetRequisitionDetailsForAdministration('A');
+            var pendingRequisitions = await eventRequisitionService.GetRequisitionDetailsForSA('A');
             // Implementation for viewing pending requisitions
             return Ok(pendingRequisitions);
         }
@@ -26,12 +26,12 @@ namespace Project.APIs.Controllers
         //    return Ok(requisitionDetails);
         //}
 
-        //[HttpGet("ViewApprovedRequisitionDetails")]
-        //public async Task<IActionResult> ViewAcceptedEventDetails()
-        //{
-        //    var requisitionDetails = await eventRequisitionService.ViewRequisitionDetailsForStudentAffairs();
-        //    return Ok(requisitionDetails);
-        //}
+        [HttpGet("GetEventRequisitionHistory")]
+        public async Task<IActionResult> ViewAcceptedEventDetails()
+        {
+            var requisitionDetails = await eventRequisitionService.GetEventRequisitionHistoryForSA();
+            return Ok(requisitionDetails);
+        }
 
         [HttpPost("RejectEventRequisition/{requisitionId:guid}")]
         public async Task<IActionResult> RejectEventRequisition(Guid requisitionId, [FromBody] ResponseMessageDto responseMessage)
@@ -52,17 +52,17 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        //[HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
-        //public async Task<IActionResult> EventCompleted(Guid requisitionId)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "H",
-        //        ReviewMessage = "Event Completed"
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
+        public async Task<IActionResult> EventCompleted(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "H",
+                ReviewMessage = "Event Completed"
+            };
+            await eventRequisitionService.UpdateRequisitionStatusAsEventComplete(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
 
         // Handle Profile Endpoints --------------------------------------------------------

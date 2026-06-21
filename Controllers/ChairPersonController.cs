@@ -138,13 +138,13 @@ namespace Project.APIs.Controllers
             return NoContent();
         }
 
-        ////View Events Requisitions History
-        //[HttpGet("getEventRequisitionHistory/{memberId:guid}")]
-        //public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
-        //{
-        //    var RequisitionList = await eventRequisitionService.GetEventRequisitionHistory(memberId);
-        //    return Ok(RequisitionList);
-        //}
+        //View Events Requisitions History
+        [HttpGet("getEventRequisitionHistory/{memberId:guid}")]
+        public async Task<IActionResult> ViewEventRequisitionHistory(Guid memberId)
+        {
+            var RequisitionList = await eventRequisitionService.GetEventRequisitionHistoryForCP(memberId);
+            return Ok(RequisitionList);
+        }
 
         // Handling Event Audits Endpoints ----------------------------------------------------
         // View audits of events
@@ -190,14 +190,14 @@ namespace Project.APIs.Controllers
         }
 
         // Confirm receive amount
-        //[HttpGet("verifyTakeAmount/{auditId:guid}")]
-        //public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
-        //{
-        //    string status = "clear";
+        [HttpGet("verifyTakeAmount/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        {
+            string status = "clear";
 
-        //    await eventAuditService.UpdateAuditStatus(auditId, status);
-        //    return Ok();
-        //}
+            await eventAuditService.UpdateAuditStatus(auditId, status);
+            return Ok();
+        }
 
         // Handling Yearly Events Requisitions Endpoints ---------------------------------------
         // Create yearly events requisitions

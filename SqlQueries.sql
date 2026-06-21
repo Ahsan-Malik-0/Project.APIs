@@ -93,7 +93,35 @@ SELECT * FROM EventRequisitions WHERE Id IN (SELECT RequisitionId FROM Events WH
 
 
 
+CREATE TABLE EventAudits(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	FundProvided DECIMAL NOT NULL,
+	SpendAmount DECIMAL NOT NULL,
+	RevenueGenerated DECIMAL NOT NULL,
+	RemainingAmount DECIMAL NOT NULL,
+	Status VARCHAR(10) NOT NULL,
 
+	EventId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (EventId) REFERENCES Events(Id)
+)
+
+SELECT * FROM EventAudits
+DELETE EventAudits -- DELETE DATA
+DROP TABLE EventAudits -- DELETE TABLE
+
+CREATE TABLE AuditSpends(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	Vender VARCHAR(50) NOT NULL,
+	Description VARCHAR (255),
+	Amount DECIMAL NOT NULL,
+	ReceiptPicture VARCHAR(MAX),
+	EventAuditId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (EventAuditId) REFERENCES EventAudits(Id)
+)
+
+SELECT * FROM AuditSpends
+DELETE AuditSpends -- DELETE DATA
+DROP TABLE AuditSpends -- DELETE TABLE
 
 
 
@@ -124,10 +152,8 @@ CREATE TABLE YearlyEvents (
     Name VARCHAR(150) NOT NULL,
     EstimateAmount DECIMAL NOT NULL,
     EstimateMonth VARCHAR(30) NOT NULL,
-
     YearlyBudgetId UNIQUEIDENTIFIER NOT NULL,
 	FOREIGN KEY (YearlyBudgetId) REFERENCES YearlyBudgets(Id)
-
 );
 
 SELECT * FROM YearlyEvents
