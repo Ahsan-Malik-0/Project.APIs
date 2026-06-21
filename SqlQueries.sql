@@ -174,3 +174,19 @@ CREATE TABLE YearlyEventRequirements (
 SELECT * FROM YearlyEventRequirement
 DELETE YearlyEventRequirement -- DELETE DATA
 DROP TABLE YearlyEventRequirement -- DELETE TABLE
+
+
+CREATE TABLE YearlyBudgetScrutinies(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	Name VARCHAR(50) NOT NULL,
+	Comment VARCHAR(1000) NOT NULL,
+	Date DATE NOT NULL,
+	MemberId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (MemberId) REFERENCES Members(Id),
+	YearlyBudgetId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (YearlyBudgetId) REFERENCES YearlyBudgets(Id)
+)
+
+SELECT * FROM YearlyBudgetScrutinies
+DELETE YearlyBudgetScrutinies -- DELETE DATA
+DROP TABLE YearlyBudgetScrutinies -- DELETE TABLE
