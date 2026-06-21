@@ -55,25 +55,25 @@ namespace Project.APIs.Controllers.CRUD
             return Ok();
         }
 
-        //[HttpGet("ViewEventRequisitionHistory")]
-        //public async Task<IActionResult> ViewEventRequisitionHistory()
-        //{
-        //    var eventRequisitionHistory = await eventRequisitionService.ViewRequisitionDetailsForFinanceHistory();
-        //    return Ok(eventRequisitionHistory);
-        //}
+        [HttpGet("ViewEventRequisitionHistory")]
+        public async Task<IActionResult> ViewEventRequisitionHistory()
+        {
+            var eventRequisitionHistory = await eventRequisitionService.GetEventRequisitionHistoryForFinance();
+            return Ok(eventRequisitionHistory);
+        }
 
 
         //// Handle audit endpoints --------------------------------------------------------
-        //[HttpGet("RequestForEventAudit/{requisitionId:guid}")]
-        //public async Task<IActionResult> RequestForEventAudit(Guid requisitionId)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "I",
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpGet("RequestForEventAudit/{requisitionId:guid}")]
+        public async Task<IActionResult> RequestForEventAudit(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "I",
+            };
+            await eventRequisitionService.UpdateRequisitionStatusToRequestForAudit(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
         [HttpGet("ViewEventAuditDetails/{eventId:guid}")]
         public async Task<IActionResult> ViewEventAuditDetails(Guid eventId)

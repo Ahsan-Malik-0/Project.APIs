@@ -22,7 +22,6 @@ namespace Project.APIs.Services
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
             {
-
                 EventAudit eventAudit = new EventAudit()
                 {
                     FundProvided = newEventAudit.FundProvided,
@@ -46,7 +45,7 @@ namespace Project.APIs.Services
                         Vender = spend.VenderName,
                         Description = spend.ItemDescription,
                         Amount = spend.Amount,
-                        ReceiptPicture = spend.ReceiptPicture,
+                        ReceiptPicture = spend.ReceiptPicture ?? null,
                         EventAuditId = eventAudit.Id,
                     };
 

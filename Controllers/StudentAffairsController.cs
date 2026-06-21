@@ -52,17 +52,17 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        //[HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
-        //public async Task<IActionResult> EventCompleted(Guid requisitionId)
-        //{
-        //    ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
-        //    {
-        //        Status = "H",
-        //        ReviewMessage = "Event Completed"
-        //    };
-        //    await eventRequisitionService.ReviewEventRequisition(requisitionId, reviewEventRequisitionDto);
-        //    return Ok();
-        //}
+        [HttpGet("MarkEventAsCompleted/{requisitionId:guid}")]
+        public async Task<IActionResult> EventCompleted(Guid requisitionId)
+        {
+            ReviewEventRequisitionDto reviewEventRequisitionDto = new ReviewEventRequisitionDto
+            {
+                Status = "H",
+                ReviewMessage = "Event Completed"
+            };
+            await eventRequisitionService.UpdateRequisitionStatusAsEventComplete(requisitionId, reviewEventRequisitionDto);
+            return Ok();
+        }
 
 
         // Handle Profile Endpoints --------------------------------------------------------

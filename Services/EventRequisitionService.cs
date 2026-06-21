@@ -852,6 +852,16 @@ namespace Project.APIs.Services
         {
             await RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
         }
+
+        public async Task UpdateRequisitionStatusAsEventComplete(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        {
+            await RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
+        }
+
+        public async Task UpdateRequisitionStatusToRequestForAudit(Guid requisitionId, ReviewEventRequisitionDto reviewEventRequisitionDto)
+        {
+            await RejectEventRequisition(requisitionId, reviewEventRequisitionDto);
+        }
         //public async Task<List<ViewRequisitionDetailsForFinanceDto>> ViewRequisitionDetailsForFinance()
         //{
         //    var acceptedRequisition = await _dB.EventRequisitions
