@@ -728,6 +728,7 @@ namespace Project.APIs.Services
                     .Select(er => new
                     {
                         er.Id,
+                        EventId = er.Events.FirstOrDefault()!.Id,
                         ChairpersonName = er.Events.FirstOrDefault()!.Society!.Members!
                                 .Where(m => m.Role == "chairperson")
                                 .Select(m => m.Name)
@@ -748,6 +749,7 @@ namespace Project.APIs.Services
                 .Select(er => new EventRequisitionHistoryForFinance()
                 {
                     RequisitionId = er.Id,
+                    EventId = er.EventId,
                     SocietyName = er.SocietyName,
                     ChairpersonName = er.ChairpersonName,
                     EventName = er.EventName,
@@ -967,18 +969,18 @@ namespace Project.APIs.Services
         //    return acceptedRequisition;
         //}
 
-        //    public async Task UpdateRequisitionStatus(Guid requisitionId)
-        //    {
-        //        var requisition = await _dB.EventRequisitions.Where(er => er.Id == requisitionId).FirstOrDefaultAsync();
+        public async Task UpdateRequisitionStatus(Guid requisitionId)
+        {
+            var requisition = await _dB.EventRequisitions.Where(er => er.Id == requisitionId).FirstOrDefaultAsync();
 
-        //        if (requisition == null)
-        //            throw new NotFoundException("Requisition Not Found");
+            if (requisition == null)
+                throw new NotFoundException("Requisition Not Found");
 
-        //        requisition.Status = "J";
+            requisition.Status = "J";
 
-        //        _dB.EventRequisitions.Update(requisition);
-        //        await _dB.SaveChangesAsync();
-        //    }
+            _dB.EventRequisitions.Update(requisition);
+            await _dB.SaveChangesAsync();
+        }
 
     }
 }

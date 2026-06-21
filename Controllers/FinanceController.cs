@@ -82,14 +82,14 @@ namespace Project.APIs.Controllers.CRUD
             return Ok(eventAuditDetails);
         }
 
-        //[HttpGet("verifyTakeAmount/{auditId:guid}")]
-        //public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
-        //{
-        //    string status = "clear";
+        [HttpGet("verifyTakeAmount/{auditId:guid}")]
+        public async Task<IActionResult> UpdateEventAuditStatus(Guid auditId)
+        {
+            string status = "clear";
 
-        //    await eventAuditService.UpdateAuditStatus(auditId, status);
-        //    return Ok();
-        //}
+            await eventAuditService.UpdateAuditStatus(auditId, status);
+            return Ok();
+        }
 
 
         // Handle Profile Endpoints --------------------------------------------------------
