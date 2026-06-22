@@ -18,5 +18,7 @@ namespace Project.APIs.Database
         public DbSet<Administration> Administrations { get; set; }
         public DbSet<EventAudit> EventAudits { get; set; }
         public DbSet<YearlyBudgetScrutiny> YearlyBudgetScrutinies { get; set; }
+        public DbSet<VirtualSociety> VirtualSocieties { get; set; }
+        public DbSet<VirtualSocietyContribution> VirtualSocietyContributions { get; set; }
     }
 }

@@ -93,7 +93,6 @@ namespace Project.APIs.Services
                     );
                 }
 
-
                 var _event = new Event
                 {
                     Name = newEvent.Name,
@@ -103,6 +102,7 @@ namespace Project.APIs.Services
                     Status = status,
                     ReviewMessage = null,
                     SocietyId = newEvent.SocietyId,
+                    VirtualSocietyId = newEvent.VirtualSocietyId,
                     Requirements = null!
                 };
 

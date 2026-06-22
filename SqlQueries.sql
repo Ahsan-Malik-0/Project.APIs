@@ -69,6 +69,14 @@ CREATE TABLE Events(
 	FOREIGN KEY (RequisitionId) REFERENCES EventRequisitions(Id),
 )
 
+ALTER TABLE Events
+ADD VirtualSocietyId UNIQUEIDENTIFIER NULL;
+
+ALTER TABLE Events
+ADD CONSTRAINT FK_Events_VirtualSocieties
+FOREIGN KEY (VirtualSocietyId)
+REFERENCES VirtualSocieties(Id);
+
 SELECT * FROM Events
 DELETE Events -- DELETE DATA
 DROP TABLE Events -- DELETE TABLE
@@ -196,4 +204,36 @@ CREATE TABLE YearlyBudgetScrutinies(
 SELECT * FROM YearlyBudgetScrutinies
 DELETE YearlyBudgetScrutinies -- DELETE DATA
 DROP TABLE YearlyBudgetScrutinies -- DELETE TABLE
+
+
+
+CREATE TABLE VirtualSocieties(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	Name VARCHAR(50) NOT NULL,
+	Description VARCHAR(2000),
+	TotalContribution DECIMAL,
+	RegistrationEndDate DATE NOT NULL,
+	MemberId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (MemberId) REFERENCES Members(Id)
+)
+
+ALTER TABLE VirtualSocieties
+ADD RegistrationEndDate DATE
+
+SELECT * FROM VirtualSocieties
+DELETE VirtualSocieties -- DELETE DATA
+DROP TABLE VirtualSocieties -- DELETE TABLE
+
+CREATE TABLE VirtualSocietyContributions(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	Contribution DECIMAL NOT NULL,
+	VirtualSocietyId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (VirtualSocietyId) REFERENCES VirtualSocieties(Id),
+	SocietyId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (SocietyId) REFERENCES Societies(Id)
+)
+
+SELECT * FROM VirtualSocietyContributions
+DELETE VirtualSocietyContributions -- DELETE DATA
+DROP TABLE VirtualSocietyContributions -- DELETE TABLE
 

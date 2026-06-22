@@ -37,8 +37,8 @@ namespace Project.APIs.Model.DTOs
         [Required(ErrorMessage = "Date is required")]
         public DateTime EventDate { get; set; }
 
-        [Required(ErrorMessage = "SocietyId is required")]
-        public Guid SocietyId { get; set; }
+        public Guid? SocietyId { get; set; }
+        public Guid? VirtualSocietyId { get; set; }
 
         [Required(ErrorMessage = "Requirements are required")]
         public required ICollection<EventRequirementDto> Requirements { get; set; }

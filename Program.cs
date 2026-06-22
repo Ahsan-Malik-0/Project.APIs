@@ -48,6 +48,7 @@ builder.Services.AddScoped<EventRequisitionService>();
 builder.Services.AddScoped<EventAuditService>();
 builder.Services.AddScoped<YearlyBudgetService>();
 builder.Services.AddScoped<YearlyBudgetScrutinyService>();
+builder.Services.AddScoped<VirtualSocietyService>();
 
 builder.Services.AddCors(options =>
 {
