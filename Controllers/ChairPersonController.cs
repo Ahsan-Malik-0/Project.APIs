@@ -9,7 +9,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService, YearlyBudgetService yearlyBudgetService, EventAuditService eventAuditService) : ControllerBase
+    public class ChairPersonController(EventService _eventService, EventRequisitionService eventRequisitionService, MemberService memberService, YearlyBudgetService yearlyBudgetService, EventAuditService eventAuditService, VirtualSocietyService virtualSocietyService) : ControllerBase
     {
         // Handling Event Endpoints -------------------------------------------------------
         // Pending Events
@@ -221,8 +221,42 @@ namespace Project.APIs.Controllers
             return Ok(yearlyBudgets);
         }
 
-        // View yearly events requisitions
-        // 
+        // Get remainig credits of current yearly budget
+        [HttpGet("GetRemainigYearlyBudge/{memberId}")]
+        public async Task<IActionResult> GetRemainigYearlyBudget(Guid memberId)
+        {
+            var remainingAmount = await yearlyBudgetService.GetRemainigYearlyBudget(memberId);
+            return Ok(remainingAmount);
+        }
+
+        // Handling Virtual Society Endpoints ---------------------------------------------------------
+        [HttpGet("getRecentVirtualSocietyDetails")]
+        public async Task<IActionResult> getRecentVirtualSocietyDetails()
+        {
+            var remainingAmount = await virtualSocietyService.GetRecentVirtualSocietyDetails();
+            return Ok(remainingAmount);
+        }
+
+        [HttpGet("getPastVirtualSocietyDetails")]
+        public async Task<IActionResult> getPastVirtualSocietyDetails()
+        {
+            var remainingAmount = await virtualSocietyService.GetPastVirtualSocietyDetails();
+            return Ok(remainingAmount);
+        }
+
+        [HttpPost("contributeToVirtualSociety/{virtualSocietyId}")]
+        public async Task<IActionResult> ContributeToVirtualSociety(Guid virtualSocietyId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
+        {
+            await virtualSocietyService.ContributeToVirtualSociety(virtualSocietyId, contributeToVC);
+            return Ok();
+        }
+
+        [HttpPost("createVirtualEvent")]
+        public async Task<IActionResult> CreateVirtualSocietyEvents([FromBody] AddEventDto eventDto)
+        {
+            await virtualSocietyService.CreateVirtualSocietyEvents(eventDto);
+            return Ok();
+        }
 
 
         // Handling Profiles Endpoints ---------------------------------------------------------

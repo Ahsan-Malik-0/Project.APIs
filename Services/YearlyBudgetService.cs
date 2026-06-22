@@ -207,5 +207,29 @@ namespace Project.APIs.Services
 
             await _dB.SaveChangesAsync();
         }
+
+        public async Task<decimal> GetRemainigYearlyBudget(Guid memberId)
+        {
+            var societyId = await _dB.Members
+               .Where(m => m.Id == memberId && m.Role == "chairperson")
+               .Select(m => m.SocietyId)
+               .FirstOrDefaultAsync();
+
+            if (societyId == Guid.Empty)
+                throw new NotFoundException("Chairperson not found or does not belong to any society.");
+
+            var yearlyBudget = await _dB.YearlyBudgets
+                .FirstOrDefaultAsync(yb => yb.SocietyId == societyId);
+
+            if(yearlyBudget == null)
+            {
+                throw new NotFoundException("Yearly Budget Not Found");
+            }
+            else if(yearlyBudget.AllotedAmount == 0)
+            {
+                return 1;
+            }
+            return yearlyBudget.Credits;
+        }
     }
 }

@@ -6,8 +6,159 @@ using Project.APIs.Model.DTOs;
 
 namespace Project.APIs.Services
 {
-    public class VirtualSocietyService(DB _dB)
+    public class VirtualSocietyService(DB _dB, EventService eventService)
     {
+        public async Task CreateVirtualSociety(CreateVirtualSocietyDto newVirtualSociety)
+        {
+            try
+            {
+                var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == newVirtualSociety.MemberId);
+                if(member == null)
+                    throw new NotFoundException("Member not found");
+
+                else if (member!.Role != "chairperson")
+                    throw new BusinessRuleException("Member can not be other then chairperson");
+
+                VirtualSociety virtualSociety = new VirtualSociety()
+                {
+                    Name = newVirtualSociety.Name,
+                    Description = newVirtualSociety.Description ?? null,
+                    RegistrationEndDate = newVirtualSociety.RegistrationEndDate,
+                    MemberId = newVirtualSociety.MemberId,
+                };
+
+                await _dB.VirtualSocieties.AddAsync(virtualSociety);
+                await _dB.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new BusinessRuleException("Unable to save requisition. Please try again.");
+            }
+            catch (Exception)
+            {
+                throw; // goes to 500 handler
+            }
+        }
+
+        public async Task<List<GetPastVirtualSocietyDetailsDto>> GetPastVirtualSocietyDetails()
+        {
+            var pastVirtalSocieties = await _dB.VirtualSocieties
+                                                .Where(vs => vs.RegistrationEndDate <= DateTime.Today.Date)
+                                                .ToListAsync();
+
+            if(pastVirtalSocieties.Count == 0)
+                throw new NotFoundException("Virtual Societies not found");
+
+            return pastVirtalSocieties.Select(pvs => new GetPastVirtualSocietyDetailsDto()
+            { 
+                Name = pvs.Name,
+                RegistrationEndDate = pvs.RegistrationEndDate,
+                MemberId= pvs.MemberId
+            })
+            .ToList();
+        }
+
+        public async Task<List<GetRecentVirtualSocietyDetailsDto>> GetRecentVirtualSocietyDetails()
+        {
+            var pastVirtalSocieties = await _dB.VirtualSocieties
+                                                .Where(vs => vs.RegistrationEndDate > DateTime.Now)
+                                                .ToListAsync();
+
+            if (pastVirtalSocieties.Count == 0)
+                throw new NotFoundException("Virtual Societies not found");
+
+            return pastVirtalSocieties.Select(pvs => new GetRecentVirtualSocietyDetailsDto()
+            {
+                Id = pvs.Id,
+                Name = pvs.Name,
+                RegistrationEndDate = pvs.RegistrationEndDate,
+                MemberId = pvs.MemberId
+            })
+            .ToList();
+        }
+
+        public async Task ContributeToVirtualSociety(Guid virtualSocietyId, ContributeToVirtualSocietyDto contributeToVC)
+        {
+            using var transaction = await _dB.Database.BeginTransactionAsync();
+            try
+            {
+                // Deduction of contribution amount from yearly budget 
+                var yearlyBudget = await _dB.YearlyBudgets.FirstOrDefaultAsync(yb => yb.SocietyId == contributeToVC.SocietyId);
+
+                if (yearlyBudget == null)
+                    throw new NotFoundException("Yearly Budget Not Found");
+                else if (yearlyBudget.AllotedAmount == 0)
+                    throw new BusinessRuleException("Yearly Budget Not Alloted Yet");
+                else if (yearlyBudget.Credits == 0)
+                    throw new BusinessRuleException("No society budget remaining");
+                else if ((yearlyBudget.Credits - contributeToVC.Conrtibution) < 0)
+                    throw new BusinessRuleException("Insufficient society budget");
+
+                yearlyBudget.Credits -= contributeToVC.Conrtibution;
+
+                // Updatin total contibution of Virtual society by adding contribution of society
+                var vertialSociety = await _dB.VirtualSocieties.FirstOrDefaultAsync(vs => vs.Id == virtualSocietyId);
+                if(vertialSociety == null)
+                    throw new NotFoundException("Virtual Societiy not found");
+
+                vertialSociety.TotalContribution += contributeToVC.Conrtibution;
+
+                // Add row in VirtualSocietyContributions table
+                VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
+                {
+                    Contribution = contributeToVC.Conrtibution,
+                    VirtualSocietyId = virtualSocietyId,
+                    SocietyId = contributeToVC.SocietyId
+                };
+
+                await _dB.VirtualSocietyContributions.AddAsync(virtualSocietyContribution);
+
+                await _dB.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                throw new BusinessRuleException("Unable to save requisition. Please try again.");
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw; // goes to 500 handler
+            }
+        }
+
+        public async Task CreateVirtualSocietyEvents(AddEventDto newEvent)
+        {
+            await eventService.AddEvent(newEvent, "vs");
+        }
+
+        public async Task<List<ChairpersonDetailsForVirtualSocietyDto>> GetChairpersonsListForVS()
+        {
+            var result = await _dB.Members
+                .Where(m => m.Role == "chairperson")
+                .Select(m => new
+                {
+                    m.Id,
+                    m.Name
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (result.Count == 0)
+                throw new NotFoundException("Chairpersons not found");
+
+            var chairpersonList = result.Select
+                (r => new ChairpersonDetailsForVirtualSocietyDto
+                {
+                    ChairperonId = r.Id,
+                    ChairperonName = r.Name,
+                }).ToList();
+
+            return chairpersonList;
+        }
+
+
         public async Task CreateEventRequisition(CreateVirtualEventRequisitionDto newRequisition)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
