@@ -230,24 +230,24 @@ namespace Project.APIs.Controllers
         }
 
         // Handling Virtual Society Endpoints ---------------------------------------------------------
-        [HttpGet("getRecentVirtualSocietyDetails")]
+        [HttpGet("getVirtualSocietiesDetails")]
         public async Task<IActionResult> getRecentVirtualSocietyDetails()
         {
-            var remainingAmount = await virtualSocietyService.GetRecentVirtualSocietyDetails();
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
             return Ok(remainingAmount);
         }
 
-        [HttpGet("getPastVirtualSocietyDetails")]
-        public async Task<IActionResult> getPastVirtualSocietyDetails()
-        {
-            var remainingAmount = await virtualSocietyService.GetPastVirtualSocietyDetails();
-            return Ok(remainingAmount);
-        }
+        //[HttpGet("getPastVirtualSocietyDetails")]
+        //public async Task<IActionResult> getPastVirtualSocietyDetails()
+        //{
+        //    var remainingAmount = await virtualSocietyService.GetPastVirtualSocietyDetails();
+        //    return Ok(remainingAmount);
+        //}
 
-        [HttpPost("contributeToVirtualSociety/{virtualSocietyId}")]
-        public async Task<IActionResult> ContributeToVirtualSociety(Guid virtualSocietyId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
+        [HttpPost("contributeToVirtualSociety/{memberId}")]
+        public async Task<IActionResult> ContributeToVirtualSociety(Guid memberId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
         {
-            await virtualSocietyService.ContributeToVirtualSociety(virtualSocietyId, contributeToVC);
+            await virtualSocietyService.ContributeToVirtualSociety(memberId, contributeToVC);
             return Ok();
         }
 
@@ -257,6 +257,7 @@ namespace Project.APIs.Controllers
             await virtualSocietyService.CreateVirtualSocietyEvents(eventDto);
             return Ok();
         }
+
 
 
         // Handling Profiles Endpoints ---------------------------------------------------------
