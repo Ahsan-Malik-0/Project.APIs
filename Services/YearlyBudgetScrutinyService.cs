@@ -18,7 +18,7 @@ namespace Project.APIs.Services
                     Id = ybs.Id,
                     AdministrationName = ybs.Name,
                     AdministrationComment = ybs.Comment,
-                    AdministrationRole = ybs.Administration!.Role,
+                    AdministrationRole = ybs.Member!.Role,
                     // AdministrationStatus = ybs.Status!,
                     CommentDate = ybs.Date,
                 }).ToListAsync();
@@ -31,17 +31,18 @@ namespace Project.APIs.Services
             return details;
         }
 
-        public async Task AddComment(Guid administrationId, AddCommentDto addComment)
+        public async Task AddComment(Guid memberId, AddCommentDto addComment)
         {
             try
             {
+                var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == memberId);
                 YearlyBudgetScrutiny newYearlyBudgetScrutiny = new YearlyBudgetScrutiny()
                 {
-                    Name = addComment.AdministrationName,
+                    Name = member!.Name,
                     Comment = addComment.AdministrationComment,
                     // Status = addComment.AdministrationStatus,
                     Date = addComment.CommentDate,
-                    AdministrationId = administrationId,
+                    MemberId = memberId,
                     YearlyBudgetId = addComment.YearlyBudgetId
                 };
 

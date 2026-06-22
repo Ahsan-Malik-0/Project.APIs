@@ -368,11 +368,11 @@ namespace Project.APIs.Services
                        {
                            e.Society!.Id,
                            e.Society.Name,
-<<<<<<< HEAD
+//<<<<<<< HEAD
                            Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "Chairperson")!.Name
-=======
-                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
->>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
+//=======
+//                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
+//>>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
                        }
                    }).FirstOrDefault()
                })
@@ -385,20 +385,20 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
 
 
             //return result
             //    .Where(er => er.Event != null) // Added by jason
             //    .Select(er => new RequisitionDetailsForChairperson()
 
-            return result
-                //.Where(er => er.Event != null) // Added by jason
-                .Select(er => new RequisitionDetailsForAdministration()
+//            return result
+//                //.Where(er => er.Event != null) // Added by jason
+//                .Select(er => new RequisitionDetailsForAdministration()
 
-=======
+//=======
             return result.Select(er => new RequisitionDetailsForSA()
->>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
+
             {
                 Id = er.Id,
                 RequestedDate = er.RequestedDate,
@@ -686,7 +686,13 @@ namespace Project.APIs.Services
 
         // SA History
         public async Task<List<EventRequisitionHistoryForSA>> GetEventRequisitionHistoryForSA()
+        //public async Task<List<EventRequisition>> GetEventRequisitionHistoryForSA()
         {
+            //var result1 = await _dB.EventRequisitions
+            //    .Include(er => er.Events)
+            //    .Where(er => er.Status != "A")
+            //    .ToListAsync();
+
             var result = await _dB.EventRequisitions
                     .Where(er => er.Status != "A")
                     .Select(er => new
@@ -712,7 +718,7 @@ namespace Project.APIs.Services
                     })
                     .AsNoTracking()
                     .ToListAsync();
-
+            if (result == null) throw new NotFoundException("History not found");
 
             var acceptedRequisition = result
                 .Select(er => new EventRequisitionHistoryForSA()
@@ -734,6 +740,27 @@ namespace Project.APIs.Services
                 })
                 .ToList();
 
+            //var acceptedRequisition = result1
+            //.Select(er => new EventRequisitionHistoryForSA()
+            //{
+            //    RequisitionId = result1.,
+            //    SocietyName = er.SocietyName,
+            //    EventName = er.EventName,
+            //    EventDate = er.EventDate,
+            //    StartTime = er.StartTime,
+            //    EndTime = er.EndTime,
+            //    RequisitionStatus = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+            //    RequestedDate = er.RequestedDate,
+            //    AllocatedDate = er.AllocatedDate,
+            //    RequestedAmount = er.RequestAmount,
+            //    AllocatedAmount = er.AllocatedAmount,
+            //    BiitContribution = er.BiitContribution,
+            //    ReviewMessage = er.ReviewMessage,
+            //    Requirements = er.Requirements
+            //})
+            //.ToList();
+
+            //return result1;
             return acceptedRequisition;
         }
 

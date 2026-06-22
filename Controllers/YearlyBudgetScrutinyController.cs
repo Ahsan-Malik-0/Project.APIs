@@ -57,10 +57,10 @@ namespace Project.APIs.Controllers
             return Ok(details);
         }
 
-        [HttpPost("addComment/{administrationId}")]
-        public async Task<IActionResult> AddComment(Guid administrationId, [FromBody] AddCommentDto addComment)
+        [HttpPost("addComment/{memberId}")]
+        public async Task<IActionResult> AddComment(Guid memberId, [FromBody] AddCommentDto addComment)
         {
-            await scrutinyService.AddComment(administrationId, addComment);
+            await scrutinyService.AddComment(memberId, addComment);
             return Ok();
         }
 
