@@ -40,50 +40,126 @@ namespace Project.APIs.Services
             }
         }
 
-        public async Task<List<GetPastVirtualSocietyDetailsDto>> GetPastVirtualSocietyDetails()
+        public async Task<List<GetVirtualSocietyDetailsDto>> GetVirtualSocietiesDetails()
         {
-            var pastVirtalSocieties = await _dB.VirtualSocieties
-                                                .Where(vs => vs.RegistrationEndDate <= DateTime.Today.Date)
-                                                .ToListAsync();
-
-            if(pastVirtalSocieties.Count == 0)
-                throw new NotFoundException("Virtual Societies not found");
-
-            return pastVirtalSocieties.Select(pvs => new GetPastVirtualSocietyDetailsDto()
-            { 
-                Name = pvs.Name,
-                RegistrationEndDate = pvs.RegistrationEndDate,
-                MemberId= pvs.MemberId
-            })
-            .ToList();
-        }
-
-        public async Task<List<GetRecentVirtualSocietyDetailsDto>> GetRecentVirtualSocietyDetails()
-        {
-            var pastVirtalSocieties = await _dB.VirtualSocieties
-                                                .Where(vs => vs.RegistrationEndDate > DateTime.Now)
-                                                .ToListAsync();
-
-            if (pastVirtalSocieties.Count == 0)
-                throw new NotFoundException("Virtual Societies not found");
-
-            return pastVirtalSocieties.Select(pvs => new GetRecentVirtualSocietyDetailsDto()
+            var result = await _dB.VirtualSocieties
+            .Select(vs => new
             {
-                Id = pvs.Id,
-                Name = pvs.Name,
-                RegistrationEndDate = pvs.RegistrationEndDate,
-                MemberId = pvs.MemberId
+                vs.Id, 
+                vs.Name,
+                vs.MemberId,
+                vs.TotalContribution,
+                vs.RegistrationEndDate,
+                ContributedSocieties = _dB.VirtualSocietyContributions
+                .Where(vsc => vsc.VirtualSocietyId == vs.Id)
+                .Select(vsc => new
+                {
+                    vsc.Society!.Name,
+                    vsc.Society!.Members!.FirstOrDefault(m => m.Role == "chairperson")!.Id,
+                    vsc.Contribution
+                }).ToList(),
+                Events = _dB.Events
+                        .Where(e => e.VirtualSocietyId == vs.Id)
+                        .Include(e => e.Requirements)
+                        .ToList(),
+                Requisition = _dB.EventRequisitions
+                        .FirstOrDefault(er => er.Events!.FirstOrDefault()!.RequisitionId == vs.Id)
             })
-            .ToList();
+            .AsNoTracking()
+            .ToListAsync();
+
+            if (result == null)
+                throw new NotFoundException("No virtual society found");
+
+            var virtualSocieties = result
+                .Select(r => new GetVirtualSocietyDetailsDto()
+                { 
+                    VirtualSocietyId = r.Id,
+                    VirtualSocietyName = r.Name,
+                    RegistrationEndDate = r.RegistrationEndDate,
+                    ManagerId = r.MemberId,
+                    TotalContribution = r.TotalContribution,
+                    VirtualSocietyEvents = r.Events,
+                    ContributedSocieties = r.ContributedSocieties
+                    .Select(cs => new ContributedSocietiesDto
+                    { 
+                        SocietyName = cs.Name,
+                        Chairpersonid = cs.Id,
+                        Conrtibution = cs.Contribution,
+                    }).ToList(),
+                    VirtualSocietyRequisition = r.Requisition
+                }).ToList();
+
+            return virtualSocieties;
+
         }
 
-        public async Task ContributeToVirtualSociety(Guid virtualSocietyId, ContributeToVirtualSocietyDto contributeToVC)
+        public async Task<List<Event>> GetVirtualSocietyEvents(Guid virtualSocietyId)
+        {
+            var events = await _dB.Events
+                .Include(e => e.Requirements)
+                .Where(e => e.VirtualSocietyId == virtualSocietyId)
+                .ToListAsync();
+
+            if (events == null) throw new NotFoundException("Events not found");
+
+            return events;
+        }
+
+        //public async Task<List<GetPastVirtualSocietyDetailsDto>> GetPastVirtualSocietyDetails()
+        //{
+        //    var pastVirtalSocieties = await _dB.VirtualSocieties
+        //                                        .Where(vs => vs.RegistrationEndDate <= DateTime.Today.Date)
+        //                                        .ToListAsync();
+
+        //    if(pastVirtalSocieties.Count == 0)
+        //        throw new NotFoundException("Virtual Societies not found");
+
+        //    return pastVirtalSocieties.Select(pvs => new GetPastVirtualSocietyDetailsDto()
+        //    { 
+        //        Name = pvs.Name,
+        //        RegistrationEndDate = pvs.RegistrationEndDate,
+        //        MemberId= pvs.MemberId
+        //    })
+        //    .ToList();
+        //}
+
+        //public async Task<List<GetRecentVirtualSocietyDetailsDto>> GetRecentVirtualSocietyDetails()
+        //{
+        //    var pastVirtalSocieties = await _dB.VirtualSocieties
+        //                                        .Where(vs => vs.RegistrationEndDate > DateTime.Now)
+        //                                        .ToListAsync();
+
+        //    if (pastVirtalSocieties.Count == 0)
+        //        throw new NotFoundException("Virtual Societies not found");
+
+        //    return pastVirtalSocieties.Select(pvs => new GetRecentVirtualSocietyDetailsDto()
+        //    {
+        //        Id = pvs.Id,
+        //        Name = pvs.Name,
+        //        RegistrationEndDate = pvs.RegistrationEndDate,
+        //        MemberId = pvs.MemberId
+        //    })
+        //    .ToList();
+        //}
+
+        public async Task ContributeToVirtualSociety(Guid memberId, ContributeToVirtualSocietyDto contributeToVC)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
             {
+                var societyId = await _dB.Members
+                    .Where(m => m.Id == memberId)
+                    .Select(m => m.SocietyId)
+                    .FirstOrDefaultAsync();
+
+                if (societyId == null)
+                    throw new NotFoundException("Member Not Found");
+
+                Guid societyIdValue = societyId.Value;
+
                 // Deduction of contribution amount from yearly budget 
-                var yearlyBudget = await _dB.YearlyBudgets.FirstOrDefaultAsync(yb => yb.SocietyId == contributeToVC.SocietyId);
+                var yearlyBudget = await _dB.YearlyBudgets.FirstOrDefaultAsync(yb => yb.SocietyId == societyIdValue);
 
                 if (yearlyBudget == null)
                     throw new NotFoundException("Yearly Budget Not Found");
@@ -91,24 +167,24 @@ namespace Project.APIs.Services
                     throw new BusinessRuleException("Yearly Budget Not Alloted Yet");
                 else if (yearlyBudget.Credits == 0)
                     throw new BusinessRuleException("No society budget remaining");
-                else if ((yearlyBudget.Credits - contributeToVC.Conrtibution) < 0)
+                else if ((yearlyBudget.Credits - contributeToVC.Contribution) < 0)
                     throw new BusinessRuleException("Insufficient society budget");
 
-                yearlyBudget.Credits -= contributeToVC.Conrtibution;
+                yearlyBudget.Credits -= contributeToVC.Contribution;
 
                 // Updatin total contibution of Virtual society by adding contribution of society
-                var vertialSociety = await _dB.VirtualSocieties.FirstOrDefaultAsync(vs => vs.Id == virtualSocietyId);
-                if(vertialSociety == null)
+                var vertialSociety = await _dB.VirtualSocieties.FirstOrDefaultAsync(vs => vs.Id == contributeToVC.VirtualSocietyId);
+                if (vertialSociety == null)
                     throw new NotFoundException("Virtual Societiy not found");
 
-                vertialSociety.TotalContribution += contributeToVC.Conrtibution;
+                vertialSociety.TotalContribution += contributeToVC.Contribution;
 
                 // Add row in VirtualSocietyContributions table
                 VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
                 {
-                    Contribution = contributeToVC.Conrtibution,
-                    VirtualSocietyId = virtualSocietyId,
-                    SocietyId = contributeToVC.SocietyId
+                    Contribution = contributeToVC.Contribution,
+                    VirtualSocietyId = contributeToVC.VirtualSocietyId,
+                    SocietyId = societyIdValue
                 };
 
                 await _dB.VirtualSocietyContributions.AddAsync(virtualSocietyContribution);
@@ -159,7 +235,7 @@ namespace Project.APIs.Services
         }
 
 
-        public async Task CreateEventRequisition(CreateVirtualEventRequisitionDto newRequisition)
+        public async Task CreateVirtualSocietyRequisition(CreateVirtualSocietyRequisitionDto newRequisition)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -167,19 +243,18 @@ namespace Project.APIs.Services
 
                 EventRequisition eventRequisition = new EventRequisition()
                 {
-                    RequestedDate = newRequisition.RequestedDate,
                     Subject = newRequisition.Subject,
                     Body = newRequisition.Body,
-                    //EventId = newRequisition.EventId,
+                    RequestedDate = newRequisition.RequestedDate,
                     RequestAmount = newRequisition.RequestedAmount,
                     Status = "A",
-                    Events = null
+                    Events = null!
                 };
 
                 await _dB.EventRequisitions.AddAsync(eventRequisition);
                 await _dB.SaveChangesAsync();
 
-                foreach (Guid eventId in newRequisition.EventIds)
+                foreach (Guid eventId in newRequisition.EventIds!)
                 {
                     var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
                     if (_event == null)

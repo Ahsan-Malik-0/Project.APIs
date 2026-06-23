@@ -230,33 +230,42 @@ namespace Project.APIs.Controllers
         }
 
         // Handling Virtual Society Endpoints ---------------------------------------------------------
-        [HttpGet("getRecentVirtualSocietyDetails")]
-        public async Task<IActionResult> getRecentVirtualSocietyDetails()
+        [HttpGet("getVirtualSocietiesDetails")]
+        public async Task<IActionResult> GetVirtualSocietiesDetails()
         {
-            var remainingAmount = await virtualSocietyService.GetRecentVirtualSocietyDetails();
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
             return Ok(remainingAmount);
         }
 
-        [HttpGet("getPastVirtualSocietyDetails")]
-        public async Task<IActionResult> getPastVirtualSocietyDetails()
+        [HttpGet("getVirtualSocietyEvents/{virtualSocietyId}")]
+        public async Task<IActionResult> GetVirtualSocietyEvents(Guid virtualSocietyId)
         {
-            var remainingAmount = await virtualSocietyService.GetPastVirtualSocietyDetails();
-            return Ok(remainingAmount);
+            var events = await virtualSocietyService.GetVirtualSocietyEvents(virtualSocietyId);
+            return Ok(events);
         }
 
-        [HttpPost("contributeToVirtualSociety/{virtualSocietyId}")]
-        public async Task<IActionResult> ContributeToVirtualSociety(Guid virtualSocietyId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
+        [HttpPost("createVirtualSocietyRequisition")]
+        public async Task<IActionResult> CreateVirtualSocietyRequisition(CreateVirtualSocietyRequisitionDto newRequisition)
         {
-            await virtualSocietyService.ContributeToVirtualSociety(virtualSocietyId, contributeToVC);
+            await virtualSocietyService.CreateVirtualSocietyRequisition(newRequisition);
             return Ok();
         }
 
-        [HttpPost("createVirtualEvent")]
-        public async Task<IActionResult> CreateVirtualSocietyEvents([FromBody] AddEventDto eventDto)
+
+        [HttpPost("contributeToVirtualSociety/{memberId}")]
+        public async Task<IActionResult> ContributeToVirtualSociety(Guid memberId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
+        {
+            await virtualSocietyService.ContributeToVirtualSociety(memberId, contributeToVC);
+            return Ok();
+        }
+
+        [HttpPost("createVirtualSocietyEvent")]
+        public async Task<IActionResult> CreateVirtualSocietyEvent([FromBody] AddEventDto eventDto)
         {
             await virtualSocietyService.CreateVirtualSocietyEvents(eventDto);
             return Ok();
         }
+
 
 
         // Handling Profiles Endpoints ---------------------------------------------------------

@@ -11,27 +11,29 @@ namespace Project.APIs.Model.DTOs
         public Guid MemberId { get; set; }
     }
 
-    public class GetPastVirtualSocietyDetailsDto
+    public class GetVirtualSocietyDetailsDto
     {
-        public required string Name { get; set; }
+        public Guid VirtualSocietyId { get; set; }
+        public required string VirtualSocietyName { get; set; }
         public DateTime RegistrationEndDate { get; set; }
-        public Guid MemberId { get; set; }
+        public decimal TotalContribution { get; set; }
+        public Guid ManagerId { get; set; }  
+        public List<Event>? VirtualSocietyEvents { get; set; }
+        public List<ContributedSocietiesDto>? ContributedSocieties { get; set; }
+        public EventRequisition? VirtualSocietyRequisition { get; set; }
     }
 
-    public class GetPastVirtualSocietyDetailsForSADto : GetPastVirtualSocietyDetailsDto
+    public class ContributedSocietiesDto
     {
-
-    }
-
-    public class GetRecentVirtualSocietyDetailsDto : GetPastVirtualSocietyDetailsDto
-    {
-        public Guid Id { get; set; }
+        public string? SocietyName { get; set; }
+        public Guid Chairpersonid { get; set; }
+        public decimal Conrtibution { get; set; }
     }
 
     public class ContributeToVirtualSocietyDto
     {
-        public Guid SocietyId { get; set; }
-        public required decimal Conrtibution { get; set; }
+        public Guid VirtualSocietyId { get; set; }
+        public decimal Contribution { get; set; }
     }
 
     public class CreateVirtualSocietyEventsDto
@@ -44,10 +46,8 @@ namespace Project.APIs.Model.DTOs
         public required string Subject { get; set; }
         public required string Body { get; set; }
         public DateTime RequestedDate { get; set; }
-        public decimal RequestAmount { get; set; }
-        public Guid VirtualSocietyId { get; set; }
-        //[JsonIgnore]
-        //public VirtualSociety? VirtualSociety { get; set; }
+        public decimal RequestedAmount { get; set; }
+        public List<Guid>? EventIds { get; set; } 
     }
 
 
@@ -63,6 +63,5 @@ namespace Project.APIs.Model.DTOs
         public Guid VirtualId { get; set; }
         public List<Guid> SocietyIds { get; set; } = new List<Guid>();
     }
-
     
 }

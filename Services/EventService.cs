@@ -93,6 +93,12 @@ namespace Project.APIs.Services
                     );
                 }
 
+                if (newEvent.SocietyId != null && newEvent.VirtualSocietyId != null)
+                {
+                    throw new BusinessRuleException(
+                        "Provide either SocietyId or VirtualSocietyId, not both.");
+                }
+
                 var _event = new Event
                 {
                     Name = newEvent.Name,
