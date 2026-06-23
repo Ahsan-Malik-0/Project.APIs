@@ -231,18 +231,26 @@ namespace Project.APIs.Controllers
 
         // Handling Virtual Society Endpoints ---------------------------------------------------------
         [HttpGet("getVirtualSocietiesDetails")]
-        public async Task<IActionResult> getRecentVirtualSocietyDetails()
+        public async Task<IActionResult> GetVirtualSocietiesDetails()
         {
             var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
             return Ok(remainingAmount);
         }
 
-        //[HttpGet("getPastVirtualSocietyDetails")]
-        //public async Task<IActionResult> getPastVirtualSocietyDetails()
-        //{
-        //    var remainingAmount = await virtualSocietyService.GetPastVirtualSocietyDetails();
-        //    return Ok(remainingAmount);
-        //}
+        [HttpGet("getVirtualSocietyEvents/{virtualSocietyId}")]
+        public async Task<IActionResult> GetVirtualSocietyEvents(Guid virtualSocietyId)
+        {
+            var events = await virtualSocietyService.GetVirtualSocietyEvents(virtualSocietyId);
+            return Ok(events);
+        }
+
+        [HttpPost("createVirtualSocietyRequisition")]
+        public async Task<IActionResult> CreateVirtualSocietyRequisition(CreateVirtualSocietyRequisitionDto newRequisition)
+        {
+            await virtualSocietyService.CreateVirtualSocietyRequisition(newRequisition);
+            return Ok();
+        }
+
 
         [HttpPost("contributeToVirtualSociety/{memberId}")]
         public async Task<IActionResult> ContributeToVirtualSociety(Guid memberId, [FromBody] ContributeToVirtualSocietyDto contributeToVC)
@@ -251,8 +259,8 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        [HttpPost("createVirtualEvent")]
-        public async Task<IActionResult> CreateVirtualSocietyEvents([FromBody] AddEventDto eventDto)
+        [HttpPost("createVirtualSocietyEvent")]
+        public async Task<IActionResult> CreateVirtualSocietyEvent([FromBody] AddEventDto eventDto)
         {
             await virtualSocietyService.CreateVirtualSocietyEvents(eventDto);
             return Ok();

@@ -94,6 +94,18 @@ namespace Project.APIs.Services
 
         }
 
+        public async Task<List<Event>> GetVirtualSocietyEvents(Guid virtualSocietyId)
+        {
+            var events = await _dB.Events
+                .Include(e => e.Requirements)
+                .Where(e => e.VirtualSocietyId == virtualSocietyId)
+                .ToListAsync();
+
+            if (events == null) throw new NotFoundException("Events not found");
+
+            return events;
+        }
+
         //public async Task<List<GetPastVirtualSocietyDetailsDto>> GetPastVirtualSocietyDetails()
         //{
         //    var pastVirtalSocieties = await _dB.VirtualSocieties
@@ -223,7 +235,7 @@ namespace Project.APIs.Services
         }
 
 
-        public async Task CreateEventRequisition(CreateVirtualEventRequisitionDto newRequisition)
+        public async Task CreateVirtualSocietyRequisition(CreateVirtualSocietyRequisitionDto newRequisition)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -231,19 +243,18 @@ namespace Project.APIs.Services
 
                 EventRequisition eventRequisition = new EventRequisition()
                 {
-                    RequestedDate = newRequisition.RequestedDate,
                     Subject = newRequisition.Subject,
                     Body = newRequisition.Body,
-                    //EventId = newRequisition.EventId,
+                    RequestedDate = newRequisition.RequestedDate,
                     RequestAmount = newRequisition.RequestedAmount,
                     Status = "A",
-                    Events = null
+                    Events = null!
                 };
 
                 await _dB.EventRequisitions.AddAsync(eventRequisition);
                 await _dB.SaveChangesAsync();
 
-                foreach (Guid eventId in newRequisition.EventIds)
+                foreach (Guid eventId in newRequisition.EventIds!)
                 {
                     var _event = await _dB.Events.FirstOrDefaultAsync(e => e.Id == eventId);
                     if (_event == null)

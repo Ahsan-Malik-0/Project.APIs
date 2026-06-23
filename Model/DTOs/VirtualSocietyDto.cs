@@ -46,10 +46,8 @@ namespace Project.APIs.Model.DTOs
         public required string Subject { get; set; }
         public required string Body { get; set; }
         public DateTime RequestedDate { get; set; }
-        public decimal RequestAmount { get; set; }
-        public Guid VirtualSocietyId { get; set; }
-        //[JsonIgnore]
-        //public VirtualSociety? VirtualSociety { get; set; }
+        public decimal RequestedAmount { get; set; }
+        public List<Guid>? EventIds { get; set; } 
     }
 
 
