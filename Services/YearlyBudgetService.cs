@@ -231,5 +231,25 @@ namespace Project.APIs.Services
             }
             return yearlyBudget.Credits;
         }
+
+        // list of events
+        // list of contributions
+
+        //public async Task GetBudgetSummery(Guid memberId)
+        //{
+        //    var societyId = await _dB.Members
+        //        .Where(m => m.Id == memberId)
+        //        .Select(m => m.SocietyId)
+        //        .FirstOrDefaultAsync();
+
+        //    // Get alloted budget date
+        //    var allotedBudgetDate = await _dB.YearlyBudgets
+        //        .Where(yb => yb.SocietyId.Equals(societyId))
+        //        .Select(yb => yb.AllotedDate)
+        //        .FirstOrDefaultAsync();
+
+        //    // List of events
+        //    var events = 
+        //}
     }
 }

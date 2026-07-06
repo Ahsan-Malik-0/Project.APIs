@@ -344,39 +344,38 @@ namespace Project.APIs.Services
 
         public async Task<List<RequisitionDetailsForSA>> GetRequisitionDetailsForSA(char status)
         {
-            // This is comment
-            var result = await _dB.EventRequisitions
-               .Where(er => er.Status == status.ToString())
-               .Select(er => new
-               {
-                   er.Id,
-                   er.RequestedDate,
-                   er.RequestAmount,
-                   er.Status,
-                   er.ReviewMessage,
-                   er.Subject,
-                   er.Body,
-                   Event = er.Events!.Select(e => new
-                   {
-                       e.Id,
-                       e.Name,
-                       e.EventDate,
-                       e.StartTime,
-                       e.EndTime,
-                       Requirements = e.Requirements.ToList(),
-                       Society = new
-                       {
-                           e.Society!.Id,
-                           e.Society.Name,
-//<<<<<<< HEAD
-                           //Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "Chairperson")!.Name
-//=======
-                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
-                           //>>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
-                       }
-                   }).FirstOrDefault()
-               })
-               .AsNoTracking().ToListAsync();
+            //This is comment
+           var result = await _dB.EventRequisitions
+              .Where(er => er.Status == status.ToString())
+              .Where(er => er.Events.Any(e => e.VirtualSocietyId == null))
+              .Select(er => new
+              {
+                  er.Id,
+                  er.RequestedDate,
+                  er.RequestAmount,
+                  er.Status,
+                  er.ReviewMessage,
+                  er.Subject,
+                  er.Body,
+                  Event = er.Events
+                  .Select(e => new
+                  {
+                      e.Id,
+                      e.Name,
+                      e.EventDate,
+                      e.StartTime,
+                      e.EndTime,
+                      Requirements = e.Requirements.ToList(),
+                      Society = new
+                      {
+                          e.Society!.Id,
+                          e.Society.Name,
+                          Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
+                      }
+                  }).FirstOrDefault()
+              })
+              .AsNoTracking().ToListAsync();
+
 
             if (!result.Any())
             {
@@ -385,18 +384,7 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
-//<<<<<<< HEAD
 
-
-            //return result
-            //    .Where(er => er.Event != null) // Added by jason
-            //    .Select(er => new RequisitionDetailsForChairperson()
-
-//            return result
-//                //.Where(er => er.Event != null) // Added by jason
-//                .Select(er => new RequisitionDetailsForAdministration()
-
-//=======
             return result.Select(er => new RequisitionDetailsForSA()
 
             {
@@ -436,6 +424,7 @@ namespace Project.APIs.Services
             // This is comment
             var result = await _dB.EventRequisitions
                .Where(er => er.Status == status.ToString())
+               .Where(er => er.Events.Any(e => e.VirtualSocietyId == null))
                .Select(er => new
                {
                    er.Id,
@@ -695,6 +684,7 @@ namespace Project.APIs.Services
 
             var result = await _dB.EventRequisitions
                     .Where(er => er.Status != "A")
+                    .Where(er => er.Events.Any(e => e.VirtualSocietyId == null))
                     .Select(er => new
                     {
                         er.Id,
@@ -769,6 +759,7 @@ namespace Project.APIs.Services
         {
             var result = await _dB.EventRequisitions
                     .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")
+                    .Where(er => er.Events.Any(e => e.VirtualSocietyId == null))
                     .Select(er => new
                     {
                         er.Id,
@@ -844,20 +835,20 @@ namespace Project.APIs.Services
                     throw new NotFoundException("Requisition Not Found");
 
                 // Minus credits from yearly if budget release by finance
-                // if (reviewEventRequisitionDto.Status == "G")
-                // {
-                //     // Get the latest yearly budget for the society
-                //     var yearlyBudget = await _dB.YearlyBudgets
-                //         .Where(yb => yb.SocietyId == requisition._event!.SocietyId)
-                //         .OrderByDescending(yb => yb.RequestedDate)
-                //         .FirstOrDefaultAsync();
+                //if (reviewEventRequisitionDto.Status == "G")
+                //{
+                //    // Get the latest yearly budget for the society
+                //    var yearlyBudget = await _dB.YearlyBudgets
+                //        .Where(yb => yb.SocietyId == requisition.Events.FirstOrDefault()!.SocietyId)
+                //        .OrderByDescending(yb => yb.RequestedDate)
+                //        .FirstOrDefaultAsync();
 
-                //     if (yearlyBudget == null)
-                //         throw new NotFoundException("Yearly Budget Not Found");
+                //    if (yearlyBudget == null)
+                //        throw new NotFoundException("Yearly Budget Not Found");
 
-                //     yearlyBudget.Credits -= requisition.RequestAmount;
-                //     _dB.YearlyBudgets.Update(yearlyBudget);
-                // }
+                //    yearlyBudget.Credits -= requisition.RequestAmount;
+                //    _dB.YearlyBudgets.Update(yearlyBudget);
+                //}
 
                 requisition.Status = reviewEventRequisitionDto.Status;
                 requisition.ReviewMessage = reviewEventRequisitionDto.ReviewMessage;
@@ -884,6 +875,23 @@ namespace Project.APIs.Services
 
             if (requisition == null)
                 throw new NotFoundException("Requisition Not Found");
+
+
+            // Minus credits from yearly if budget release by finance
+            //if (approveEventRequisitionDto.S == "G")
+            //{
+            //    // Get the latest yearly budget for the society
+            //    var yearlyBudget = await _dB.YearlyBudgets
+            //        .Where(yb => yb.SocietyId == requisition._event!.SocietyId)
+            //        .OrderByDescending(yb => yb.RequestedDate)
+            //        .FirstOrDefaultAsync();
+
+            //    if (yearlyBudget == null)
+            //        throw new NotFoundException("Yearly Budget Not Found");
+
+            //    yearlyBudget.Credits -= requisition.RequestAmount;
+            //    _dB.YearlyBudgets.Update(yearlyBudget);
+            //}
 
             requisition.Status = "E";
             requisition.AllocatedDate = approveEventRequisitionDto.AllocatedDate;
