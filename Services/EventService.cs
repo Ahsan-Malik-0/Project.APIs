@@ -3,7 +3,6 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
-using System.Net.WebSockets;
 
 namespace Project.APIs.Services
 {
