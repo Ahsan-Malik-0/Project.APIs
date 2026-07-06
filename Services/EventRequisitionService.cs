@@ -369,10 +369,10 @@ namespace Project.APIs.Services
                            e.Society!.Id,
                            e.Society.Name,
 //<<<<<<< HEAD
-                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "Chairperson")!.Name
+                           //Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Id && m.Role == "Chairperson")!.Name
 //=======
-//                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
-//>>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
+                           Member = e.Society.Members!.FirstOrDefault(m => m.SocietyId == e.Society.Id && m.Role == "chairperson")!.Name
+                           //>>>>>>> 5d9eb823d72a403c51e14d5ccb22d9fd41354b20
                        }
                    }).FirstOrDefault()
                })
