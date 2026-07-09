@@ -25,11 +25,11 @@ public class ExceptionMiddleware
         {
             await HandleExceptionAsync(context, HttpStatusCode.BadRequest, ex.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // log ex here later
             await HandleExceptionAsync(context, HttpStatusCode.InternalServerError,
-                "Something went wrong. Please try again later.");
+                "Something went wrong. Please try again later." + ex);
         }
     }
 

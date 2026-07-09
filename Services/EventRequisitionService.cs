@@ -629,9 +629,15 @@ namespace Project.APIs.Services
             if (societyId == Guid.Empty)
                 throw new NotFoundException("Society not found");
 
-            var acceptedRequisition = await _dB.EventRequisitions
-                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J"
-                    && er.Events.FirstOrDefault()!.SocietyId == societyId)
+            var requisitions = await _dB.EventRequisitions
+                .Include(er => er.Events)
+                .ThenInclude(e => e.Requirements)
+                .Where(er => er.Events.FirstOrDefault()!.SocietyId == societyId).ToListAsync();
+
+            if (!requisitions.Any()) throw new NotFoundException("Requisition history not found");
+
+            var acceptedRequisition = requisitions
+                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")
                     .Select(er => new
                     {
                         er.Id,
@@ -640,7 +646,7 @@ namespace Project.APIs.Services
                         EventDate = er.Events.FirstOrDefault()!.EventDate,
                         StartTime = er.Events.FirstOrDefault()!.StartTime,
                         EndTime = er.Events.FirstOrDefault()!.EndTime,
-                        Requirements = er.Events.FirstOrDefault()!.Requirements.ToList(),
+                        Requirements = er.Events.FirstOrDefault()?.Requirements?.ToList() ?? new List<EventRequirement>(),
                         er.Status,
                         er.RequestedDate,
                         er.AllocatedDate,
@@ -648,8 +654,7 @@ namespace Project.APIs.Services
                         er.AllocatedAmount,
                         er.BiitContribution
                     })
-                    .AsNoTracking()
-                    .ToListAsync();
+                    .ToList();
 
             var dto = acceptedRequisition
                     .Select(er => new EventRequisitionHistoryForCP()
