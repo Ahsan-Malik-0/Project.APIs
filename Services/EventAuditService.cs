@@ -8,16 +8,16 @@ namespace Project.APIs.Services
 {
     public class EventAuditService(DB _dB, EventRequisitionService eventRequisitionService)
     {
-        public async Task<EventAudit> GetEventAuditById(Guid eventId)
+        public async Task<EventAudit> GetEventAuditById(Guid requisitionId)
         {
-            var eventAudit = await _dB.EventAudits.Include(ea => ea.Spends).FirstOrDefaultAsync(ea => ea.EventId == eventId);
+            var eventAudit = await _dB.EventAudits.Include(ea => ea.Spends).FirstOrDefaultAsync(ea => ea.RequisitionId == requisitionId);
 
             if (eventAudit == null) throw new NotFoundException("Event audit not found");
 
             return eventAudit;
         }
 
-        public async Task CreateEventAudit(Guid eventId, CreateEventAuditDto newEventAudit)
+        public async Task CreateEventAudit(Guid requisitionId, CreateEventAuditDto newEventAudit)
         {
             using var transaction = await _dB.Database.BeginTransactionAsync();
             try
@@ -28,7 +28,7 @@ namespace Project.APIs.Services
                     SpendAmount = newEventAudit.SpendAmount,
                     RevenueGenerated = newEventAudit.RevenueGenerated,
                     RemainingAmount = newEventAudit.RemainingAmount,
-                    EventId = eventId,
+                    RequisitionId = requisitionId,
                 };
 
                 if (newEventAudit.RemainingAmount > 0) eventAudit.Status = "give";
@@ -58,7 +58,7 @@ namespace Project.APIs.Services
             catch (DbUpdateException)
             {
                 await transaction.RollbackAsync();
-                throw new BusinessRuleException("Unable to save event. Please try again.");
+                throw new BusinessRuleException("Unable to save audit. Please try again.");
             }
             catch (Exception)
             {
@@ -161,8 +161,7 @@ namespace Project.APIs.Services
             {
                 if (status == "clear")
                 {
-                    var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.Events!.FirstOrDefault()!.Id == _dB.EventAudits.FirstOrDefault(ea => ea.Id == eventAuditId)!.EventId);
-
+                    var requisition = await _dB.EventRequisitions.FirstOrDefaultAsync(er => er.Id == _dB.EventAudits.FirstOrDefault(ea => ea.Id == eventAuditId)!.RequisitionId);
                     await eventRequisitionService.UpdateRequisitionStatus(requisition!.Id);
                 }
 

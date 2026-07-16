@@ -75,10 +75,10 @@ namespace Project.APIs.Controllers.CRUD
             return Ok();
         }
 
-        [HttpGet("ViewEventAuditDetails/{eventId:guid}")]
-        public async Task<IActionResult> ViewEventAuditDetails(Guid eventId)
+        [HttpGet("ViewEventAuditDetails/{requisitionId:guid}")]
+        public async Task<IActionResult> ViewEventAuditDetails(Guid requisitionId)
         {
-            var eventAuditDetails = await eventAuditService.GetEventAuditById(eventId);
+            var eventAuditDetails = await eventAuditService.GetEventAuditById(requisitionId);
             return Ok(eventAuditDetails);
         }
 

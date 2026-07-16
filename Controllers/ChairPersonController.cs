@@ -148,23 +148,23 @@ namespace Project.APIs.Controllers
 
         // Handling Event Audits Endpoints ----------------------------------------------------
         // View audits of events
-        [HttpGet("viewEventAudits/{eventId:guid}")]
-        public async Task<IActionResult> ViewEventAudits(Guid eventId)
+        [HttpGet("viewEventAudits/{requisitionId:guid}")]
+        public async Task<IActionResult> ViewEventAudits(Guid requisitionId)
         {
-            var audits = await eventAuditService.GetEventAuditById(eventId);
+            var audits = await eventAuditService.GetEventAuditById(requisitionId);
             return Ok(audits);
         }
 
         // Create Audit of events
-        [HttpPost("createEventAudit/{eventId:guid}")]
-        public async Task<IActionResult> CreateEventAudit(Guid eventId, [FromBody] CreateEventAuditDto eventAuditDto)
+        [HttpPost("createEventAudit/{requisitionId:guid}")]
+        public async Task<IActionResult> CreateEventAudit(Guid requisitionId, [FromBody] CreateEventAuditDto eventAuditDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            await eventAuditService.CreateEventAudit(eventId, eventAuditDto);
+            await eventAuditService.CreateEventAudit(requisitionId, eventAuditDto);
             return Ok();
         }
 
@@ -227,6 +227,14 @@ namespace Project.APIs.Controllers
         {
             var remainingAmount = await yearlyBudgetService.GetRemainigYearlyBudget(memberId);
             return Ok(remainingAmount);
+        }
+
+        // Get yearly budget summery
+        [HttpGet("getYearlyBudgeSummery/{memberId}")]
+        public async Task<IActionResult> GetYearlyBudgeSummery(Guid memberId)
+        {
+            var summery = await yearlyBudgetService.GetBudgetSummery(memberId);
+            return Ok(summery);
         }
 
         // Handling Virtual Society Endpoints ---------------------------------------------------------
