@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Project.APIs.Model
 {
@@ -10,9 +11,11 @@ namespace Project.APIs.Model
         public decimal RevenueGenerated { get; set; }
         public decimal RemainingAmount { get; set; }
         public string? Status { get; set; }
-        public Guid EventId { get; set; }
+        public Guid RequisitionId { get; set; }
+
+        [ForeignKey(nameof(RequisitionId))]
         [JsonIgnore]
-        public Event? _event { get; set; }
+        public EventRequisition? EventRequisition { get; set; }
 
         public virtual ICollection<AuditSpend>? Spends { get; set; }
     }

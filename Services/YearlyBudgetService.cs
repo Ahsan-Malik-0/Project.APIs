@@ -235,21 +235,38 @@ namespace Project.APIs.Services
         // list of events
         // list of contributions
 
-        //public async Task GetBudgetSummery(Guid memberId)
-        //{
-        //    var societyId = await _dB.Members
-        //        .Where(m => m.Id == memberId)
-        //        .Select(m => m.SocietyId)
-        //        .FirstOrDefaultAsync();
+        public async Task<List<EventAudit>> GetBudgetSummery(Guid memberId)
+        {
+            // Get society id
+            var societyId = await _dB.Members
+                .Where(m => m.Id == memberId)
+                .Select(m => m.SocietyId)
+                .FirstOrDefaultAsync();
 
-        //    // Get alloted budget date
-        //    var allotedBudgetDate = await _dB.YearlyBudgets
-        //        .Where(yb => yb.SocietyId.Equals(societyId))
-        //        .Select(yb => yb.AllotedDate)
-        //        .FirstOrDefaultAsync();
+            if (societyId == Guid.Empty)
+                throw new NotFoundException("Member not found.");
 
-        //    // List of events
-        //    var events = 
-        //}
+            // Get allotted budget date
+            var allottedDate = await _dB.YearlyBudgets
+                .Where(yb => yb.SocietyId == societyId)
+                .Select(yb => yb.AllotedDate)
+                .FirstOrDefaultAsync();
+
+            // Get requisition ids
+            var requisitionIds = await _dB.EventRequisitions
+                .Where(er => er.AllocatedDate > allottedDate)
+                .Select(er => er.Id)
+                .ToListAsync();
+
+            // Get audits
+            var eventAudits = await _dB.EventAudits
+                .Where(ea => requisitionIds.Contains(ea.RequisitionId))
+                .ToListAsync();
+
+            if (!eventAudits.Any())
+                throw new NotFoundException("Audits not found.");
+
+            return eventAudits;
+        }
     }
 }
