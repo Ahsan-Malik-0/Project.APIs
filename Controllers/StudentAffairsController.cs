@@ -10,7 +10,7 @@ namespace Project.APIs.Controllers
     [ApiController]
     public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService, VirtualSocietyService virtualSocietyService) : ControllerBase
     {
-        // Handle Event Requisition Endpoints --------------------------------------------------------
+        //// Handle Event Requisition Endpoints --------------------------------------------------------
         [HttpGet("ViewPendingRequisitions")]
         public async Task<IActionResult> ViewPendingRequisitions()
         {

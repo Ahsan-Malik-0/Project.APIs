@@ -179,6 +179,12 @@ CREATE TABLE YearlyEventRequirements (
 
 );
 
+-- <<<<<<< HEAD
+-- SELECT * FROM YearlyEventRequirements
+-- DELETE YearlyEventRequirements -- DELETE DATA
+-- DROP TABLE YearlyEventRequirements -- DELETE TABLE
+-- =======
+
 SELECT * FROM YearlyEventRequirement
 DELETE YearlyEventRequirement -- DELETE DATA
 DROP TABLE YearlyEventRequirement -- DELETE TABLE
@@ -198,6 +204,7 @@ CREATE TABLE YearlyBudgetScrutinies(
 SELECT * FROM YearlyBudgetScrutinies
 DELETE YearlyBudgetScrutinies -- DELETE DATA
 DROP TABLE YearlyBudgetScrutinies -- DELETE TABLE
+
 
 
 CREATE TABLE VirtualSocieties(
@@ -229,3 +236,4 @@ CREATE TABLE VirtualSocietyContributions(
 SELECT * FROM VirtualSocietyContributions
 DELETE VirtualSocietyContributions -- DELETE DATA
 DROP TABLE VirtualSocietyContributions -- DELETE TABLE
+

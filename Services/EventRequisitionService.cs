@@ -376,16 +376,6 @@ namespace Project.APIs.Services
               })
               .AsNoTracking().ToListAsync();
 
-            //var requisitionDetails = await _dB.EventRequisitions
-            //    .Where(er => er.Status == status.ToString()).ToListAsync();
-            //if (requisitionDetails.Count > 0) throw new NotFoundException("Requisition not found");
-
-            //List<Event> events = new();
-
-            //foreach(var requisition in requisitionDetails)
-            //{
-            //    var _event = await _dB.Events.Where
-            //}
 
             if (!result.Any())
             {
@@ -394,7 +384,9 @@ namespace Project.APIs.Services
 
             string member = result.FirstOrDefault()!.Event!.Society.Member;
 
+
             return result.Select(er => new RequisitionDetailsForSA()
+
             {
                 Id = er.Id,
                 RequestedDate = er.RequestedDate,
@@ -637,9 +629,15 @@ namespace Project.APIs.Services
             if (societyId == Guid.Empty)
                 throw new NotFoundException("Society not found");
 
-            var acceptedRequisition = await _dB.EventRequisitions
-                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J"
-                    && er.Events.FirstOrDefault()!.SocietyId == societyId)
+            var requisitions = await _dB.EventRequisitions
+                .Include(er => er.Events)
+                .ThenInclude(e => e.Requirements)
+                .Where(er => er.Events.FirstOrDefault()!.SocietyId == societyId).ToListAsync();
+
+            if (!requisitions.Any()) throw new NotFoundException("Requisition history not found");
+
+            var acceptedRequisition = requisitions
+                    .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")
                     .Select(er => new
                     {
                         er.Id,
@@ -648,7 +646,7 @@ namespace Project.APIs.Services
                         EventDate = er.Events.FirstOrDefault()!.EventDate,
                         StartTime = er.Events.FirstOrDefault()!.StartTime,
                         EndTime = er.Events.FirstOrDefault()!.EndTime,
-                        Requirements = er.Events.FirstOrDefault()!.Requirements.ToList(),
+                        Requirements = er.Events.FirstOrDefault()?.Requirements?.ToList() ?? new List<EventRequirement>(),
                         er.Status,
                         er.RequestedDate,
                         er.AllocatedDate,
@@ -656,8 +654,7 @@ namespace Project.APIs.Services
                         er.AllocatedAmount,
                         er.BiitContribution
                     })
-                    .AsNoTracking()
-                    .ToListAsync();
+                    .ToList();
 
             var dto = acceptedRequisition
                     .Select(er => new EventRequisitionHistoryForCP()
@@ -683,7 +680,13 @@ namespace Project.APIs.Services
 
         // SA History
         public async Task<List<EventRequisitionHistoryForSA>> GetEventRequisitionHistoryForSA()
+        //public async Task<List<EventRequisition>> GetEventRequisitionHistoryForSA()
         {
+            //var result1 = await _dB.EventRequisitions
+            //    .Include(er => er.Events)
+            //    .Where(er => er.Status != "A")
+            //    .ToListAsync();
+
             var result = await _dB.EventRequisitions
                     .Where(er => er.Status != "A")
                     .Where(er => er.Events.Any(e => e.VirtualSocietyId == null))
@@ -710,7 +713,7 @@ namespace Project.APIs.Services
                     })
                     .AsNoTracking()
                     .ToListAsync();
-
+            if (result == null) throw new NotFoundException("History not found");
 
             var acceptedRequisition = result
                 .Select(er => new EventRequisitionHistoryForSA()
@@ -732,6 +735,27 @@ namespace Project.APIs.Services
                 })
                 .ToList();
 
+            //var acceptedRequisition = result1
+            //.Select(er => new EventRequisitionHistoryForSA()
+            //{
+            //    RequisitionId = result1.,
+            //    SocietyName = er.SocietyName,
+            //    EventName = er.EventName,
+            //    EventDate = er.EventDate,
+            //    StartTime = er.StartTime,
+            //    EndTime = er.EndTime,
+            //    RequisitionStatus = StatusMap.GetValueOrDefault(er.Status, "Unknown"),
+            //    RequestedDate = er.RequestedDate,
+            //    AllocatedDate = er.AllocatedDate,
+            //    RequestedAmount = er.RequestAmount,
+            //    AllocatedAmount = er.AllocatedAmount,
+            //    BiitContribution = er.BiitContribution,
+            //    ReviewMessage = er.ReviewMessage,
+            //    Requirements = er.Requirements
+            //})
+            //.ToList();
+
+            //return result1;
             return acceptedRequisition;
         }
 
