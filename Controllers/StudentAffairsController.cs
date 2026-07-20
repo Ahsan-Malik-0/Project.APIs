@@ -80,6 +80,13 @@ namespace Project.APIs.Controllers
             return Ok(chairpersonList);
         }
 
+        [HttpGet("getVirtualSocietiesDetails")]
+        public async Task<IActionResult> GetVirtualSocietiesDetails()
+        {
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
+            return Ok(remainingAmount);
+        }
+
         // Handle Profile Endpoints --------------------------------------------------------
         //View Profile
         [HttpGet("viewProfile/{memberId:guid}")]

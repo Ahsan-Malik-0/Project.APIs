@@ -23,6 +23,14 @@ namespace Project.APIs.Model.DTOs
         public EventRequisition? VirtualSocietyRequisition { get; set; }
     }
 
+    public class GetVirtualSocietyDetailsForFinanceDto
+    {
+        public Guid VirtualSocietyId { get; set; }
+        public required string VirtualSocietyName { get; set; }
+        public decimal TotalContribution { get; set; }
+        public List<ContributedSocietiesDto>? ContributedSocieties { get; set; }
+    }
+
     public class ContributedSocietiesDto
     {
         public string? SocietyName { get; set; }

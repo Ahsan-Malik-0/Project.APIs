@@ -17,7 +17,7 @@ namespace Project.APIs.Services
                     throw new NotFoundException("Member not found");
 
                 else if (member!.Role != "chairperson")
-                    throw new BusinessRuleException("Member can not be other then chairperson");
+                    throw new BusinessRuleException("Manager can not be other then chairperson");
 
                 VirtualSociety virtualSociety = new VirtualSociety()
                 {
@@ -63,13 +63,21 @@ namespace Project.APIs.Services
                         .Include(e => e.Requirements)
                         .ToList(),
                 Requisition = _dB.EventRequisitions
-                        .FirstOrDefault(er => er.Events!.FirstOrDefault()!.RequisitionId == vs.Id)
+                        .FirstOrDefault(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id)
             })
             .AsNoTracking()
             .ToListAsync();
 
             if (result == null)
                 throw new NotFoundException("No virtual society found");
+
+            foreach(var item in result)
+            {
+                if(item.Requisition != null)
+                {
+                    item.Requisition.Status = StatusMap.GetValueOrDefault(item.Requisition.Status, "Unknown");
+                }
+            }
 
             var virtualSocieties = result
                 .Select(r => new GetVirtualSocietyDetailsDto()
@@ -88,6 +96,66 @@ namespace Project.APIs.Services
                         Conrtibution = cs.Contribution,
                     }).ToList(),
                     VirtualSocietyRequisition = r.Requisition
+                }).ToList();
+
+            return virtualSocieties;
+
+        }
+
+        public async Task<List<GetVirtualSocietyDetailsForFinanceDto>> GetVirtualSocietiesDetailsForFinance()
+        {
+            // get those requisitions which status is equal to E along with their societies
+            var requisitionIds = await _dB.Events.Where(e => e.SocietyId == null && e.RequisitionId != null).Select(e => e.RequisitionId).ToListAsync();
+
+            if (requisitionIds == null)
+                throw new NotFoundException("Requisitions not found");
+
+            var requisitions = await _dB.EventRequisitions
+                .Where(er => requisitionIds.Contains(er.Id) && er.Status == "E")
+                .ToListAsync();
+
+            if (requisitions == null)
+                throw new NotFoundException("Requisitions not found");
+
+
+
+            var result = await _dB.VirtualSocieties
+            .Select(vs => new
+            {
+                vs.Id,
+                vs.Name,
+                vs.MemberId,
+                vs.TotalContribution,
+                vs.RegistrationEndDate,
+                ContributedSocieties = _dB.VirtualSocietyContributions
+                .Where(vsc => vsc.VirtualSocietyId == vs.Id)
+                .Select(vsc => new
+                {
+                    vsc.Society!.Name,
+                    vsc.Society!.Members!.FirstOrDefault(m => m.Role == "chairperson")!.Id,
+                    vsc.Contribution
+                }).ToList(),
+            })
+            .AsNoTracking()
+            .ToListAsync();
+
+            if (result == null)
+                throw new NotFoundException("No virtual society found");
+
+
+            var virtualSocieties = result
+                .Select(r => new GetVirtualSocietyDetailsForFinanceDto()
+                {
+                    VirtualSocietyId = r.Id,
+                    VirtualSocietyName = r.Name,
+                    TotalContribution = r.TotalContribution,
+                    ContributedSocieties = r.ContributedSocieties
+                    .Select(cs => new ContributedSocietiesDto
+                    {
+                        SocietyName = cs.Name,
+                        Chairpersonid = cs.Id,
+                        Conrtibution = cs.Contribution,
+                    }).ToList()
                 }).ToList();
 
             return virtualSocieties;

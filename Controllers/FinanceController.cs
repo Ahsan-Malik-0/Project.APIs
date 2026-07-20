@@ -7,7 +7,7 @@ namespace Project.APIs.Controllers.CRUD
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FinanceController(EventRequisitionService eventRequisitionService, MemberService memberService, EventAuditService eventAuditService) : ControllerBase
+    public class FinanceController(EventRequisitionService eventRequisitionService, MemberService memberService, EventAuditService eventAuditService, VirtualSocietyService virtualSocietyService) : ControllerBase
     {
         [HttpGet("ViewEventRequisitionDetails")]
         public async Task<IActionResult> ViewPendingRequisitions()
@@ -89,6 +89,15 @@ namespace Project.APIs.Controllers.CRUD
 
             await eventAuditService.UpdateAuditStatus(auditId, status);
             return Ok();
+        }
+
+        // Handle Virtual Society Endpoints --------------------------------------------------------
+        // Get Details
+        [HttpGet("getVirtualSocietiesDetails")]
+        public async Task<IActionResult> GetVirtualSocietiesDetails()
+        {
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
+            return Ok(remainingAmount);
         }
 
 
