@@ -9,6 +9,13 @@ namespace Project.APIs.Model.DTOs
         public string? Description { get; set; }
         public DateTime RegistrationEndDate { get; set; }
         public Guid MemberId { get; set; }
+
+
+        //Added by jason on tuesday
+
+        public Guid ChairpersonId { get; set; }
+
+        public List<Guid> MembersId { get; set; }
     }
 
     public class GetVirtualSocietyDetailsDto

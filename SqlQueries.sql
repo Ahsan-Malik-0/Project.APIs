@@ -237,3 +237,17 @@ SELECT * FROM VirtualSocietyContributions
 DELETE VirtualSocietyContributions -- DELETE DATA
 DROP TABLE VirtualSocietyContributions -- DELETE TABLE
 
+
+
+
+
+        -- Added by jason on tuesday
+
+CREATE TABLE VirtualSocietyMembers(
+	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+	VirtualSocietyId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (VirtualSocietyId) REFERENCES VirtualSocieties(Id),
+	MemberIdId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (MemberIdId) REFERENCES Members(Id)
+)
+
