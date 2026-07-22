@@ -216,6 +216,7 @@ namespace Project.APIs.Services
                 existingEvent.EventDate = dto.EventDate;
                 existingEvent.ReviewMessage = "";
 
+
                 if (existingEvent.Status == "rejected" || existingEvent.Status == "postponed")
                     existingEvent.Status = "pending";
 

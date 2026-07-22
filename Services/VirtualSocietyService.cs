@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
@@ -310,15 +311,25 @@ namespace Project.APIs.Services
 
                 vertialSociety.TotalContribution += contributeToVC.Contribution;
 
-                // Add row in VirtualSocietyContributions table
-                VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
-                {
-                    Contribution = contributeToVC.Contribution,
-                    VirtualSocietyId = contributeToVC.VirtualSocietyId,
-                    SocietyId = societyIdValue
-                };
+                var existingContribution = await _dB.VirtualSocietyContributions
+                   .FirstOrDefaultAsync(vsc => vsc.VirtualSocietyId == contributeToVC.VirtualSocietyId && vsc.SocietyId == societyIdValue);
 
-                await _dB.VirtualSocietyContributions.AddAsync(virtualSocietyContribution);
+                if (existingContribution == null)
+                    throw new NotFoundException("Not found.");
+
+                existingContribution.Contribution = contributeToVC.Contribution;
+
+
+
+                //// Add row in VirtualSocietyContributions table
+                //VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
+                //{
+                //    Contribution = contributeToVC.Contribution,
+                //    VirtualSocietyId = contributeToVC.VirtualSocietyId,
+                //    SocietyId = societyIdValue
+                //};
+
+                //await _dB.VirtualSocietyContributions.AddAsync(virtualSocietyContribution);
 
                 await _dB.SaveChangesAsync();
                 await transaction.CommitAsync();
