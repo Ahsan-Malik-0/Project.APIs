@@ -8,12 +8,50 @@ namespace Project.APIs.Services
 {
     public class VirtualSocietyService(DB _dB, EventService eventService)
     {
+        //public async Task CreateVirtualSociety(CreateVirtualSocietyDto newVirtualSociety)
+        //{
+        //    try
+        //    {
+        //        var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == newVirtualSociety.MemberId);
+        //        if(member == null)
+        //            throw new NotFoundException("Member not found");
+
+        //        else if (member!.Role != "chairperson")
+        //            throw new BusinessRuleException("Manager can not be other then chairperson");
+
+        //        VirtualSociety virtualSociety = new VirtualSociety()
+        //        {
+        //            Name = newVirtualSociety.Name,
+        //            Description = newVirtualSociety.Description ?? null,
+        //            RegistrationEndDate = newVirtualSociety.RegistrationEndDate,
+        //            MemberId = newVirtualSociety.MemberId,
+        //        };
+
+        //        await _dB.VirtualSocieties.AddAsync(virtualSociety);
+        //        await _dB.SaveChangesAsync();
+
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        throw new BusinessRuleException("Unable to save requisition. Please try again.");
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw; // goes to 500 handler
+        //    }
+        //}
+
+
+
+
         public async Task CreateVirtualSociety(CreateVirtualSocietyDto newVirtualSociety)
         {
+
+            using var transaction = await _dB.Database.BeginTransactionAsync();
             try
             {
-                var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == newVirtualSociety.MemberId);
-                if(member == null)
+                var member = await _dB.Members.FirstOrDefaultAsync(m => m.Id == newVirtualSociety.ChairpersonId);
+                if (member == null)
                     throw new NotFoundException("Member not found");
 
                 else if (member!.Role != "chairperson")
@@ -24,11 +62,31 @@ namespace Project.APIs.Services
                     Name = newVirtualSociety.Name,
                     Description = newVirtualSociety.Description ?? null,
                     RegistrationEndDate = newVirtualSociety.RegistrationEndDate,
-                    MemberId = newVirtualSociety.MemberId,
+                    MemberId = newVirtualSociety.ChairpersonId,
                 };
 
                 await _dB.VirtualSocieties.AddAsync(virtualSociety);
                 await _dB.SaveChangesAsync();
+
+                if (newVirtualSociety.SocietyIds == null || newVirtualSociety.SocietyIds.Count == 0) throw new NotFoundException("Socities not found");
+
+                foreach (var SocietyId in newVirtualSociety.SocietyIds)
+                {
+
+                    VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
+                    {
+                        Contribution = 0,
+                        VirtualSocietyId = virtualSociety.Id,
+                        SocietyId = SocietyId
+                    };
+
+                    await _dB.VirtualSocietyContributions.AddAsync(virtualSocietyContribution);
+                }
+
+
+                await _dB.SaveChangesAsync();
+                await transaction.CommitAsync();
+
             }
             catch (DbUpdateException)
             {

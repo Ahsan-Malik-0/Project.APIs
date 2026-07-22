@@ -3,19 +3,26 @@ using System.Text.Json.Serialization;
 
 namespace Project.APIs.Model.DTOs
 {
+    //public class CreateVirtualSocietyDto
+    //{
+    //    public required string Name { get; set; }
+    //    public string? Description { get; set; }
+    //    public DateTime RegistrationEndDate { get; set; }
+    //    public Guid MemberId { get; set; }
+    //
+    //}
+
+
+
     public class CreateVirtualSocietyDto
     {
         public required string Name { get; set; }
         public string? Description { get; set; }
         public DateTime RegistrationEndDate { get; set; }
-        public Guid MemberId { get; set; }
-
-
-        //Added by jason on tuesday
 
         public Guid ChairpersonId { get; set; }
 
-        public List<Guid> MembersId { get; set; }
+        public List<Guid>? SocietyIds { get; set; }
     }
 
     public class GetVirtualSocietyDetailsDto

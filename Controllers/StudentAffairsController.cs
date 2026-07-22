@@ -8,7 +8,7 @@ namespace Project.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService, VirtualSocietyService virtualSocietyService) : ControllerBase
+    public class StudentAffairsController(EventRequisitionService eventRequisitionService, MemberService memberService, VirtualSocietyService virtualSocietyService, SocietyService societyService) : ControllerBase
     {
         //// Handle Event Requisition Endpoints --------------------------------------------------------
         [HttpGet("ViewPendingRequisitions")]
@@ -79,6 +79,14 @@ namespace Project.APIs.Controllers
             var chairpersonList = await virtualSocietyService.GetChairpersonsListForVS();
             return Ok(chairpersonList);
         }
+
+        [HttpGet("getSocietiesListForVS")]
+        public async Task<IActionResult> GetSocietiesList()
+        {
+            var societiesList = await societyService.GetAllSocieties();
+            return Ok(societiesList);
+        }
+
 
         [HttpGet("getVirtualSocietiesDetails")]
         public async Task<IActionResult> GetVirtualSocietiesDetails()
