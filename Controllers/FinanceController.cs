@@ -96,7 +96,7 @@ namespace Project.APIs.Controllers.CRUD
         [HttpGet("getVirtualSocietiesDetails")]
         public async Task<IActionResult> GetVirtualSocietiesDetails()
         {
-            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetails();
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesDetailsForFinance();
             return Ok(remainingAmount);
         }
 

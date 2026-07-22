@@ -3,6 +3,7 @@ using Project.APIs.Database;
 using Project.APIs.Exceptions;
 using Project.APIs.Model;
 using Project.APIs.Model.DTOs;
+using System.Net.WebSockets;
 
 namespace Project.APIs.Services
 {
@@ -105,17 +106,17 @@ namespace Project.APIs.Services
         public async Task<List<GetVirtualSocietyDetailsForFinanceDto>> GetVirtualSocietiesDetailsForFinance()
         {
             // get those requisitions which status is equal to E along with their societies
-            var requisitionIds = await _dB.Events.Where(e => e.SocietyId == null && e.RequisitionId != null).Select(e => e.RequisitionId).ToListAsync();
+            //var requisitionIds = await _dB.Events.Where(e => e.SocietyId == null && e.RequisitionId != null).Select(e => e.RequisitionId).ToListAsync();
 
-            if (requisitionIds == null)
-                throw new NotFoundException("Requisitions not found");
+            //if (requisitionIds == null)
+            //    throw new NotFoundException("Requisitions not found");
 
-            var requisitions = await _dB.EventRequisitions
-                .Where(er => requisitionIds.Contains(er.Id) && er.Status == "E")
-                .ToListAsync();
+            //var requisitions = await _dB.EventRequisitions
+            //    .Where(er => requisitionIds.Contains(er.Id) && er.Status == "E")
+            //    .ToListAsync();
 
-            if (requisitions == null)
-                throw new NotFoundException("Requisitions not found");
+            //if (requisitions == null)
+            //    throw new NotFoundException("Requisitions not found");
 
 
 
@@ -135,6 +136,8 @@ namespace Project.APIs.Services
                     vsc.Society!.Members!.FirstOrDefault(m => m.Role == "chairperson")!.Id,
                     vsc.Contribution
                 }).ToList(),
+                RequisitionId = _dB.EventRequisitions
+                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id && er.Status == "E").Select(er => er.Id).FirstOrDefault()
             })
             .AsNoTracking()
             .ToListAsync();
@@ -142,8 +145,9 @@ namespace Project.APIs.Services
             if (result == null)
                 throw new NotFoundException("No virtual society found");
 
+            var result2 = result.Where(r => r.RequisitionId != Guid.Empty).ToList();
 
-            var virtualSocieties = result
+            var virtualSocieties = result2
                 .Select(r => new GetVirtualSocietyDetailsForFinanceDto()
                 {
                     VirtualSocietyId = r.Id,
@@ -155,7 +159,8 @@ namespace Project.APIs.Services
                         SocietyName = cs.Name,
                         Chairpersonid = cs.Id,
                         Conrtibution = cs.Contribution,
-                    }).ToList()
+                    }).ToList(),
+                    RequisitionId = r.RequisitionId
                 }).ToList();
 
             return virtualSocieties;
@@ -274,7 +279,7 @@ namespace Project.APIs.Services
 
         public async Task CreateVirtualSocietyEvents(AddEventDto newEvent)
         {
-            await eventService.AddEvent(newEvent, "vs");
+            await eventService.AddEvent(newEvent, "pending");
         }
 
         public async Task<List<ChairpersonDetailsForVirtualSocietyDto>> GetChairpersonsListForVS()
