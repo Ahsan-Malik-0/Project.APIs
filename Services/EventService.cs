@@ -51,7 +51,7 @@ namespace Project.APIs.Services
                 // Check if conflicting event exists
                 // Step 1: get non-financial requirement names from new event
                 var newNonFinancialReqNames = newEvent.Requirements
-                    .Where(r => r.Type == "non-financial")
+                    .Where(r => r.Type == "non-financial" && r.Type == "suggestedEvent")
                     .Select(r => r.Name)
                     .ToList();
 
@@ -92,10 +92,16 @@ namespace Project.APIs.Services
                     );
                 }
 
-                if (newEvent.SocietyId != null && newEvent.VirtualSocietyId != null)
+                if (status == "suggestedEvent")
                 {
-                    throw new BusinessRuleException(
-                        "Provide either SocietyId or VirtualSocietyId, not both.");
+                    if (newEvent.SocietyId == Guid.Empty || newEvent.VirtualSocietyId == Guid.Empty)
+                        throw new BusinessRuleException("Both Ids (societyId, virtualSocietyId) required");
+                }
+                else if (status == "pending")
+                {
+                    if (newEvent.SocietyId != null && newEvent.VirtualSocietyId != null)
+
+                        throw new BusinessRuleException("Provide either SocietyId or VirtualSocietyId, not both.");
                 }
 
                 var _event = new Event
@@ -159,7 +165,7 @@ namespace Project.APIs.Services
 
             // Step 1: get non-financial requirement names from new event
             var newNonFinancialReqNames = dto.Requirements
-                .Where(r => r.Type == "non-financial")
+                .Where(r => r.Type == "non-financial" && r.Type == "suggestedEvent")
                 .Select(r => r.Name)
                 .ToList();
 

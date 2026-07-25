@@ -348,7 +348,7 @@ namespace Project.APIs.Services
 
         public async Task CreateVirtualSocietyEvents(AddEventDto newEvent)
         {
-            await eventService.AddEvent(newEvent, "pending");
+            await eventService.AddEvent(newEvent, "suggestedEvent");
         }
 
         public async Task<List<ChairpersonDetailsForVirtualSocietyDto>> GetChairpersonsListForVS()
