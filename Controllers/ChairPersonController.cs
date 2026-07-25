@@ -20,6 +20,20 @@ namespace Project.APIs.Controllers
             return Ok(pendingEvents);
         }
 
+
+        [HttpPost("addEvent")]
+        public async Task<IActionResult> AddEvent([FromBody] AddEventDto newEvent)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _eventService.AddEvent(newEvent, "pending");
+            return Created();
+        }
+
+
         //Update Existing 
         [HttpPut("updateEvent/{eventId:guid}")]
         public async Task<IActionResult> UpdateEvent(Guid eventId, [FromBody] UpdateEventDto updateEventDto)

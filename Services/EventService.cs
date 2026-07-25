@@ -102,7 +102,7 @@ namespace Project.APIs.Services
                 {
                     Name = newEvent.Name,
                     StartTime = newEvent.StartTime,
-                    EndTime = newEvent.EndTime,
+                    //EndTime = newEvent.EndTime,
                     EventDate = newEvent.EventDate,
                     Status = status,
                     ReviewMessage = null,
