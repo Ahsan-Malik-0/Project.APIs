@@ -43,9 +43,6 @@ namespace Project.APIs.Services
         //    }
         //}
 
-
-
-
         public async Task CreateVirtualSociety(CreateVirtualSocietyDto newVirtualSociety)
         {
 
@@ -77,7 +74,7 @@ namespace Project.APIs.Services
 
                     VirtualSocietyContribution virtualSocietyContribution = new VirtualSocietyContribution()
                     {
-                        Contribution = 0,
+                        Contribution = -1,
                         VirtualSocietyId = virtualSociety.Id,
                         SocietyId = SocietyId
                     };
@@ -120,6 +117,7 @@ namespace Project.APIs.Services
                 }).ToList(),
                 Events = _dB.Events
                         .Where(e => e.VirtualSocietyId == vs.Id)
+                        .Include(e => e.Society)
                         .Include(e => e.Requirements)
                         .ToList(),
                 Requisition = _dB.EventRequisitions

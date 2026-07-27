@@ -326,6 +326,17 @@ namespace Project.APIs.Controllers
             return Ok();
         }
 
-        
+        // Handling Society Endpoints ---------------------------------------------------------------
+        // Get society id using member's id
+        [HttpGet("getSocietyId/{memberId:guid}")]
+        public async Task<IActionResult> GetSocietyId(Guid memberId)
+        {
+            if (memberId == Guid.Empty)
+                return BadRequest();
+
+            var societyId = await memberService.GetSocietyIdAsync(memberId);
+
+            return Ok(societyId);
+        }
     }
 }
