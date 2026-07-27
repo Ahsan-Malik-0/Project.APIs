@@ -227,6 +227,7 @@ namespace Project.APIs.Services
         public async Task<List<Event>> GetVirtualSocietyEvents(Guid virtualSocietyId)
         {
             var events = await _dB.Events
+                .Include(e => e.Society)
                 .Include(e => e.Requirements)
                 .Where(e => e.VirtualSocietyId == virtualSocietyId)
                 .ToListAsync();
