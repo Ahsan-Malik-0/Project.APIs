@@ -41,6 +41,7 @@ namespace Project.APIs.Model.DTOs
     {
         public Guid VirtualSocietyId { get; set; }
         public required string VirtualSocietyName { get; set; }
+        public required string ManagerName { get; set; }
         public decimal TotalContribution { get; set; }
         public List<ContributedSocietiesDto>? ContributedSocieties { get; set; }
         public EventRequisition? VirtualSocietyRequisition { get; set; }

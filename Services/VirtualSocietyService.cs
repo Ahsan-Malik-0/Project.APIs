@@ -53,7 +53,7 @@ namespace Project.APIs.Services
                 if (member == null)
                     throw new NotFoundException("Member not found");
 
-                else if (member!.Role != "chairperson")
+                else if (member.Role != "chairperson")
                     throw new BusinessRuleException("Manager can not be other then chairperson");
 
                 VirtualSociety virtualSociety = new VirtualSociety()
@@ -182,7 +182,7 @@ namespace Project.APIs.Services
             {
                 vs.Id,
                 vs.Name,
-                vs.MemberId,
+                ManagerName = _dB.Members.Where(m => m.Id == vs.MemberId).Select(m => m.Name).FirstOrDefault(),
                 vs.TotalContribution,
                 vs.RegistrationEndDate,
                 ContributedSocieties = _dB.VirtualSocietyContributions
@@ -218,6 +218,7 @@ namespace Project.APIs.Services
                 {
                     VirtualSocietyId = r.Id,
                     VirtualSocietyName = r.Name,
+                    ManagerName = r.ManagerName!,
                     TotalContribution = r.TotalContribution,
                     ContributedSocieties = r.ContributedSocieties
                     .Select(cs => new ContributedSocietiesDto
