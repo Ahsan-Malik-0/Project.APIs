@@ -194,7 +194,7 @@ namespace Project.APIs.Services
                     vsc.Contribution
                 }).ToList(),
                 Requisition = _dB.EventRequisitions
-                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id && er.Status == "E").FirstOrDefault()
+                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id && (er.Status == "E" || er.Status == "F" || er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")).FirstOrDefault()
             })
             .AsNoTracking()
             .ToListAsync();
