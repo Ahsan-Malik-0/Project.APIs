@@ -193,8 +193,8 @@ namespace Project.APIs.Services
                     vsc.Society!.Members!.FirstOrDefault(m => m.Role == "chairperson")!.Id,
                     vsc.Contribution
                 }).ToList(),
-                RequisitionId = _dB.EventRequisitions
-                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id && er.Status == "E").Select(er => er.Id).FirstOrDefault()
+                Requisition = _dB.EventRequisitions
+                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id && er.Status == "E").FirstOrDefault()
             })
             .AsNoTracking()
             .ToListAsync();
@@ -202,9 +202,18 @@ namespace Project.APIs.Services
             if (result == null)
                 throw new NotFoundException("No virtual society found");
 
-            var result2 = result.Where(r => r.RequisitionId != Guid.Empty).ToList();
+            foreach (var item in result)
+            {
+                if (item.Requisition != null)
+                {
+                    item.Requisition.Status = StatusMap.GetValueOrDefault(item.Requisition.Status, "Unknown");
+                }
+            }
 
-            var virtualSocieties = result2
+            //var result2 = result.Where(r => r.RequisitionId != Guid.Empty).ToList();
+
+            var virtualSocieties = result
+                .Where(r => r.Requisition != null)
                 .Select(r => new GetVirtualSocietyDetailsForFinanceDto()
                 {
                     VirtualSocietyId = r.Id,
@@ -217,7 +226,7 @@ namespace Project.APIs.Services
                         Chairpersonid = cs.Id,
                         Conrtibution = cs.Contribution,
                     }).ToList(),
-                    RequisitionId = r.RequisitionId
+                    VirtualSocietyRequisition = r.Requisition
                 }).ToList();
 
             return virtualSocieties;
@@ -549,7 +558,7 @@ namespace Project.APIs.Services
             ["B"] = "Reject By Student Affairs",
             ["C"] = "Approved By Student Affairs",
             ["D"] = "Reject By Admin",
-            ["E"] = "Approved By Admin",
+            ["E"] = "Approved By Student Affairs",
             ["F"] = "Reject By Finance",
             ["G"] = "Budget Released By Finance",
             ["H"] = "Event Completed",

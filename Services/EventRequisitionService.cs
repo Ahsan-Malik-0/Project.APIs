@@ -334,7 +334,7 @@ namespace Project.APIs.Services
             ["B"] = "Reject By Student Affairs",
             ["C"] = "Approved By Student Affairs",
             ["D"] = "Reject By Admin",
-            ["E"] = "Approved By Admin",
+            ["E"] = "Approved By Student Affairs",
             ["F"] = "Reject By Finance",
             ["G"] = "Budget Released By Finance",
             ["H"] = "Event Completed",
