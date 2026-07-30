@@ -160,6 +160,143 @@ namespace Project.APIs.Services
 
         }
 
+        public async Task<List<GetVirtualSocietyCompleteDetailsDto>> GetVirtualSocietiesCompleteDetails()
+        {
+            var result = await _dB.VirtualSocieties
+            .Select(vs => new
+            {
+                vs.Id,
+                vs.Name,
+                vs.MemberId,
+                vs.TotalContribution,
+                vs.RegistrationEndDate,
+                ContributedSocieties = _dB.VirtualSocietyContributions
+                .Where(vsc => vsc.VirtualSocietyId == vs.Id)
+                .Select(vsc => new
+                {
+                    vsc.Society!.Name,
+                    vsc.Society!.Members!.FirstOrDefault(m => m.Role == "chairperson")!.Id,
+                    vsc.Contribution
+                }).ToList(),
+                Events = _dB.Events
+                        .Where(e => e.VirtualSocietyId == vs.Id)
+                        .Include(e => e.Society)
+                        .Include(e => e.Requirements)
+                        .ToList(),
+                Requisition = _dB.EventRequisitions
+                        .FirstOrDefault(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id),
+                Audit = _dB.EventAudits
+                        .Include(ea => ea.Spends)
+                        .FirstOrDefault(ea => ea.RequisitionId == _dB.EventRequisitions
+                        .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == vs.Id)
+                        .Select(er => er.Id)
+                        .FirstOrDefault())
+
+            })
+            .AsNoTracking()
+            .ToListAsync();
+
+            if (result == null)
+                throw new NotFoundException("No virtual society found");
+
+            foreach (var item in result)
+            {
+                if (item.Requisition != null)
+                {
+                    item.Requisition.Status = StatusMap.GetValueOrDefault(item.Requisition.Status, "Unknown");
+                }
+            }
+
+            var virtualSocieties = result
+                .Select(r => new GetVirtualSocietyCompleteDetailsDto()
+                {
+                    VirtualSocietyId = r.Id,
+                    VirtualSocietyName = r.Name,
+                    RegistrationEndDate = r.RegistrationEndDate,
+                    ManagerId = r.MemberId,
+                    TotalContribution = r.TotalContribution,
+                    VirtualSocietyEvents = r.Events,
+                    ContributedSocieties = r.ContributedSocieties
+                    .Select(cs => new ContributedSocietiesDto
+                    {
+                        SocietyName = cs.Name,
+                        Chairpersonid = cs.Id,
+                        Conrtibution = cs.Contribution,
+                    }).ToList(),
+                    VirtualSocietyRequisition = r.Requisition,
+                    VirtualSocietyAudit = r.Audit
+                }).ToList();
+
+            return virtualSocieties;
+
+        }
+
+        public async Task Refund(Guid virtualSocietyId)
+        {
+            using var transaction = await _dB.Database.BeginTransactionAsync();
+
+            try
+            {
+                var virtualSociety = await _dB.VirtualSocieties
+                .FirstOrDefaultAsync(vs => vs.Id == virtualSocietyId);
+
+                if (virtualSociety == null)
+                    throw new NotFoundException("Virtual Society not found.");
+
+                var contributedSocieties = await _dB.VirtualSocietyContributions
+                    .Where(vsc => vsc.VirtualSocietyId == virtualSocietyId).ToListAsync();
+
+                if (contributedSocieties == null)
+                    throw new NotFoundException("Contributed Societies not found.");
+
+                var requisitionId = await _dB.EventRequisitions
+                            .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == virtualSocietyId)
+                            .Select(er => er.Id)
+                            .FirstOrDefaultAsync();
+
+                if (requisitionId == Guid.Empty)
+                    throw new NotFoundException("Requisition Id not found.");
+
+                var eventAudit = await _dB.EventAudits.Where(ea => ea.RequisitionId == requisitionId).FirstOrDefaultAsync();
+
+                if (eventAudit == null)
+                    throw new NotFoundException("Event Audit not found.");
+
+                if (eventAudit.Status == "Refunded")
+                    throw new BusinessRuleException("Refund has already been processed.");
+                else
+                    eventAudit.Status = "Refunded";
+
+                decimal remainingAmount = eventAudit.RemainingAmount;
+
+                foreach (var contribution in contributedSocieties)
+                {
+                    decimal con = contribution.Contribution == -1 ? 0 : contribution.Contribution;
+
+                    decimal percentage = con / virtualSociety.TotalContribution;
+
+                    decimal refund = remainingAmount * percentage;
+
+                    var yearlyBudget = await _dB.YearlyBudgets
+                        .FirstOrDefaultAsync(yb => yb.SocietyId == contribution.SocietyId);
+
+                    if (yearlyBudget != null)
+                    {
+                        yearlyBudget.Credits += refund;
+                    }
+                }
+
+                await _dB.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new BusinessRuleException(ex.Message);
+            }
+            
+        }
+
         public async Task<List<GetVirtualSocietyDetailsForFinanceDto>> GetVirtualSocietiesDetailsForFinance()
         {
             // get those requisitions which status is equal to E along with their societies
@@ -566,5 +703,8 @@ namespace Project.APIs.Services
             ["I"] = "Request For Audit",
             ["J"] = "Audit Cleared"
         };
+
+
+
     }
 }

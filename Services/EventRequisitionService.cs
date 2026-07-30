@@ -259,6 +259,7 @@ namespace Project.APIs.Services
         {
             var result = await _dB.EventRequisitions
                 .Where(er => er.Status != "H" && er.Status != "I" && er.Status != "J")
+                .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == null)
                 .Where(er => er.Events!.FirstOrDefault()!.Society!.Members!.Any(m => m.Id == memberId))
                 .Select(er => new
                 {
@@ -638,6 +639,7 @@ namespace Project.APIs.Services
 
             var acceptedRequisition = requisitions
                     .Where(er => er.Status == "G" || er.Status == "H" || er.Status == "I" || er.Status == "J")
+                    .Where(er => er.Events!.FirstOrDefault()!.VirtualSocietyId == null)
                     .Select(er => new
                     {
                         er.Id,

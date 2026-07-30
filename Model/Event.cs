@@ -15,6 +15,7 @@ namespace Project.APIs.Model
         public Guid? SocietyId { get; set; }
         public Society? Society { get; set; }
         public Guid? VirtualSocietyId { get; set; }
+        [JsonIgnore]
         public VirtualSociety? VirtualSociety { get; set; }
         public Guid? RequisitionId { get; set; }
         [JsonIgnore]

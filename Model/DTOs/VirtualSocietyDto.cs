@@ -37,6 +37,19 @@ namespace Project.APIs.Model.DTOs
         public EventRequisition? VirtualSocietyRequisition { get; set; }
     }
 
+    public class GetVirtualSocietyCompleteDetailsDto
+    {
+        public Guid VirtualSocietyId { get; set; }
+        public required string VirtualSocietyName { get; set; }
+        public DateTime RegistrationEndDate { get; set; }
+        public decimal TotalContribution { get; set; }
+        public Guid ManagerId { get; set; }
+        public List<Event>? VirtualSocietyEvents { get; set; }
+        public List<ContributedSocietiesDto>? ContributedSocieties { get; set; }
+        public EventRequisition? VirtualSocietyRequisition { get; set; }
+        public EventAudit? VirtualSocietyAudit { get; set; }
+    }
+
     public class GetVirtualSocietyDetailsForFinanceDto
     {
         public Guid VirtualSocietyId { get; set; }

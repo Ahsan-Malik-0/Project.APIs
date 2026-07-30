@@ -259,6 +259,20 @@ namespace Project.APIs.Controllers
             return Ok(remainingAmount);
         }
 
+        [HttpGet("getVirtualSocietiesCompleteDetail")]
+        public async Task<IActionResult> GetVirtualSocietiesCompleteDetail()
+        {
+            var remainingAmount = await virtualSocietyService.GetVirtualSocietiesCompleteDetails();
+            return Ok(remainingAmount);
+        }
+
+        [HttpPost("getVirtualSocietiesRefund/{virtualSocietyId}")]
+        public async Task<IActionResult> GetVirtualSocietiesRefund(Guid virtualSocietyId)
+        {
+            await virtualSocietyService.Refund(virtualSocietyId);
+            return Ok();
+        }
+
         [HttpGet("getVirtualSocietyEvents/{virtualSocietyId}")]
         public async Task<IActionResult> GetVirtualSocietyEvents(Guid virtualSocietyId)
         {
